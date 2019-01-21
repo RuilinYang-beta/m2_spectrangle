@@ -1,6 +1,5 @@
 package spectranglegame;
 
-
 import java.util.*;
 import java.util.List;
 import java.util.Arrays;
@@ -16,7 +15,7 @@ public class Bag {
     private static List<Character> right =       Arrays.asList('R', 'B', 'G', 'Y', 'P', 'R', 'R', 'B', 'B', 'G', 'G', 'Y', 'Y', 'P', 'P', 'R', 'R', 'B', 'B', 'G', 'G', 'Y', 'Y', 'P', 'P', 'Y', 'R', 'B', 'G', 'B', 'Y', 'Y', 'G', 'B', 'R', 'W');
 //	private String[] tiles = new String[36];
 	private List<String> tiles = new LinkedList<String>();
-	private MineTile tile;
+	private Tile tile;
     
 	/**
 	 * Constructs the bag of tiles
@@ -24,7 +23,7 @@ public class Bag {
     public Bag() {
     	for(int i = 0; i < 36; i++) {
    // 		tiles[i] = vertical.get(i).toString() + left.get(i).toString() + right.get(i).toString();
-    		tiles.add(vertical.get(i).toString() + left.get(i).toString() + right.get(i).toString() + values.get(i));
+    		tiles.add(right.get(i).toString() + vertical.get(i).toString() + left.get(i).toString() + values.get(i));
       	}
     }
     
@@ -43,28 +42,7 @@ public class Bag {
 //		}
 //	}
 //	
-    /*
-     * @ensures (tile.getRotation() == \old.tile.getRotation() + 1 || tile.getRotation() == 0) ;
-     * @ensures \old.tile.getVertical() == tile.getRight() && \old.tile.getLeft() == tile.getVertical() && \old.tile.getRight() == tile.getLeft();
-     */
-    /**
-     *  Function that rotates a tile with the tile given as a parameter
-	 * @param tile indicates the tile that will be rotated 
-	 */
-	public void rotate(MineTile tile) {
-		if(tile.getRotation() == 5) {
-			tile.rotate(0);
-		}else {
-			tile.rotate(tile.getRotation() +1);
-		}
-		char v = tile.getVertical();
-		char l = tile.getLeft();
-		char r = tile.getRight();
-		tile.putLeft(v);
-		tile.putRight(l);
-		tile.putVertical(r);
-	}
-	
+
 	/*
 	 * @requires i >= 0 && i < 36;
 	 */
@@ -72,10 +50,10 @@ public class Bag {
 	 * @param i index of the tile
 	 * @return A tile based on index
 	 */
-	public MineTile getTile(int i) {
+	public Tile getTile(int i) {
 		if (i >= 0 && i < tiles.size()) {
 	//		tile = new Tile(values.get(i), tiles[i]);
-			tile = new MineTile(values.get(i), tiles.get(i));
+			tile = new Tile(values.get(i), tiles.get(i));
 			return tile;
 		}
 		return null;
@@ -113,9 +91,9 @@ public class Bag {
      * @param tiles represents the string that creates the tile
      * @return object of the String
      */
-    public MineTile makeTile(String tiles) {
+    public Tile makeTile(String tiles) {
     	int i = getIndex(tiles);
-    	MineTile t = new MineTile(values.get(i), tiles);
+    	Tile t = new Tile(values.get(i), tiles);
     	return t;
     }
     
@@ -126,7 +104,7 @@ public class Bag {
      * Generates a random value for the tile
      * @return a random tile from the bag
      */
-    public MineTile randomTile() {
+    public Tile randomTile() {
     	Random rand = new Random();
     	int n = rand.nextInt(35) + 1;
     	return makeTile(this.tiles.get(n));
@@ -148,7 +126,7 @@ public class Bag {
     /*
      * @ensures tiles.size() == \old.tiles.size() - 1;
      */
-    public void removeTile(MineTile tile) {
+    public void removeTile(Tile tile) {
     	boolean ok = true;
     	for(String s : tiles) {
     		if(s.equals(tile.toString())) {
@@ -165,7 +143,7 @@ public class Bag {
      * @param tile is the tile that is checked
      * @return true if the tile is a valid tile from the bag, or false in case it is not
      */
-    public boolean isValidTile(MineTile tile) {
+    public boolean isValidTile(Tile tile) {
     	for(String s : tiles) {
     		if(s.equals(tile.toString())) {
     			return true;
@@ -177,14 +155,17 @@ public class Bag {
     
 	public static void main(String[] args) {
 		Bag t = new Bag();
-		MineTile t1 = new MineTile(3, "RGB");
-		t.showtiles();
-		t.rotate(t1);
-//		t.rotate(t1);
-//		t.rotate(t1);
-//		t.rotate(t1);
-//		t.rotate(t1);
-//		t.rotate(t1);
-//		System.out.println(t1.stringTile());
+		Tile t1 = new Tile(3, "RGB");
+	//	System.out.println(t1.getLeft());
+		//t.showtiles();
+		t1.rotateTile();
+//		//System.out.println(t1.getLeft());
+		t1.rotateTile();
+		t1.rotateTile();
+		t1.rotateTile();
+		t1.rotateTile();
+		t1.rotateTile();
+		System.out.println(t1.stringTile());
 	}
+
 }

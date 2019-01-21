@@ -43,6 +43,36 @@ public class Tile {
 		this.vertical = v;
 	}
 	
+    /*
+     * @ensures (tile.getRotation() == \old.tile.getRotation() + 1 || tile.getRotation() == 0) ;
+     * @ensures \old.tile.getVertical() == tile.getRight() && \old.tile.getLeft() == tile.getVertical() && \old.tile.getRight() == tile.getLeft();
+     */
+    /**
+     *  Function that rotates a tile with the tile given as a parameter
+	 * @param tile indicates the tile that will be rotated 
+	 */
+	public void rotateTile() {
+		if (this.getRotation() % 2 == 0) {
+			char v = getVertical();
+			char l = getLeft();
+			putLeft(v);
+			putVertical(l);
+			this.rotate(this.getRotation() + 1);
+		} else {
+			char v = getVertical();
+			char l = getLeft();
+			char r = getRight();
+			putLeft(l);
+			putRight(v);
+			putVertical(r);
+			if (this.getRotation() == 5) {
+				this.rotate(0);
+			} else {
+				this.rotate(this.getRotation() + 1);
+			}
+		}
+	}
+	
 	/*
 	 * @ensures \result == this.left;
 	 */
@@ -119,28 +149,32 @@ public class Tile {
 		case 0:
 			return "" + rotation + right + vertical + left + value;
 		case 1:
-			return "" + rotation + left + vertical + right + value;
+			return "" + rotation + right + left + vertical + value;
 		case 2:
-			return "" + rotation  + left + right + vertical + value;
+			return "" + rotation + vertical + left + right + value;
 		case 3:
-			return "" + rotation + right + vertical + left  + value;
+			return "" + rotation + left + vertical + right + value;
 		case 4:
-			return "" + rotation + vertical + left + right  + value;
-		case 5:
 			return "" + rotation + left + right + vertical + value;
+		case 5:
+			return "" + rotation + vertical + right + left + value;
 		}
 		return null;
 	}
 	
-	 public String toString(Tile tile) {
-	    	return "" + tile.stringTile().charAt(1) + tile.stringTile().charAt(2) + tile.stringTile().charAt(3) + tile.stringTile().charAt(4);
+	 public String toString() {
+	    return "" + stringTile().charAt(1) + stringTile().charAt(2) + stringTile().charAt(3) + stringTile().charAt(4);
+	 }
+	 
+	 public void tileRepresentation() {
+		 
 	 }
 	 
 	public static void main(String[] args) {
 		Tile t = new Tile(3,"RGB");
 		String s = t.stringTile();
 		System.out.println(s);
+		System.out.println(t.toString());
 	}
 
 }
-

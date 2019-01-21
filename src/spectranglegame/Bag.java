@@ -16,6 +16,11 @@ public class Bag {
 	private List<String> tiles = new LinkedList<String>();
 	private Tile tile;
     
+	
+	
+	public List<String> getTiles() {
+		return tiles;
+	}
 
 	/**
 	 * Constructs the bag of tiles
@@ -26,14 +31,6 @@ public class Bag {
       	}
     }
     
-    
-	/**
-	 * @return this.tiles;
-	 */
-	public List<String> getTiles() {
-		return tiles;
-	}
-	
     /*
      * Rotates the tile with the given input
      * @param i is the index of the tile that needs to be rotated

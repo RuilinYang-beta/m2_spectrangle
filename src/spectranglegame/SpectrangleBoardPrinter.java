@@ -3,15 +3,23 @@ package spectranglegame;
 import java.util.*;
 import java.util.stream.Stream;
 
+import spectranglegame.Bag;
+import spectranglegame.SpectrangleBoardPrinter;
+import spectranglegame.Tile;
+
 public class SpectrangleBoardPrinter {
     private static List<Integer> bonuses =       Arrays.asList(1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 4, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2, 1, 1, 1, 3, 1);
-    private static List<Integer> values =        Arrays.asList(5,   null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-    private static List<Character> vertical =    Arrays.asList('R', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-    private static List<Character> left =        Arrays.asList('G', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-    private static List<Character> right =       Arrays.asList('B', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-
+    private static List<Integer> values =        Arrays.asList(null,   null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+    private static List<Character> vertical =    Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+    private static List<Character> left =        Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+    private static List<Character> right =       Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+    private static Bag t = new Bag();
+    
     public static void main(String[] args) {
-        // This is an example of how to use the function below.
+        // This is an example of a random tile put on the board.
+        Tile tile = t.randomTile();
+        SpectrangleBoardPrinter t12 = new SpectrangleBoardPrinter();
+        t12.putTile(tile);
         System.out.println(getBoardString(values, vertical, left, right));
     }
 
@@ -113,5 +121,14 @@ public class SpectrangleBoardPrinter {
         for(int i = 0; i < values.size(); i++){ indexed_values.put(i, inputList.get(i)); }
         return indexed_values;
     }
+    
+    public void putTile(Tile tile) {
+   	 int i = t.getIndex(tile.toString());
+        values.set(i, tile.getValue());
+        vertical.set(i, tile.getVertical());
+        left.set(i, tile.getLeft());
+        right.set(i, tile.getRight());
+    }
+    
 }
 

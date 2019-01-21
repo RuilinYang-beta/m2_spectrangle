@@ -13,7 +13,6 @@ public class Bag {
     private static List<Character> vertical =    Arrays.asList('R', 'B', 'G', 'Y', 'P', 'R', 'R', 'B', 'B', 'G', 'G', 'Y', 'Y', 'P', 'P', 'R', 'R', 'B', 'B', 'G', 'G', 'Y', 'Y', 'P', 'P', 'B', 'G', 'G', 'R', 'R', 'P', 'P', 'R', 'Y', 'Y', 'W');
     private static List<Character> left =        Arrays.asList('R', 'B', 'G', 'Y', 'P', 'Y', 'P', 'R', 'P', 'R', 'B', 'G', 'B', 'Y', 'G', 'B', 'G', 'G', 'Y', 'Y', 'P', 'R', 'P', 'R', 'B', 'P', 'Y', 'P', 'B', 'P', 'R', 'G', 'P', 'G', 'B', 'W');
     private static List<Character> right =       Arrays.asList('R', 'B', 'G', 'Y', 'P', 'R', 'R', 'B', 'B', 'G', 'G', 'Y', 'Y', 'P', 'P', 'R', 'R', 'B', 'B', 'G', 'G', 'Y', 'Y', 'P', 'P', 'Y', 'R', 'B', 'G', 'B', 'Y', 'Y', 'G', 'B', 'R', 'W');
-//	private String[] tiles = new String[36];
 	private List<String> tiles = new LinkedList<String>();
 	private Tile tile;
     
@@ -22,7 +21,6 @@ public class Bag {
 	 */
     public Bag() {
     	for(int i = 0; i < 36; i++) {
-   // 		tiles[i] = vertical.get(i).toString() + left.get(i).toString() + right.get(i).toString();
     		tiles.add(right.get(i).toString() + vertical.get(i).toString() + left.get(i).toString() + values.get(i));
       	}
     }
@@ -156,10 +154,7 @@ public class Bag {
 	public static void main(String[] args) {
 		Bag t = new Bag();
 		Tile t1 = new Tile(3, "RGB");
-	//	System.out.println(t1.getLeft());
-		//t.showtiles();
 		t1.rotateTile();
-//		//System.out.println(t1.getLeft());
 		t1.rotateTile();
 		t1.rotateTile();
 		t1.rotateTile();

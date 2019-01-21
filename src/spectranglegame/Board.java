@@ -15,14 +15,13 @@ public class Board {
 	
 	private static final List<Integer> bonuses =       Arrays.asList(1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 4, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2, 1, 1, 1, 3, 1);
     // better to remove these fields, Board only maintain Tile[]. for better encapsulation.
-	private static List<Integer> values =        Arrays.asList(5,   null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-    private static List<Character> vertical =    Arrays.asList('R', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-    private static List<Character> left =        Arrays.asList('G', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-    private static List<Character> right =       Arrays.asList('B', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+//	private static List<Integer> values =        Arrays.asList(5,   null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+//    private static List<Character> vertical =    Arrays.asList('R', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+//    private static List<Character> left =        Arrays.asList('G', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+//    private static List<Character> right =       Arrays.asList('B', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     
-    // an array of current tiles on board
-    // null if a field does not has a tile
- 	private MineTile[] tilesOnBoard = new MineTile[36];
+    // an array of current tiles on board, null if a field does not has a tile
+ 	private Tile[] tilesOnBoard = new Tile[36];
  	// an helper array of getRCIdex
  	private Integer[] accumlatedNum = {1, 4, 9, 16, 25, 36};
  	
@@ -136,11 +135,11 @@ public class Board {
 		String[] surroundings = new String[4];
 		// can be read to boolean using Boolean.parseBoolean(surroundings[0]);
 		surroundings[0] = (isFacingUp)? "true" : "false";
-		surroundings[1] = (isLegalIdx(vNeighborIdx)) ? getTile(getOneDimIndex(vNeighborIdx)).getvColor() : null;
+		surroundings[1] = (isLegalIdx(vNeighborIdx)) ? "" + getTile(getOneDimIndex(vNeighborIdx)).getVertical() : null;
 		// the surrounding color of left boarder should be the **right** color of the left neighbor
-		surroundings[2] = (isLegalIdx(lNeighborIdx)) ? getTile(getOneDimIndex(lNeighborIdx)).getrColor() : null;
+		surroundings[2] = (isLegalIdx(lNeighborIdx)) ? "" + getTile(getOneDimIndex(lNeighborIdx)).getRight() : null;
 		// the surrounding color of right boarder should be the **left** color of the left neighbor
-		surroundings[3] = (isLegalIdx(rNeighborIdx)) ? getTile(getOneDimIndex(rNeighborIdx)).getlColor() : null;
+		surroundings[3] = (isLegalIdx(rNeighborIdx)) ? "" + getTile(getOneDimIndex(rNeighborIdx)).getLeft() : null;
 		
 //		return neighbors;
 		return surroundings;
@@ -179,7 +178,7 @@ public class Board {
 	 * @param i The index of the tile.
 	 * @return The tile of that index. 
 	 */
-	public MineTile getTile(int i) {
+	public Tile getTile(int i) {
 		return tilesOnBoard[i];
 	}
 	
@@ -187,7 +186,7 @@ public class Board {
 	 * @param i The index you want to put a tile on.
 	 * @param t The tile object.
 	 */
-	public void setTile(int i, MineTile t) {
+	public void setTile(int i, Tile t) {
 		this.tilesOnBoard[i] = t;
 	}
 	
@@ -195,7 +194,4 @@ public class Board {
 		Arrays.fill(tilesOnBoard, null);
 	}
 	
-	public static void main(String[] args) {
-		//
-	}
 }

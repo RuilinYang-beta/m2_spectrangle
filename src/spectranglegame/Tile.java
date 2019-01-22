@@ -86,7 +86,7 @@ public class Tile {
 				this.rotate(this.getRotation() + 1);
 			}
 		}
-	}
+	} 
 	
 	/*
 	 * @ensures \result == this.left;
@@ -183,6 +183,12 @@ public class Tile {
 	 
 	 public void tileRepresentation() {
 		 
+	 }
+	 
+	 @Override
+	 protected Tile clone() throws CloneNotSupportedException {
+
+	     return (Tile) super.clone();
 	 }
 	 
 	public static void main(String[] args) {

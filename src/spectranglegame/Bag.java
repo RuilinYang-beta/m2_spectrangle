@@ -21,11 +21,11 @@ public class Bag {
 	/**
 	 * Constructs the bag of tiles
 	 */
-//    public Bag() {
-//    	for(int i = 0; i < 36; i++) {
-//    		tilesString.add(right.get(i).toString() + vertical.get(i).toString() + left.get(i).toString() + values.get(i));
-//      	}
-//    }
+    public Bag() {
+    	for(int i = 0; i < 36; i++) {
+    		tilesString.add(right.get(i).toString() + vertical.get(i).toString() + left.get(i).toString() + values.get(i));
+      	}
+    }
 	
     /**
      * An alternative constructor that populates List<Tile> tiles with Tiles object.
@@ -139,7 +139,7 @@ public class Bag {
      */
     public Tile randomTile() {
     	Random rand = new Random();
-    	int n = rand.nextInt(35) + 1;
+    	int n = rand.nextInt(this.tilesString.size()) + 1;
     	return makeTile(this.tilesString.get(n));
     }
     

@@ -11,7 +11,7 @@ import java.util.Map;
  * @author RuilinYang
  *
  */
-public class Board {
+public class Board { 
 	
 	private static final List<Integer> bonuses =       Arrays.asList(1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 4, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2, 1, 1, 1, 3, 1);
     // better to remove these fields, Board only maintain Tile[]. for better encapsulation.

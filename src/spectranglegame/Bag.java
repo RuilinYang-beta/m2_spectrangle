@@ -13,24 +13,51 @@ public class Bag {
     private static List<Character> vertical =    Arrays.asList('R', 'B', 'G', 'Y', 'P', 'R', 'R', 'B', 'B', 'G', 'G', 'Y', 'Y', 'P', 'P', 'R', 'R', 'B', 'B', 'G', 'G', 'Y', 'Y', 'P', 'P', 'B', 'G', 'G', 'R', 'R', 'P', 'P', 'R', 'Y', 'Y', 'W');
     private static List<Character> left =        Arrays.asList('R', 'B', 'G', 'Y', 'P', 'Y', 'P', 'R', 'P', 'R', 'B', 'G', 'B', 'Y', 'G', 'B', 'G', 'G', 'Y', 'Y', 'P', 'R', 'P', 'R', 'B', 'P', 'Y', 'P', 'B', 'P', 'R', 'G', 'P', 'G', 'B', 'W');
     private static List<Character> right =       Arrays.asList('R', 'B', 'G', 'Y', 'P', 'R', 'R', 'B', 'B', 'G', 'G', 'Y', 'Y', 'P', 'P', 'R', 'R', 'B', 'B', 'G', 'G', 'Y', 'Y', 'P', 'P', 'Y', 'R', 'B', 'G', 'B', 'Y', 'Y', 'G', 'B', 'R', 'W');
-	private List<String> tiles = new LinkedList<String>();
+	private List<String> tilesString = new LinkedList<String>();
+	private List<Tile> tiles = new LinkedList<>();
 	private Tile tile;
-    
 	
-	
-	public List<String> getTiles() {
-		return tiles;
-	}
 
 	/**
 	 * Constructs the bag of tiles
 	 */
+//    public Bag() {
+//    	for(int i = 0; i < 36; i++) {
+//    		tilesString.add(right.get(i).toString() + vertical.get(i).toString() + left.get(i).toString() + values.get(i));
+//      	}
+//    }
+	
+    /**
+     * An alternative constructor that populates List<Tile> tiles with Tiles object.
+     */
     public Bag() {
-    	for(int i = 0; i < 36; i++) {
-    		tiles.add(right.get(i).toString() + vertical.get(i).toString() + left.get(i).toString() + values.get(i));
-      	}
+    	for (int i = 0; i < 36; i++) {
+    		tiles.add(new Tile(values.get(i), vertical.get(i),
+    				           left.get(i), right.get(i)));
+    	}
+    	
+    	// shuffle the list of tiles in place
+    	// so every distinct instance of bag maintains a tiles list in diff order 
+    	Collections.shuffle(tiles);
     }
     
+	/**
+	 * A getter of List<Tile> tiles
+	 * @return this.tiles.
+	 */
+	public List<Tile> getTiles() {
+		return tiles;
+	}
+    
+	
+	/**
+	 * A getter of List<String> tilesString.
+	 * @return
+	 */
+	public List<String> getTilesString() {
+		return tilesString;
+	}
+	
     /*
      * Rotates the tile with the given input
      * @param i is the index of the tile that needs to be rotated
@@ -55,9 +82,9 @@ public class Bag {
 	 * @return A tile based on index
 	 */
 	public Tile getTile(int i) {
-		if (i >= 0 && i < tiles.size()) {
+		if (i >= 0 && i < tilesString.size()) {
 	//		tile = new Tile(values.get(i), tiles[i]);
-			tile = new Tile(values.get(i), tiles.get(i));
+			tile = new Tile(values.get(i), tilesString.get(i));
 			return tile;
 		}
 		return null;
@@ -72,8 +99,8 @@ public class Bag {
      * @return index i of the tile
      */
     public int getIndex(String tile) {
-    	for(int i = 0; i < tiles.size(); i++) {
-    		if(tiles.get(i).equals(tile)) {
+    	for(int i = 0; i < tilesString.size(); i++) {
+    		if(tilesString.get(i).equals(tile)) {
     			return i;
     		}
     	}
@@ -111,7 +138,7 @@ public class Bag {
     public Tile randomTile() {
     	Random rand = new Random();
     	int n = rand.nextInt(35) + 1;
-    	return makeTile(this.tiles.get(n));
+    	return makeTile(this.tilesString.get(n));
     }
     
     /**
@@ -119,8 +146,8 @@ public class Bag {
      * 
      */
     public void showtiles() {
-    	for(int i = 0; i < tiles.size(); i++) {
-    		System.out.println(tiles.get(i));
+    	for(int i = 0; i < tilesString.size(); i++) {
+    		System.out.println(tilesString.get(i));
     	}
     }
     
@@ -132,9 +159,9 @@ public class Bag {
      */
     public void removeTile(Tile tile) {
     	boolean ok = true;
-    	for(String s : tiles) {
+    	for(String s : tilesString) {
     		if(s.equals(tile.toString())) {
-    			tiles.remove(s);
+    			tilesString.remove(s);
     			ok = false;
     		}
     	}
@@ -148,7 +175,7 @@ public class Bag {
      * @return true if the tile is a valid tile from the bag, or false in case it is not
      */
     public boolean isValidTile(Tile tile) {
-    	for(String s : tiles) {
+    	for(String s : tilesString) {
     		if(s.equals(tile.toString())) {
     			return true;
     		}

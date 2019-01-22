@@ -23,6 +23,21 @@ public class Tile {
 		rotation = 0;
 	}
 	
+	/**
+	 * An alternative constuctor. 
+	 * @param value
+	 * @param vColor
+	 * @param lColor
+	 * @param rColor
+	 */
+	public Tile(int v, char vColor, char lColor, char rColor) {
+		this.value = v;
+		this.vertical = vColor;
+		this.left = lColor;
+		this.right = rColor;
+		this.rotation = 0;
+	}
+	
 	/*
 	 * @ensures \result == this.vertical;
 	 */

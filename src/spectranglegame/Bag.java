@@ -30,15 +30,17 @@ public class Bag {
     /**
      * An alternative constructor that populates List<Tile> tiles with Tiles object.
      */
-    public Bag() {
+    public Bag(boolean shuffle) {
     	for (int i = 0; i < 36; i++) {
     		tiles.add(new Tile(values.get(i), vertical.get(i),
     				           left.get(i), right.get(i)));
     	}
     	
-    	// shuffle the list of tiles in place
-    	// so every distinct instance of bag maintains a tiles list in diff order 
-    	Collections.shuffle(tiles);
+    	if (shuffle) {
+    		// shuffle the list of tiles in place
+        	// so every distinct instance of bag maintains a tiles list in diff order 
+        	Collections.shuffle(tiles);
+    	}
     }
     
 	/**
@@ -185,7 +187,7 @@ public class Bag {
     
     
 	public static void main(String[] args) {
-		Bag t = new Bag();
+		Bag t = new Bag(false);
 		Tile t1 = new Tile(3, "RGB");
 		t1.rotateTile();
 		t1.rotateTile();

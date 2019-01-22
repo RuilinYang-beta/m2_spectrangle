@@ -19,26 +19,29 @@ public class GameControl {
 	private int numPlayers;
 	
 	// constructor
-	public GameControl(List<Player> lp) {
+	public GameControl(List<Player> lp, boolean shuffle) {
 		this.board = new Board();
-		this.bag = new Bag();
+		this.bag = new Bag(shuffle);
 		this.mapPlayers = new HashMap<>();
 		this.listPlayers = lp;
 		this.numPlayers = lp.size();
-		// initiate each player with an empty array
-		// that can hold at most 4 Tiles object
-		for (Player p : this.listPlayers) {
-			Tile[] tiles = new Tile[4];
-			mapPlayers.put(p, tiles);
-		}
 	}
 	
 	/**
 	 * Deal tiles so that each user has 4 Tiles, stored in mapPlayers.
 	 * Also return the index of the player to make the first move.
 	 * @return The index of player that should take the first move.
+	 *         Return null if this index is still undetermined.
+	 *         (which is very unlikely for shuffled bag)
 	 */
 	public Integer dealTiles() {
+		// initiate each player with an empty array
+		// that can hold at most 4 Tiles object
+		for (Player p : this.listPlayers) {
+			Tile[] tiles = new Tile[4];
+			mapPlayers.put(p, tiles);
+		}
+		
 		Integer firstPlayerIdx = null;
 		
 		// for each of the 4 slot in Tile[4]
@@ -57,7 +60,7 @@ public class GameControl {
 											stream().
 											map(p -> getValuesAtHand(p)).
 											collect(Collectors.toList());
-
+				
 				// if there's a unique max value, 
 				// the user to make the first move is determined
 				if (hasUniqueMax(valAtHand)) {
@@ -101,6 +104,19 @@ public class GameControl {
 		// as idx1 do, only in a reverse ordered list
 		return (idx1 + idx2) == (valuesCopy.size() - 1);
 	}
+	
+	
+	
+
+	/**
+	 * A getter of mapPlayers.
+	 */
+	public Map<Player, Tile[]> getMapPlayers() {
+		return mapPlayers;
+	}
+	
+	
+	
 	
 	
 

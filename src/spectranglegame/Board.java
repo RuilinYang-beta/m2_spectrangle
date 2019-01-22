@@ -23,7 +23,7 @@ public class Board {
     // an array of current tiles on board, null if a field does not has a tile
  	private Tile[] tilesOnBoard = new Tile[36];
  	// an helper array of getRCIdex
- 	private Integer[] accumlatedNum = {1, 4, 9, 16, 25, 36};
+ 	private static final Integer[] accumNum = {1, 4, 9, 16, 25, 36};
  	
 	
 	/**
@@ -54,11 +54,35 @@ public class Board {
 	}
 	
 	/**
+	 * @param idx The index of the field of your interest.
+	 * @return true if this field is a bonus field.
+	 */
+	public static boolean isBonusField(int idx) {
+		return bonuses.get(idx) != 1;
+	}
+	
+	/**
+	 * @param i The index of the field of interest.
+	 * @return true if the field is facing up.
+	 */
+	public static boolean isFacingUp(Integer i) {
+		return Board.isFacingUp(Board.getRCIndex(i));
+	}
+	
+	/**
+	 * @param rowCol Row-column index of that field.
+	 * @return true if the field is facing upward.
+	 */
+	public static boolean isFacingUp(Integer[] rowCol) {
+		return ((rowCol[0] + rowCol[1]) % 2 == 0);
+	}
+	
+	/**
 	 * To get the one dimensional index from the row-column index.
 	 * @param rowCol The row-column coordinate of a field
 	 * @return One dimension index of that field
 	 */
-	public Integer getOneDimIndex(Integer[] rowCol) {
+ 	public static Integer getOneDimIndex(Integer[] rowCol) {
 		if (!isLegalIdx(rowCol)) {
 			return null;
 		}
@@ -74,7 +98,7 @@ public class Board {
 	 * @return An array of length two, 
 	 * 		   of which first element is row index, second element is column index.
 	 */
-	public Integer[] getRCIndex(Integer i) {
+	public static Integer[] getRCIndex(Integer i) {
 		if (!isLegalIdx(i)) {
 			return null;
 		}
@@ -82,11 +106,11 @@ public class Board {
 		Integer nthField = i + 1;
 		Integer idx = 0;
 		Integer[] rowCol = new Integer[2];
-		while (nthField - accumlatedNum[idx] > 0) {
+		while (nthField - accumNum[idx] > 0) {
 			idx += 1;
 		}
 		rowCol[0] = idx;
-		rowCol[1] = (idx == 0) ? 0 : nthField - accumlatedNum[idx - 1] - (idx+1);
+		rowCol[1] = (idx == 0) ? 0 : nthField - accumNum[idx - 1] - (idx+1);
 		return rowCol;	
 	}
 	
@@ -114,8 +138,8 @@ public class Board {
 		Integer[] rNeighborIdx = rowColIdx.clone(); rNeighborIdx[1] += 1;
 		Integer[] vNeighborIdx = rowColIdx.clone();
 		
-		boolean isFacingUp = ((rowColIdx[0] + rowColIdx[1]) % 2 == 0);
-		if (isFacingUp) {
+		boolean facingUp = isFacingUp(i);
+		if (facingUp) {
 			vNeighborIdx[0] += 1;
 		} else {
 			vNeighborIdx[0] -= 1;
@@ -128,13 +152,13 @@ public class Board {
 //		neighbors[2] = (isLegalIdx(rNeighborIdx)) ? getOneDimIndex(rNeighborIdx) : null;
 		
 		// test run with tile: return an array of length 4:
-		// [this_tile_isFacingUp, 
-		//  this_tile's_vertical_boarder_color, 
-		//  this_tile's_left_boarder_color, 
-		//  this_tile's_right_boarder_color ]
+		// [isFacingUp, 
+		//  vertical_boarder_color, 
+		//  left_boarder_color, 
+		//  right_boarder_color ]
 		String[] surroundings = new String[4];
 		// can be read to boolean using Boolean.parseBoolean(surroundings[0]);
-		surroundings[0] = (isFacingUp)? "true" : "false";
+		surroundings[0] = (facingUp)? "true" : "false";
 		surroundings[1] = (isLegalIdx(vNeighborIdx)) ? "" + getTile(getOneDimIndex(vNeighborIdx)).getVertical() : null;
 		// the surrounding color of left boarder should be the **right** color of the left neighbor
 		surroundings[2] = (isLegalIdx(lNeighborIdx)) ? "" + getTile(getOneDimIndex(lNeighborIdx)).getRight() : null;

@@ -8,14 +8,16 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.*;
 
+import players.HumanPlayer;
 import players.Player;
 
 public class GameControl {
 	
-	// ------------------------ Fields ------------------------
+	// ======================== Fields ========================
 	private Board board;
 	private Bag bag;
 	private List<Tile> tilesCopy;
+	private int firstNonNullIdx = 0;
 	// used to store player and its tiles
 	private Map<Player, Tile[]> mapPlayers;
 	// used to store an ordered list of players (to determine play order)
@@ -34,8 +36,7 @@ public class GameControl {
 		this.numPlayers = lp.size();
 	}
 	
-	// ======================== Commands ========================
-	// ------------ Preparation: deal the initial tiles ------------
+	// ============ Preparation: deal the initial tiles ============
 	/**
 	 * Deal tiles so that each user has 4 Tiles, stored in mapPlayers.
 	 * Also return the index of the player to make the first move.
@@ -57,6 +58,7 @@ public class GameControl {
 			for (int i = 0; i < numPlayers; i++) {
 				mapPlayers.get(listPlayers.get(i))[j] = this.bag.getTiles().get(j * numPlayers + i);
 				this.tilesCopy.set(j * numPlayers + i, null); 
+				firstNonNullIdx++;
 			} 
 		
 			// if the player to make the first move is undetermined
@@ -113,26 +115,29 @@ public class GameControl {
 		return (idx1 + idx2) == (valuesCopy.size() - 1);
 	}
 	
+	// ==================== Gaming: make a move ====================
+	// ----------------- FirstMove and its sanitaryCheck -----------------
 	/**
-	 * Safety measure before every new game.
+	 * Let the first user make the first move.
 	 */
-	public void resetBoard() {
-		board.resetBoard();
-	}
-	
-	public void askFirstMove() {
+	public void makeFirstMove() {
 		// if when each user has 4 tiles but still duplicate max (very unlikely but still possible)
 		// let the first user make the first move 
 		if (firstPlayerIdx == null) {
 			firstPlayerIdx = 0;
 		}
 		
+		Player firstPlayer = listPlayers.get(firstPlayerIdx);
+		
 		// An array of length 3: [idxFieldOfChoice, idxOfTilesAtHand, rotationOfTile]
-		int[] userChoice = listPlayers.get(firstPlayerIdx).makeMove(board);
+		int[] userChoice = firstPlayer.makeMove(board);
 		
 		// if userChoice is legal
 		if (sanitaryCheckFirstMove(userChoice)) {
-			// place the chosen rotation of chosen tile on the chosen field
+			// 1. place the chosen rotation of chosen tile on the chosen field
+				// to-do
+			// 2. draw another tile to replace mapPlayers.get(firstPlayer)[userChoice[1])
+			mapPlayers.get(firstPlayer)[userChoice[1]] = drawATile();
 		} else {
 			System.out.println("Illegal first move, please try again.");
 			// need a mechanism to make user try again.
@@ -140,29 +145,64 @@ public class GameControl {
 		
 	}
 	
+	/**
+	 * A helper function of makeFirstMove().
+	 * @param choices An array of length 3: 
+	 * 				  [idxFieldOfChoice, idxOfTilesAtHand, rotationOfTile]
+	 * @return true if choice is a legal move by all means.
+	 */
 	private boolean sanitaryCheckFirstMove(int[] choices) {
+		// not a bonus field
+		boolean cond1 = !board.isBonusField(choices[0]);
+		// direction of field match rotation of tile
+		boolean cond2 = board.isFacingUp(choices[0]) == (choices[2] % 2 == 0);
 		
+		return cond1 && cond2;
 	}
 	
-	private boolean sanitaryCheck() {
-		
+	/**
+	 * Get a tile from the bag, nullify the corresponding tile in the tilesCopy, 
+	 * and update firstNonNullIdx.
+	 * @return The tile being drew from the bag.
+	 */
+	public Tile drawATile() {
+		Tile t = bag.getTiles().get(firstNonNullIdx);
+		tilesCopy.set(firstNonNullIdx, null);
+		firstNonNullIdx++;
+		return t;
 	}
 	
-	private boolean sanitaryField() {
-		return false;
-	}
+	// ----------------- NormalMove and its sanitaryCheck -----------------
+//	private boolean sanitaryCheck() {
+//		
+//	}
+//	
+//	private boolean sanitaryField() {
+//		return false;
+//	}
+//	
+//	private boolean sanitaryRotation() {
+//		return false;
+//	}
+//	
+//	private boolean sanitaryTile() {
+//		return false;
+//	}
+//	
+//	public void makeNormalMove() {
+//		
+//	}
+
 	
-	private boolean sanitaryRotation() {
-		return false;
-	}
+	// ================== Gaming: other functionalities ==================
+		/**
+		 * Safety measurement before every new game.
+		 */
+		public void resetBoard() {
+			board.resetBoard();
+		}
 	
-	private boolean sanitaryTile() {
-		return false;
-	}
-	
-	
-	
-	// ------------------------ Queries ------------------------
+	// ======================== Queries ========================
 
 	/**
 	 * A getter of mapPlayers.
@@ -182,20 +222,29 @@ public class GameControl {
 	 * A getter of tilesCopy.
 	 * @return
 	 */
-	public List<Tile> getTiles() {
+	public List<Tile> getTilesCopy() {
 		return tilesCopy;
 	}
 	
-	public static void main(String[] args) {
-		
+	/**
+	 * A getter of this.bag.getTiles(); 
+	 * Don't change it after getting it!
+	 * @return
+	 */
+	public List<Tile> getTiles(){
+		return bag.getTiles();
 	}
 	
-	
-	
-	
-	
-	
-	
-	
+	// ======================== Main ========================
+	public static void main(String[] args) {
+		
+		GameControl shu3 = new GameControl( Arrays.asList(new HumanPlayer("A"),
+															 new HumanPlayer("B"),
+															 new HumanPlayer("C")), 
+											  true);
+		shu3.dealTiles();
+		System.out.println(shu3.getTilesCopy());
+		
+	}
 
 }

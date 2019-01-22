@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.DynamicContainer.dynamicContainer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import players.HumanPlayer;
+
 import java.util.Arrays;
 
 import spectranglegame.*;
@@ -47,10 +49,16 @@ class GameControlTest {
 		assertEquals(0, (int) unshu4.dealTiles());
 	}
 	
+	
+	/**
+	 * Try to come up with a stronger test.
+	 */
 	@Test
 	void testDealTilesShuffled() {
-		// should be equal because they have the same 
+		// should be equal because when GameControl is created ,
+		// order of tiles is determined.
 		assertEquals(shu3.dealTiles(), shu3.dealTiles());
+//		System.out.println(shu3.getTiles());
 	}
 
 }

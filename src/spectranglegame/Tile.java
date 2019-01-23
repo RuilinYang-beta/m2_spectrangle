@@ -220,20 +220,49 @@ public class Tile {
 	 * @ requires this.rotation % 2 == 0;
 	 */
 	public void showTile() {
-		String template =                     " \n" +
-                "                              / \\\n" +
-                "                             /   \\\n" +
-                "                            /"+ left+" " + value + " " +right +"\\\n" +
-                "                           /   " + vertical +"   \\\n" +
-                "                          /---------\\\n" ;
-		System.out.print(template + "  ");
+		String template =" " +
+                "        / \\\n" +
+                "        / " + value + " \\\n" +
+                "       /"+ left+ " "  + " " +right +" \\\n" +
+                "      /   " + vertical +"   \\\n" +
+                "     /---------\\\n" ;
+		System.out.print(template);
 	}
-	 
-	 
+	
+	public void showTiledown() {
+		String template = 
+			     "   \\---------/\n" +
+			     "     \\ " + "  " + vertical + "   " +"/ \n" +
+                 "      \\" + left + " "  + " " + right +  " "+ "/\n" +
+                 "       \\ " + value + " "+ "/\n" +
+			     "        \\ / \n " ;
+		System.out.print(template);
+	}
+	
+	
+	public void showTileRotations() {
+		if (this.getRotation() % 2 == 0) {
+			for (int i = 0; i < 3; i++) {
+				this.showTile();
+				this.rotateTile();
+			}
+		} else {
+			for (int i = 0; i < 3; i++) {
+				this.showTiledown();
+				this.rotateTile();
+			}
+		}
+	}
+	
 	public static void main(String[] args) {
 		Tile t = new Tile(3,"RGB");
 		Tile t1 = new Tile(3, "RGB");
-		System.out.println(t.stringTile().equals(t1.stringTile()));
+		//System.out.println(t.stringTile().equals(t1.stringTile()));
+		//t1.showTileRotations();
+		t1.rotateTile();
+		t1.showTileRotations();
+//		t1.showTiledown();
+//		t1.showTile();
 //		String s = t.stringTile();
 //		System.out.println(s);
 //		System.out.println(t.toString());

@@ -2,12 +2,13 @@ package spectranglegame;
 
 public class Tile {
 	
-	int value;
-	char vertical;
-	char left;
-	char right;
-	int rotation;
+	private int value;
+	private char vertical;
+	private char left;
+	private char right;
+	private int rotation;
 	
+	// =================== Constructors ===================
 	/** Constructs the tile object
 	 * @param value gives the value of the tile
 	 * @param colors gives the string of the colors in the order right, vertical, left
@@ -23,45 +24,76 @@ public class Tile {
 		rotation = 0;
 	}
 	
-	/**
-	 * An alternative constructor. 
-	 * @param value
-	 * @param vColor
-	 * @param lColor
-	 * @param rColor
+	
+	/*
+	 * A public constructor that builds Tile with rotation 0;
 	 */
-	public Tile(int v, char vColor, char lColor, char rColor) {
-		this.value = v;
-		this.vertical = vColor;
-		this.left = lColor;
-		this.right = rColor;
-		this.rotation = 0;
+	public Tile(int val, char vColor, char lColor, char rColor) {
+		this(val, vColor, lColor, rColor, 0);
 	}
 	
 	/*
-	 * @ensures \result == this.vertical;
+	 * A private constructor that can build Tile with any rotation;
 	 */
-	/**
-	 * @return this.vertical
-	 */
+	private Tile(int val, char vColor, char lColor, char rColor, int rot) {
+		this.value = val;
+		this.vertical = vColor;
+		this.left = lColor;
+		this.right = rColor;
+		this.rotation = rot;
+	}
+	
+
+	// =================== Queries ===================
+	public int getValue() {
+		return this.value;
+	}
+	
 	public char getVertical() {
 		return this.vertical;
 	}
 	
-	/*
-	 * @ensures this.getVertical() == v;
-	 */
+	public char getRight() {
+		return this.right;
+	}
+	
+	public char getLeft() {
+		return this.left;
+	}
+	
+	public int getRotation() {
+		return this.rotation;
+	}
+	
+	public boolean isFacingUp() {
+		return (rotation % 2 == 0);
+	}
+	
+	// =================== Setters ===================
+	// ------------ I would suggest not to use them ------------
 	/**
 	 * @param v gives the new value of the tile
 	 */
-	public void putVertical(char v) {
+	private void putVertical(char v) {
 		this.vertical = v;
 	}
 	
-    /*
-     * @ensures (tile.getRotation() == \old.tile.getRotation() + 1 || tile.getRotation() == 0) ;
-     * @ensures \old.tile.getVertical() == tile.getRight() && \old.tile.getLeft() == tile.getVertical() && \old.tile.getRight() == tile.getLeft();
-     */
+	/**
+	 * @param v gives the new left color of the tile
+	 */
+	private void putLeft(char l) {
+		this.left = l;
+	}
+	
+	/**
+	 * @param v gives the new right color of the tile
+	 */
+	private void putRight(char r) {
+		this.right = r;
+	}
+
+	// =================== Rotation Related ===================
+	
     /**
      *  Function that rotates a tile with the tile given as a parameter
 	 * @param tile indicates the tile that will be rotated 
@@ -90,107 +122,43 @@ public class Tile {
 	} 
 	
 	/**
-	 * @return A new Tile of this tile, after rotate once.
+	 * @return A new Tile generated from this tile, after rotate once.
 	 */
 	public Tile rotateTileOnce() {
-		Tile t = new Tile(this.value, "BBB"); // this color doesn't really exist, only to fill constructor
+		Tile t;
 		
-		if (this.getRotation() % 2 == 0) {
-			t.putRight(right);
-			t.putVertical(left);
-			t.putLeft(vertical);
+		if (this.isFacingUp()) {
+			// constructor order (t.val, t.vertical, t.left, t.right, t.rotation)
+			// when this.isFacingUp, color changes as follows: 
+			// this.left     -->  t.vertical
+			// this.vertical -->  t.left
+			// this.right    -->  t.right
+			t = new Tile(value, left, vertical, right, 
+					     (rotation + 1) % 6);
 		} else {
-			t.putLeft(left);
-			t.putRight(vertical);
-			t.putVertical(right);
+			// constructor order (t.val, t.vertical, t.left, t.right, t.rotation)
+			// when !this.isFacingUp, color changes as follows: 
+			// this.left     -->  t.left
+			// this.vertical -->  t.right
+			// this.right    -->  t.vertical
+			t = new Tile(value, right, left, vertical, 
+						 (rotation + 1) % 6);
 		}
-		t.rotation =  (rotation + 1) % 6;
 		return t;
 	}
 	
 	public Tile rotateTileTwice() {
-		Tile t = new Tile(this.value, "BBB"); // this color doesn't really exist, only to fill constructor
-		
-		t.putVertical(right);
-		t.putRight(left);
-		t.putLeft(vertical);
-		
-		t.rotation =  (rotation + 2) % 6;
+		// when rotating twice, no matter original is facing up or down:
+		// this.right    -->  t.vertical
+		// this.vertical -->  t.left
+		// this.left     -->  t.right
+		Tile t = new Tile(value, right, vertical, left, 
+						  (rotation + 2) % 6);
 		return t;
 	}
 	
-	
-	
 
-
-//	public void rotate(int rotation) {
-//		if(rotation >= 0 && rotation < 6) {
-//			this.rotation = rotation;
-//		}
-//	}
-	
-	/*
-	 * @ensures \result == this.rotation;
-	 */
-	/**
-	 * @return this.rotation 
-	 */
-	public int getRotation() {
-		return this.rotation;
-	}
-	
-	/*
-	 * @ensures \result == this.left;
-	 */
-	/**
-	 * @return this.left
-	 */
-	public char getLeft() {
-		return this.left;
-	}
-	
-	/*
-	 * @ensures this.getLeft() == l;
-	 */
-	/**
-	 * @param v gives the new left color of the tile
-	 */
-	public void putLeft(char l) {
-		this.left = l;
-	}
-	
-	/*
-	 * @ensures \result == this.right;
-	 */
-	/**
-	 * @return this.right.
-	 */
-	public char getRight() {
-		return this.right;
-	}
-	
-	/*
-	 * @ensures this.getRight() == r;
-	 */
-	/**
-	 * @param v gives the new right color of the tile
-	 */
-	public void putRight(char r) {
-		this.right = r;
-	}
-	/*
-	 * @ensures \result == this.value;
-	 */
-	/**
-	 * @return this.value. 
-	 */
-	public int getValue() {
-		return this.value;
-	}
-	
-
-
-	
+	// =================== String Representations ===================
 	/**
 	 * @return String representation of the tile in the next format: rotation + String representing the colors + value;
 	 */
@@ -216,6 +184,8 @@ public class Tile {
 	    return "" + stringTile().charAt(1) + stringTile().charAt(2) + stringTile().charAt(3) + stringTile().charAt(4);
 	 }
 	 
+	 
+	// =================== Visual Representations ===================
 	/*
 	 * @ requires this.rotation % 2 == 0;
 	 */
@@ -254,6 +224,7 @@ public class Tile {
 		}
 	}
 	
+	// =================== Main ===================
 	public static void main(String[] args) {
 		Tile t = new Tile(3,"RGB");
 		Tile t1 = new Tile(3, "RGB");

@@ -30,5 +30,9 @@ public class HumanPlayer extends Player{
 	public Tile chooseTile() {
 		return null;
 	}
+	
+	public Tile chooseRotation(Tile t) {
+		return null;
+	}
 
 }

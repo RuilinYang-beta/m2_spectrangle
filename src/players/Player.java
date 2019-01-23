@@ -15,28 +15,14 @@ public abstract class Player {
 		return name;
 	}
 	
-//	public abstract int determineMove(Board b);
+	public abstract int chooseField(Board b);
 	
-	/**
-	 * @param b A board instance of the game the player is on.
-	 * @return An array of length 3: [idxFieldOfChoice, idxOfTilesAtHand, rotationOfTile]
-	 */
-	public abstract int[] makeMove(Board b) ;
+	// This function is only meant for interaction between Player and TUI
+	// Return an intermediate product that GameControl do not need.
+	public abstract Tile chooseTile();
 	
-	
-//	public int determineField(Board b) {
-//		;
-//	}
-	
-	public int chooseField(Board b) {
-		Scanner in = new Scanner(System.in);
-		int num = in.nextInt();
-		return num;
-	}
-	
-	public Tile chooseTile() {
-		return null;
-	}
+	// the Tile t is the returned object of chooseTile()
+	public abstract Tile chooseRotation(Tile t);
 	
 	
 }

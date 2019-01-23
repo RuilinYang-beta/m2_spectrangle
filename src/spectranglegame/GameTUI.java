@@ -7,26 +7,56 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Stream;
+import players.*;
 
 import javax.swing.text.html.HTMLDocument.HTMLReader.CharacterAction;
 
 public class GameTUI {
 	
-	private GameControl control;
-	
-	public GameTUI(GameControl gc) {
-		this.control = gc;
-	}
-
-	
-    private static final List<Integer> bonuses =       Arrays.asList(1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 4, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2, 1, 1, 1, 3, 1);
+	// =========== Static Fields: only for test purpose ===========
+	private static final List<Integer> bonuses =       Arrays.asList(1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 4, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2, 1, 1, 1, 3, 1);
     private static List<Integer> values =        Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     private static List<Character> vertical =    Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     private static List<Character> left =        Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     private static List<Character> right =       Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
+    // =========== Instance Field ===========
+	private GameControl control;
+	
+	// =========== Constructor ===========
+	public GameTUI(GameControl gc) {
+		this.control = gc;
+	}
 
-    public void printBoardDynamic(List<Integer> values, List<Character> vertical, List<Character> left, List<Character> right) {
+	// ========================= Ask User Input =========================
+    /**
+     * @param p Ask this player for input.
+     * @return The index of the player's choice.
+     */
+    public int askField(Player p) {
+    	return 0;
+    }
+    
+    /**
+     * @param p Ask this player for input.
+     * @return The Tile (cloned) of the player's choice. 
+     */
+    public Tile askTile(Player p) {
+    	return null;
+    }
+    
+    /**
+     * @param p Ask this player for input.
+     * @return The Tile (rotated and cloned) of the player's choice.s
+     */
+    public Tile askRotation(Player p) {
+    	return null;
+    }
+
+    
+    // ========================= Print the board =========================
+	
+	public void printBoardDynamic(List<Integer> values, List<Character> vertical, List<Character> left, List<Character> right) {
     	System.out.println(getBoardString(values, vertical, left, right));
     }
 
@@ -35,7 +65,7 @@ public class GameTUI {
     	System.out.println(getBoardString(values, vertical, left, right));
     }
     
-    // ========================= Print the board =========================
+	
     /* if a field is empty         =>      its index showed, its bonus (if not 1) showed
      * if a field has a tile on it =>      its index hidden, its bonus (if not 1) showed,
      *  								   its value showed.

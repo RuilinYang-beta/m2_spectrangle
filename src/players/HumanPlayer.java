@@ -6,6 +6,7 @@ import spectranglegame.*;
 public class HumanPlayer extends Player{
 	
 	private String name;
+	private Tile[] tilesAtHand;
 	
 	public HumanPlayer(String n) {
 		super(n);
@@ -20,10 +21,14 @@ public class HumanPlayer extends Player{
 		return null;
 	}
 	
-	public int determineMove(Board b) {
+	public int chooseField(Board b) {
 		Scanner in = new Scanner(System.in);
 		int num = in.nextInt();
 		return num;
+	}
+	
+	public Tile chooseTile() {
+		return null;
 	}
 
 }

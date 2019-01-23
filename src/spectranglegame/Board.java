@@ -13,26 +13,31 @@ import java.util.Map;
  */
 public class Board { 
 	
-	private static final List<Integer> bonuses =       Arrays.asList(1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 4, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2, 1, 1, 1, 3, 1);
-    // better to remove these fields, Board only maintain Tile[]. for better encapsulation.
-//	private static List<Integer> values =        Arrays.asList(5,   null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-//    private static List<Character> vertical =    Arrays.asList('R', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-//    private static List<Character> left =        Arrays.asList('G', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-//    private static List<Character> right =       Arrays.asList('B', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-    
-    // an array of current tiles on board, null if a field does not has a tile
- 	private Tile[] tilesOnBoard = new Tile[36];
- 	// an helper array of getRCIdex
- 	private static final Integer[] accumNum = {1, 4, 9, 16, 25, 36};
+	public static final List<Integer> BONUSES =       Arrays.asList(1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 4, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2, 1, 1, 1, 3, 1);
+ 	private static final Integer[] ACCUMULATEDNUM = {1, 4, 9, 16, 25, 36};    // an helper array of getRCIdex
+ 	public static final int FIELDSNUM = 36;
  	
-	
+	// an array of current tiles on board, null if a field does not has a tile
+ 	private Tile[] tilesOnBoard = new Tile[36];
+	// 4 lists below only cares about the 4 dimension of each of the 36 tiles
+	private List<Integer> values;
+    private List<Character> vertical;
+    private List<Character> left;
+    private List<Character> right;
+ 	
+ 	// ======================== Constructor ========================
 	/**
 	 * Generate a board, with no tiles on it.
 	 */
 	public Board() {
-		Arrays.fill(tilesOnBoard, null);
+//		Arrays.fill(tilesOnBoard, null);
+		values = new ArrayList<>(Collections.nCopies(FIELDSNUM, null));
+		vertical = new ArrayList<>(Collections.nCopies(FIELDSNUM, null));
+		left = new ArrayList<>(Collections.nCopies(FIELDSNUM, null));
+		right = new ArrayList<>(Collections.nCopies(FIELDSNUM, null));
 	}
 	
+	// ======================== Static Methods ========================
 	/**
 	 * @param i The one dimensional index.
 	 * @return True if this index is legal.
@@ -58,7 +63,7 @@ public class Board {
 	 * @return true if this field is a bonus field.
 	 */
 	public static boolean isBonusField(int idx) {
-		return bonuses.get(idx) != 1;
+		return BONUSES.get(idx) != 1;
 	}
 	
 	/**
@@ -106,14 +111,15 @@ public class Board {
 		Integer nthField = i + 1;
 		Integer idx = 0;
 		Integer[] rowCol = new Integer[2];
-		while (nthField - accumNum[idx] > 0) {
+		while (nthField - ACCUMULATEDNUM[idx] > 0) {
 			idx += 1;
 		}
 		rowCol[0] = idx;
-		rowCol[1] = (idx == 0) ? 0 : nthField - accumNum[idx - 1] - (idx+1);
+		rowCol[1] = (idx == 0) ? 0 : nthField - ACCUMULATEDNUM[idx - 1] - (idx+1);
 		return rowCol;	
 	}
 	
+	// ======================== Instance Queries ========================
 	/**
 	 * Input a one-dimensional index, get the corresponding field's surrounding informations, see return.
 	 * @param i An one-dimension index of a field
@@ -124,7 +130,7 @@ public class Board {
 	 *         The forth is a string abbr. of right boarder surrounding color.
 	 * 		   If one specific neighbor does not exist, then the corresponding surrounding color is null.
 	 */
-//	public Integer[] getSurroundingInfo(Integer i) {
+	// public Integer[] getSurroundingInfo(Integer i) {
 	public String[] getSurroundingInfo(Integer i) {
 		if (!isLegalIdx(i)) {
 			return null;
@@ -174,7 +180,7 @@ public class Board {
 	 * @param i The index of the field.
 	 * @return True if the field is empty.
 	 */
-	public boolean isEmpty(int i) {
+	public boolean fieldIsEmpty(int i) {
 		return (this.tilesOnBoard[i] == null);
 	}
 	
@@ -194,7 +200,7 @@ public class Board {
 	/**
 	 * @return True if the board is full.
 	 */
-	public boolean isFull() {
+	public boolean boardIsFull() {
 		return this.getEmptyFields().size() == 0;
 	}
 	
@@ -206,12 +212,35 @@ public class Board {
 		return tilesOnBoard[i];
 	}
 	
+	protected List<Integer> getValuesOnBoard(){
+		return values;
+	}
+	
+	protected List<Character> getVerticalOnBoard(){
+		return vertical;
+	}
+	
+	protected List<Character> getLeftOnBoard(){
+		return left;
+	}
+	
+	protected List<Character> getRightOnBoard(){
+		return right;
+	}
+	
+	// ======================== Instance Commands ========================
 	/**
+	 * Put a tile t on the field with index i, 
+	 * update Tile[] and also 4 arrayLists.
 	 * @param i The index you want to put a tile on.
 	 * @param t The tile object.
 	 */
 	public void setTile(int i, Tile t) {
-		this.tilesOnBoard[i] = t;
+		tilesOnBoard[i] = t;
+		values.set(i, t.getValue());
+		vertical.set(i, t.getVertical());
+		left.set(i, t.getLeft());
+		right.set(i, t.getRight());
 	}
 	
 	public void resetBoard() {

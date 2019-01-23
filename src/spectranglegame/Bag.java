@@ -22,12 +22,12 @@ public class Bag {
 	/**
 	 * Constructs the bag of tiles
 	 */
-    public Bag() {
-    	for(int i = 0; i < 36; i++) {
-    		tilesString.add(right.get(i).toString() + vertical.get(i).toString() + left.get(i).toString() + values.get(i));
-      	}
-    }
-	
+//    public Bag() {
+//    	for(int i = 0; i < 36; i++) {
+//    		tilesString.add(right.get(i).toString() + vertical.get(i).toString() + left.get(i).toString() + values.get(i));
+//      	}
+//    }
+//	
     /**
      * An alternative constructor that populates List<Tile> tiles with Tiles object.
      */
@@ -54,14 +54,14 @@ public class Bag {
 	}
     
 	
-	/**
-	 * A getter of List<String> tilesString.
-	 * @return
-	 */
-	public List<String> getTilesString() {
-		return tilesString;
-	}
-	
+//	/**
+//	 * A getter of List<String> tilesString.
+//	 * @return
+//	 */
+//	public List<String> getTilesString() {
+//		return tilesString;
+//	}
+//	
     /*
      * Rotates the tile with the given input
      * @param i is the index of the tile that needs to be rotated
@@ -104,11 +104,12 @@ public class Bag {
      */
 	public int getIndex(Tile tile) {
 		for(int i = 0; i < tiles.size(); i++) {
-			if(tiles.get(i).equals(tile)) {
+			if(tiles.get(i).getLeft() == tile.getLeft() && tiles.get(i).getRight() == tile.getRight() && 
+	    			tiles.get(i).getLeft() == tile.getLeft() && tiles.get(i).getValue() == tile.getValue()) {
 				return i;
 			}
 		}
-		return 0;
+		return -1;
 	}
 	
 	/*
@@ -207,7 +208,8 @@ public class Bag {
      */
     public boolean isValidTile(Tile tile) {
     	for(Tile s : tiles) {
-    		if(s.equals(tile)) {
+    		if(s.getLeft() == tile.getLeft() && s.getRight() == tile.getRight() && 
+    			s.getLeft() == tile.getLeft() && s.getValue() == tile.getValue()) {
     			return true;
     		}
     	}
@@ -225,6 +227,7 @@ public class Bag {
 		t1.rotateTile();
 		t1.rotateTile();
 		System.out.println(t1.stringTile());
+		t.showtiles();
 	}
 
 }

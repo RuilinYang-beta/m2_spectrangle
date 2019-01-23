@@ -86,7 +86,7 @@ public class Tile {
 				this.rotate(this.getRotation() + 1);
 			}
 		}
-	}
+	} 
 	
 	/*
 	 * @ensures \result == this.left;
@@ -185,11 +185,19 @@ public class Tile {
 		 
 	 }
 	 
+	 @Override
+	 protected Tile clone() throws CloneNotSupportedException {
+
+	     return (Tile) super.clone();
+	 }
+	 
 	public static void main(String[] args) {
 		Tile t = new Tile(3,"RGB");
-		String s = t.stringTile();
-		System.out.println(s);
-		System.out.println(t.toString());
+		Tile t1 = new Tile(3, "RGB");
+		System.out.println(t.stringTile().equals(t1.stringTile()));
+//		String s = t.stringTile();
+//		System.out.println(s);
+//		System.out.println(t.toString());
 	}
 
 }

@@ -3,6 +3,7 @@ package spectranglegame;
 import java.util.*;
 import java.util.List;
 import java.util.Arrays;
+import java.util.ArrayList;
 /*
  * @author Radu
  * The bag of tiles;
@@ -13,7 +14,7 @@ public class Bag {
     private static List<Character> vertical =    Arrays.asList('R', 'B', 'G', 'Y', 'P', 'R', 'R', 'B', 'B', 'G', 'G', 'Y', 'Y', 'P', 'P', 'R', 'R', 'B', 'B', 'G', 'G', 'Y', 'Y', 'P', 'P', 'B', 'G', 'G', 'R', 'R', 'P', 'P', 'R', 'Y', 'Y', 'W');
     private static List<Character> left =        Arrays.asList('R', 'B', 'G', 'Y', 'P', 'Y', 'P', 'R', 'P', 'R', 'B', 'G', 'B', 'Y', 'G', 'B', 'G', 'G', 'Y', 'Y', 'P', 'R', 'P', 'R', 'B', 'P', 'Y', 'P', 'B', 'P', 'R', 'G', 'P', 'G', 'B', 'W');
     private static List<Character> right =       Arrays.asList('R', 'B', 'G', 'Y', 'P', 'R', 'R', 'B', 'B', 'G', 'G', 'Y', 'Y', 'P', 'P', 'R', 'R', 'B', 'B', 'G', 'G', 'Y', 'Y', 'P', 'P', 'Y', 'R', 'B', 'G', 'B', 'Y', 'Y', 'G', 'B', 'R', 'W');
-	private List<String> tilesString = new LinkedList<String>();
+	private List<String> tilesString = new ArrayList<String>(36);
 	private List<Tile> tiles = new LinkedList<>();
 	private Tile tile;
 	
@@ -32,8 +33,9 @@ public class Bag {
      */
     public Bag(boolean shuffle) {
     	for (int i = 0; i < 36; i++) {
-    		tiles.add(new Tile(values.get(i), vertical.get(i),
-    				           left.get(i), right.get(i)));
+//    		tiles.add(new Tile(values.get(i), vertical.get(i),
+//    				           left.get(i), right.get(i)));
+    		tiles.add(new Tile(values.get(i), "" + vertical.get(i) + left.get(i) + right.get(i)));
     	}
     	
     	if (shuffle) {
@@ -84,9 +86,9 @@ public class Bag {
 	 * @return A tile based on index
 	 */
 	public Tile getTile(int i) {
-		if (i >= 0 && i < tilesString.size()) {
-	//		tile = new Tile(values.get(i), tiles[i]);
-			tile = new Tile(values.get(i), tilesString.get(i));
+		if (i >= 0 && i < tiles.size()) {
+			tile = new Tile(values.get(i), "" + tiles.get(i).getVertical() + tiles.get(i).getLeft() 
+					+ tiles.get(i).getRight());
 			return tile;
 		}
 		return null;
@@ -97,18 +99,35 @@ public class Bag {
 	 */
      /**
       * Returns the index of a tile
+     * @param tile 
+     * @return index i of the tile
+     */
+	public int getIndex(Tile tile) {
+		for(int i = 0; i < tiles.size(); i++) {
+			if(tiles.get(i).equals(tile)) {
+				return i;
+			}
+		}
+		return 0;
+	}
+	
+	/*
+	 * @ensures \result >= 0 && \result < 36;
+	 */
+     /**
+      * Returns the index of a tile
      * @param tile the string representing the tile
      * @return index i of the tile
      */
-    public int getIndex(String tile) {
-    	for(int i = 0; i < tilesString.size(); i++) {
-    		if(tilesString.get(i).equals(tile)) {
-    			return i;
-    		}
-    	}
-    	return 0;
-    }
-    
+//    public int getIndex(String tile) {
+//    	for(int i = 0; i < tilesString.size(); i++) {
+//    		if(tilesString.get(i).equals(tile.toString())) {
+//    			return i;
+//    		}
+//    	}
+//    	return 0;
+//    }
+//    
     /*
      * @ensures \result > 0 && \result < 7;
      */
@@ -124,11 +143,11 @@ public class Bag {
      * @param tiles represents the string that creates the tile
      * @return object of the String
      */
-    public Tile makeTile(String tiles) {
-    	int i = getIndex(tiles);
-    	Tile t = new Tile(values.get(i), tiles);
-    	return t;
-    }
+//    public Tile makeTile(String tiles) {
+//    	int i = getIndex(tiles);
+//    	Tile t = new Tile(values.get(i), tiles);
+//    	return t;
+//    }
     
     /*
      * @ensures \result instanceof Tile;
@@ -137,19 +156,29 @@ public class Bag {
      * Generates a random value for the tile
      * @return a random tile from the bag
      */
-    public Tile randomTile() {
-    	Random rand = new Random();
-    	int n = rand.nextInt(this.tilesString.size()) + 1;
-    	return makeTile(this.tilesString.get(n));
-    }
+
+//    public Tile randomTile() {
+//    	Random rand = new Random();
+//    	int n = rand.nextInt(tilesString.size()) + 1;
+//    	if()
+//    	//return makeTile(this.tilesString.get(n));
+//    	
+//    }
+
+//    public Tile randomTile() {
+//    	Random rand = new Random();
+//    	int n = rand.nextInt(this.tilesString.size()) + 1;
+//    	return makeTile(this.tilesString.get(n));
+//    }
+
     
     /**
      * Prints all the tiles from the bag
      * 
      */
     public void showtiles() {
-    	for(int i = 0; i < tilesString.size(); i++) {
-    		System.out.println(tilesString.get(i));
+    	for(int i = 0; i < tiles.size() && tiles.get(i) != null; i++) {
+    		System.out.println(i + " " + tiles.get(i));
     	}
     }
     
@@ -163,7 +192,7 @@ public class Bag {
     	boolean ok = true;
     	for(String s : tilesString) {
     		if(s.equals(tile.toString())) {
-    			tilesString.remove(s);
+  //  			tilesString.set(getIndex(tile.toString()), null);
     			ok = false;
     		}
     	}
@@ -177,8 +206,8 @@ public class Bag {
      * @return true if the tile is a valid tile from the bag, or false in case it is not
      */
     public boolean isValidTile(Tile tile) {
-    	for(String s : tilesString) {
-    		if(s.equals(tile.toString())) {
+    	for(Tile s : tiles) {
+    		if(s.equals(tile)) {
     			return true;
     		}
     	}
@@ -187,7 +216,7 @@ public class Bag {
     
     
 	public static void main(String[] args) {
-		Bag t = new Bag(false);
+		Bag t = new Bag(true);
 		Tile t1 = new Tile(3, "RGB");
 		t1.rotateTile();
 		t1.rotateTile();

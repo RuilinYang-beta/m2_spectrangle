@@ -15,25 +15,32 @@ public class GameControl {
 	
 	// ======================== Fields ========================
 	private Board board;
+	private GameTUI tui;
+	
 	private Bag bag;
-	private List<Tile> tilesCopy;
-	private int firstNonNullIdx = 0;
-	// used to store player and its tiles
-	private Map<Player, Tile[]> mapPlayers;
-	// used to store an ordered list of players (to determine play order)
-	private List<Player> listPlayers;
-	private int numPlayers;
-	private Integer firstPlayerIdx = null;
+	private List<Tile> tilesCopy;  // for safety, don't want to change a collection when looping through it
+	private int firstNonNullIdx;   // for safety, auxiliary to tilesCopy
+	
+	private final int numPlayers;
+	private List<Player> listPlayers; // to have a order in players
+	private Integer firstPlayerIdx;   // not determined until dealTiles
+	private Map<Player, Tile[]> mapPlayers; // to store player and its tiles
+	
 	
 	// ======================== Constructor ========================
 	public GameControl(List<Player> lp, boolean shuffle) {
 		this.board = new Board();
+		this.tui = new GameTUI(this);
+		
 		this.bag = new Bag(shuffle);
 		// a clone of bag.getTiles()
 		this.tilesCopy = new ArrayList<>(bag.getTiles());
-		this.mapPlayers = new HashMap<>();
-		this.listPlayers = lp;
+		firstNonNullIdx = 0;
+		
 		this.numPlayers = lp.size();
+		this.listPlayers = lp;
+		firstPlayerIdx = null;
+		this.mapPlayers = new HashMap<>();
 	}
 	
 	// ============ Preparation: deal the initial tiles ============
@@ -115,22 +122,6 @@ public class GameControl {
 		return (idx1 + idx2) == (valuesCopy.size() - 1);
 	}
 	
-
-	public void showtiles() {
-		for (int j = 0; j < 4; j++) {
-			for (int i = 0; i < mapPlayers.values().size(); i++) {
-					String template =                     " ʌ\n" +
-			                "                              / \\\n" +
-			                "                             /  \\\n" +
-			                "                            /"+ mapPlayers.get(listPlayers.get(i))[j].getLeft() + "  " + mapPlayers.get(listPlayers.get(i))[j].getValue() + "  " + mapPlayers.get(listPlayers.get(i))[j].getLeft() +"\\\n" +
-			                "                           /   " + mapPlayers.get(listPlayers.get(i))[j].getVertical() +"   \\\n" +
-			                "                          /---------\\\n" ;
-			System.out.print(template + "  ");
-			}
-		}
-		
-	}
-
 	// ==================== Gaming: make a move ====================
 	// ----------------- FirstMove and its sanitaryCheck -----------------
 	/**
@@ -152,8 +143,9 @@ public class GameControl {
 		if (sanitaryCheckFirstMove(userChoice)) {
 			// 1. place the chosen rotation of chosen tile on the chosen field
 				// to-do
-			// 2. draw another tile to replace mapPlayers.get(firstPlayer)[userChoice[1])
-			mapPlayers.get(firstPlayer)[userChoice[1]] = drawATile();
+			mapPlayers.get(firstPlayer)[userChoice[1]] = null;        // analogous to put off one tile at hand
+			// 2. draw another tile to restore to 4 tiles in hand
+			mapPlayers.get(firstPlayer)[userChoice[1]] = drawATile(); // analogous draw a tile to fill the hole
 		} else {
 			System.out.println("Illegal first move, please try again.");
 			// need a mechanism to make user try again.
@@ -169,23 +161,11 @@ public class GameControl {
 	 */
 	private boolean sanitaryCheckFirstMove(int[] choices) {
 		// not a bonus field
-		boolean cond1 = !board.isBonusField(choices[0]);
+		boolean cond1 = !Board.isBonusField(choices[0]);
 		// direction of field match rotation of tile
-		boolean cond2 = board.isFacingUp(choices[0]) == (choices[2] % 2 == 0);
+		boolean cond2 = Board.isFacingUp(choices[0]) == (choices[2] % 2 == 0);
 		
 		return cond1 && cond2;
-	}
-	
-	/**
-	 * Get a tile from the bag, nullify the corresponding tile in the tilesCopy, 
-	 * and update firstNonNullIdx.
-	 * @return The tile being drew from the bag.
-	 */
-	public Tile drawATile() {
-		Tile t = bag.getTiles().get(firstNonNullIdx);
-		tilesCopy.set(firstNonNullIdx, null);
-		firstNonNullIdx++;
-		return t;
 	}
 	
 	// ----------------- NormalMove and its sanitaryCheck -----------------
@@ -210,13 +190,61 @@ public class GameControl {
 //	}
 
 	
-	// ================== Gaming: other functionalities ==================
-		/**
-		 * Safety measurement before every new game.
-		 */
-		public void resetBoard() {
-			board.resetBoard();
+	// ================== Gaming: other common functionalities ==================
+	// ------------------ that both FirstMove and NormalMove can use ------------------
+	/**
+	 * Safety measurement before every new game.
+	 */
+	public void resetBoard() {
+		board.resetBoard();
+	}
+	
+	/**
+	 * Get a tile from the bag, and nullify the corresponding tile in the tilesCopy, 
+	 * and update firstNonNullIdx.
+	 * @return The tile being drew from the bag.
+	 */
+	public Tile drawATile() {
+		Tile t = bag.getTiles().get(firstNonNullIdx);
+		tilesCopy.set(firstNonNullIdx, null);
+		firstNonNullIdx++;
+		return t;
+	}
+	
+	
+	/**
+	 * [to be tested] Show all tiles at one player's hand, it should accommodate the situation
+	 * that the player has 4 tiles, or less than 4 tiles.
+	 * The latter can happen when the bag is empty, no more tile to draw to restore to 4.
+	 */
+	public void showtiles() {
+		for (int j = 0; j < 4; j++) {
+			for (int i = 0; i < mapPlayers.values().size(); i++) {
+					String template =                     " ʌ\n" +
+			                "                              / \\\n" +
+			                "                             /  \\\n" +
+			                "                            /"+ mapPlayers.get(listPlayers.get(i))[j].getLeft() + "  " + mapPlayers.get(listPlayers.get(i))[j].getValue() + "  " + mapPlayers.get(listPlayers.get(i))[j].getLeft() +"\\\n" +
+			                "                           /   " + mapPlayers.get(listPlayers.get(i))[j].getVertical() +"   \\\n" +
+			                "                          /---------\\\n" ;
+			System.out.print(template + "  ");
+			}
 		}
+		
+	}
+
+	/**
+	 * Get data from board, ask tui to print them.
+	 */
+	public void printBoard() {
+		tui.printBoardDynamic(board.getValuesOnBoard(), 
+							  board.getVerticalOnBoard(), 
+							  board.getLeftOnBoard(),
+							  board.getRightOnBoard());
+	}
+	
+	public void putTileOnBoard(int idx, Tile t) {
+		board.setTile(idx, t);
+	}
 	
 	// ======================== Queries ========================
 
@@ -242,16 +270,6 @@ public class GameControl {
 		return tilesCopy;
 	}
 
-	public void showtile(Tile t) {
-		String template =                     " \n" +
-                "                              / \\\n" +
-                "                             /   \\\n" +
-                "                            /"+ t.getLeft()+" " + t.getValue() + " " +t.getLeft() +"\\\n" +
-                "                           /   " + t.getVertical() +"   \\\n" +
-                "                          /---------\\\n" ;
-		System.out.print(template + "  ");
-	}
-
 	/**
 	 * A getter of this.bag.getTiles(); 
 	 * Don't change it after getting it!
@@ -261,26 +279,41 @@ public class GameControl {
 		return bag.getTiles();
 	}
 	
-//	 public static void main(String[] args) {
-//		 List<Player> lp = new ArrayList<>();
-//		 boolean shuffle = true;
-//		 Tile t = new Tile(3, "RGB");
-//		 GameControl g = new GameControl(lp, shuffle);
-//		 g.showtile(t);
-//		 
-//		 
-//	 }
-//	
 	// ======================== Main ========================
 	public static void main(String[] args) {
 		
-		GameControl shu3 = new GameControl( Arrays.asList(new HumanPlayer("A"),
-															 new HumanPlayer("B"),
-															 new HumanPlayer("C")), 
-											  true);
-		shu3.dealTiles();
-		System.out.println(shu3.getTilesCopy());
+		GameControl shuffled3P = new GameControl( Arrays.asList(new HumanPlayer("A"),
+				 new HumanPlayer("B"),
+				 new HumanPlayer("C")), 
+  true);
 		
+		shuffled3P.printBoard(); // empty board
+		
+		Tile t = new Tile(3, "RGB");
+		
+		// test rotateTileOnce
+		shuffled3P.putTileOnBoard(25, t);
+		shuffled3P.printBoard();  // idx 25 filled with rotation 0 of the tile
+		
+		shuffled3P.putTileOnBoard(27, t.rotateTileOnce().rotateTileOnce());
+		shuffled3P.printBoard(); // additionally, idx 27 filled with rotation 2 of the tile
+		
+		shuffled3P.putTileOnBoard(29, t.rotateTileOnce().rotateTileOnce().rotateTileOnce().rotateTileOnce());
+		shuffled3P.printBoard(); // additionally, idx 27 filled with rotation 4 of the tile
+		
+//		System.out.println(t.rotateTileOnce().rotateTileOnce().rotation);
+		
+		// test rotateTileTwice
+		shuffled3P.putTileOnBoard(31, t);
+		shuffled3P.printBoard();  // idx 31 filled with rotation 0 of the tile
+		
+		shuffled3P.putTileOnBoard(33, t.rotateTileTwice());
+		shuffled3P.printBoard(); // additionally, idx 33 filled with rotation 2 of the tile
+		
+		shuffled3P.putTileOnBoard(35, t.rotateTileTwice().rotateTileTwice());
+		shuffled3P.printBoard(); // additionally, idx 35 filled with rotation 4 of the tile
+		
+		// the appearence of 25 and 31, 27 and 33, 29 and 35 should be identical
 	}
 
 }

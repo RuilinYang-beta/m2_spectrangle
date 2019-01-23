@@ -72,7 +72,7 @@ public class Tile {
 			char l = getLeft();
 			putLeft(v);
 			putVertical(l);
-			this.rotate(this.getRotation() + 1);
+//			this.rotate(this.getRotation() + 1);
 		} else {
 			char v = getVertical();
 			char l = getLeft();
@@ -80,13 +80,64 @@ public class Tile {
 			putLeft(l);
 			putRight(v);
 			putVertical(r);
-			if (this.getRotation() == 5) {
-				this.rotate(0);
-			} else {
-				this.rotate(this.getRotation() + 1);
-			}
+//			if (this.getRotation() == 5) {
+//				this.rotate(0);
+//			} else {
+//				this.rotate(this.getRotation() + 1);
+//			}
 		}
+		rotation =  (rotation + 1) % 6;
 	} 
+	
+	/**
+	 * @return A new Tile of this tile, after rotate once.
+	 */
+	public Tile rotateTileOnce() {
+		Tile t = new Tile(this.value, "BBB"); // this color doesn't really exist, only to fill constructor
+		
+		if (this.getRotation() % 2 == 0) {
+			t.putRight(right);
+			t.putVertical(left);
+			t.putLeft(vertical);
+		} else {
+			t.putLeft(left);
+			t.putRight(vertical);
+			t.putVertical(right);
+		}
+		t.rotation =  (rotation + 1) % 6;
+		return t;
+	}
+	
+	public Tile rotateTileTwice() {
+		Tile t = new Tile(this.value, "BBB"); // this color doesn't really exist, only to fill constructor
+		
+		t.putVertical(right);
+		t.putRight(left);
+		t.putLeft(vertical);
+		
+		t.rotation =  (rotation + 2) % 6;
+		return t;
+	}
+	
+	
+	
+
+
+//	public void rotate(int rotation) {
+//		if(rotation >= 0 && rotation < 6) {
+//			this.rotation = rotation;
+//		}
+//	}
+	
+	/*
+	 * @ensures \result == this.rotation;
+	 */
+	/**
+	 * @return this.rotation 
+	 */
+	public int getRotation() {
+		return this.rotation;
+	}
 	
 	/*
 	 * @ensures \result == this.left;
@@ -137,24 +188,8 @@ public class Tile {
 		return this.value;
 	}
 	
-	/*
-	 * @ensures \result == this.rotation;
-	 */
-	/**
-	 * @return this.rotation 
-	 */
-	public int getRotation() {
-		return this.rotation;
-	}
-	
-	/*
-	 * 
-	 */
-	public void rotate(int rotation) {
-		if(rotation >= 0 && rotation < 6) {
-			this.rotation = rotation;
-		}
-	}
+
+
 	
 	/**
 	 * @return String representation of the tile in the next format: rotation + String representing the colors + value;

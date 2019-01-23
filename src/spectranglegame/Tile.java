@@ -24,7 +24,7 @@ public class Tile {
 	}
 	
 	/**
-	 * An alternative constuctor. 
+	 * An alternative constructor. 
 	 * @param value
 	 * @param vColor
 	 * @param lColor
@@ -181,15 +181,19 @@ public class Tile {
 	    return "" + stringTile().charAt(1) + stringTile().charAt(2) + stringTile().charAt(3) + stringTile().charAt(4);
 	 }
 	 
-	 public void tileRepresentation() {
-		 
-	 }
+	/*
+	 * @ requires this.rotation % 2 == 0;
+	 */
+	public void showTile() {
+		String template =                     " \n" +
+                "                              / \\\n" +
+                "                             /   \\\n" +
+                "                            /"+ left+" " + value + " " +right +"\\\n" +
+                "                           /   " + vertical +"   \\\n" +
+                "                          /---------\\\n" ;
+		System.out.print(template + "  ");
+	}
 	 
-	 @Override
-	 protected Tile clone() throws CloneNotSupportedException {
-
-	     return (Tile) super.clone();
-	 }
 	 
 	public static void main(String[] args) {
 		Tile t = new Tile(3,"RGB");

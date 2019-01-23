@@ -12,7 +12,7 @@ class Tiletest1 {
 
 	@BeforeEach
 	void setUp() throws Exception {
-	t = new Tile(3,"RGB");
+		t = new Tile(3,"RGB");
 	}
 
 	@Test
@@ -47,5 +47,23 @@ class Tiletest1 {
 		assertEquals("RGB3", t.toString());
 	}
 	
+	@Test
+	public void testShowTileAllUpRotation() {
+		t.showTile();    // show rotation 0
+		
+		t.rotateTile();
+		t.rotateTile();
+		t.showTile();    // show rotation 2
+		
+		t.rotateTile();
+		t.rotateTile();
+		t.showTile();    // show rotation 4
+		
+	}
+	
+	@Test
+	public void testShowTileAllDownRotation() {
+		;
+	}
 
 }

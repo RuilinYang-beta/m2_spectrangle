@@ -105,9 +105,20 @@ public class GameControl {
 		return (idx1 + idx2) == (valuesCopy.size() - 1);
 	}
 	
-	
-	
-
+	public void showtiles() {
+		for (int j = 0; j < 4; j++) {
+			for (int i = 0; i < mapPlayers.values().size(); i++) {
+					String template =                     " ʌ\n" +
+			                "                              / \\\n" +
+			                "                             /  \\\n" +
+			                "                            /"+ mapPlayers.get(listPlayers.get(i))[j].getLeft() + "  " + mapPlayers.get(listPlayers.get(i))[j].getValue() + "  " + mapPlayers.get(listPlayers.get(i))[j].getLeft() +"\\\n" +
+			                "                           /   " + mapPlayers.get(listPlayers.get(i))[j].getVertical() +"   \\\n" +
+			                "                          /---------\\\n" ;
+			System.out.print(template + "  ");
+			}
+		}
+		
+	}
 	/**
 	 * A getter of mapPlayers.
 	 */
@@ -115,9 +126,26 @@ public class GameControl {
 		return mapPlayers;
 	}
 	
+	public void showtile(Tile t) {
+		String template =                     " \n" +
+                "                              / \\\n" +
+                "                             /   \\\n" +
+                "                            /"+ t.getLeft()+" " + t.getValue() + " " +t.getLeft() +"\\\n" +
+                "                           /   " + t.getVertical() +"   \\\n" +
+                "                          /---------\\\n" ;
+		System.out.print(template + "  ");
+	}
 	
 	
-	
+	 public static void main(String[] args) {
+		 List<Player> lp = new ArrayList<>();
+		 boolean shuffle = true;
+		 Tile t = new Tile(3, "RGB");
+		 GameControl g = new GameControl(lp, shuffle);
+		 g.showtile(t);
+		 
+		 
+	 }
 	
 
 }

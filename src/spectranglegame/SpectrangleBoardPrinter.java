@@ -9,17 +9,19 @@ import spectranglegame.Tile;
 
 public class SpectrangleBoardPrinter {
     private static List<Integer> bonuses =       Arrays.asList(1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 4, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2, 1, 1, 1, 3, 1);
-    private static List<Integer> values =        Arrays.asList(null,   null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+    private static List<Integer> values =        Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     private static List<Character> vertical =    Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     private static List<Character> left =        Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     private static List<Character> right =       Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-    private static Bag t = new Bag();
+    private static Bag t;
     
     public static void main(String[] args) {
         // This is an example of a random tile put on the board.
-        Tile tile = t.randomTile();
+        //Tile tile = t.randomTile();
+    	t = new Bag(true);
+    	Tile tile = t.getTile(1);
         SpectrangleBoardPrinter t12 = new SpectrangleBoardPrinter();
-        t12.putTile(tile);
+        t12.putTile(tile, 1);
         System.out.println(getBoardString(values, vertical, left, right));
     }
 
@@ -76,22 +78,22 @@ public class SpectrangleBoardPrinter {
                 "                        / {f1b} \\{f20}{f2v} {f21}/ {f3b} \\\n" +
                 "                       /{f10}{f1v} {f11}\\ {f2b} /{f30}{f3v} {f31}\\\n" +
                 "                      /   {f12}   \\ /   {f32}   \\\n" +
-                "                     /---------Ó¾---------\\\n" +
+                "                     /---------Ó---------\\\n" +
                 "                    / \\   {f52}   / \\   {f72}   / \\\n" +
                 "                   / {f4b} \\{f50}{f5v} {f51}/ {f6b} \\{f70}{f7v} {f71}/ {f8b} \\\n" +
                 "                  /{f40}{f4v} {f41}\\ {f5b} /{f60}{f6v} {f61}\\ {f7b} /{f80}{f8v} {f81}\\\n" +
                 "                 /   {f42}   \\ /   {f62}   \\ /   {f82}   \\\n" +
-                "                /---------Ó¾---------Ó¾---------\\\n" +
+                "                /---------Ó---------Ó---------\\\n" +
                 "               / \\   {f102}   / \\   {f122}   / \\   {f142}   / \\\n" +
                 "              / {f9b} \\{f100}{f10v} {f101}/ {f11b} \\{f120}{f12v} {f121}/ {f13b} \\{f140}{f14v} {f141}/ {f15b} \\\n" +
                 "             /{f90}{f9v} {f91}\\ {f10b} /{f110}{f11v} {f111}\\ {f12b} /{f130}{f13v} {f131}\\ {f14b} /{f150}{f15v} {f151}\\\n" +
                 "            /   {f92}   \\ /   {f112}   \\ /   {f132}   \\ /   {f152}   \\\n" +
-                "           /---------Ó¾---------Ó¾---------Ó¾---------\\\n" +
+                "           /---------Ó---------Ó---------Ó---------\\\n" +
                 "          / \\   {f172}   / \\   {f192}   / \\   {f212}   / \\   {f232}   / \\\n" +
                 "         / {f16b} \\{f170}{f17v} {f171}/ {f18b} \\{f190}{f19v} {f191}/ {f20b} \\{f210}{f21v} {f211}/ {f22b} \\{f230}{f23v} {f231}/ {f24b} \\\n" +
                 "        /{f160}{f16v} {f161}\\ {f17b} /{f180}{f18v} {f181}\\ {f19b} /{f200}{f20v} {f201}\\ {f21b} /{f220}{f22v} {f221}\\ {f23b} /{f240}{f24v} {f241}\\\n" +
                 "       /   {f162}   \\ /   {f182}   \\ /   {f202}   \\ /   {f222}   \\ /   {f242}   \\\n" +
-                "      /---------Ó¾---------Ó¾---------Ó¾---------Ó¾---------\\\n" +
+                "      /---------Ó---------Ó---------Ó---------Ó---------\\\n" +
                 "     / \\   {f262}   / \\   {f282}   / \\   {f302}   / \\   {f322}   / \\   {f342}   / \\\n" +
                 "    / {f25b} \\{f260}{f26v} {f261}/ {f27b} \\{f280}{f28v} {f281}/ {f29b} \\{f300}{f30v} {f301}/ {f31b} \\{f320}{f32v} {f321}/ {f33b} \\{f340}{f34v} {f341}/ {f35b} \\\n" +
                 "   /{f250}{f25v} {f251}\\ {f26b} /{f270}{f27v} {f271}\\ {f28b} /{f290}{f29v} {f291}\\ {f30b} /{f310}{f31v} {f311}\\ {f32b} /{f330}{f33v} {f331}\\ {f34b} /{f350}{f35v} {f351}\\\n" +
@@ -122,13 +124,17 @@ public class SpectrangleBoardPrinter {
         return indexed_values;
     }
     
-    public void putTile(Tile tile) {
-   	 int i = t.getIndex(tile.toString());
-        values.set(i, tile.getValue());
-        vertical.set(i, tile.getVertical());
-        left.set(i, tile.getLeft());
-        right.set(i, tile.getRight());
-    }
-    
+	public void putTile(Tile tile, int pos) {
+		if (values.get(pos) == null) {
+			values.set(pos, tile.getValue());
+			vertical.set(pos, tile.getVertical());
+			left.set(pos, tile.getLeft());
+			right.set(pos, tile.getRight());
+		}
+		else {
+			System.out.println("position already occupied");
+		}
+	}
+
 }
 

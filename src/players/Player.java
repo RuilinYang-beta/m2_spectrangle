@@ -9,14 +9,18 @@ public abstract class Player {
 	protected Tile[] tiles;
 	
 	/*
+	 * @requires tiles != null;
 	 * @requires n != null;
 	 * @ensures this.getName() == n; 
+	 * @ensures this.getTiles() == tiles
 	 */
 	/**
 	 * @param n represents the name of the player
+	 * @param tiles represents the tiles that a player will have in hand
 	 */
-	public Player(String n) {
+	public Player(String n, Tile[] tiles) {
 		this.name = n;
+		this.tiles = tiles;
 	}
 	
 	public String getName() {
@@ -28,13 +32,6 @@ public abstract class Player {
 	 * @requires tiles != null;
 	 * @ensures this.getTiles() == tiles;
 	 */
-	/**
-	 * @param tiles represents the tiles that the player will receive and have in hand
-	 */
-	public void TilesinHand(Tile[] tiles) {
-		this.tiles = tiles;
-	}
-	
 	/*
 	 * Returns the tiles in the hand of ther player
 	 */
@@ -46,17 +43,16 @@ public abstract class Player {
 
 	public abstract int chooseField(Board b);
 
-	
-	public Tile chooseTile(){
-		// choose a Tile, return the Tile
-		// and accordingly set the Tile in TileAtHand to null
-		
-		return null;
-	}
+	// choose a Tile, return the Tile
+	// and accordingly set the Tile in TileAtHand to null
+//	public Tile chooseTile(){
+//	
+//		
+//	}
 	
 	public Tile chooseRotation(Tile[] allRotation) {
 		
-		// return the Tile of the chosen rotation
+		
 		return null;
 	}
 	

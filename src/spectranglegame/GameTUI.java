@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import players.*;
 
 import javax.swing.text.html.HTMLDocument.HTMLReader.CharacterAction;
-
+import java.util.Scanner;
 public class GameTUI {
 	
 	// =========== Static Fields: only for test purpose ===========
@@ -39,9 +39,18 @@ public class GameTUI {
      * @return The index of the player's choice.
      */
     public int askField(Player p, Board b) {
-    	int i = 0; // this will be replaced by user input.
-    	chosenFieldFacingUp = Board.isFacingUp(i);
-    	return p.chooseField(b);
+    	Scanner in = new Scanner(System.in);
+    	System.out.println("Chose a field to place a tile: ");
+    	String s = in.nextLine();
+    	int i = Integer.parseInt(s);
+    	if(s != null && i < 36 && i >= 0) {
+    		chosenFieldFacingUp = Board.isFacingUp(i);
+    		return p.chooseField(b);
+    	}
+    	else {
+    		System.out.println("Incorrect field");
+    		return -1;
+    	}
     }
     
     /**
@@ -62,7 +71,8 @@ public class GameTUI {
      */
     private Tile askTile(Player p) {
     	// add interaction 
-    	return p.chooseTile();
+    //	return p.chooseTile();
+    	return null;
     }
     
     

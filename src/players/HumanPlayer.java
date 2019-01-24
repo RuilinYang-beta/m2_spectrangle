@@ -8,8 +8,8 @@ public class HumanPlayer extends Player{
 	private String name;
 	private Tile[] tilesAtHand;
 	
-	public HumanPlayer(String n) {
-		super(n);
+	public HumanPlayer(String n, Tile[] tiles) {
+		super(n,tiles);
 	}
 	
 	public String getName() {

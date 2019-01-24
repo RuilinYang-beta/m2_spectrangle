@@ -7,7 +7,7 @@ import spectranglegame.*;
 public abstract class Player {
 	protected String name;
 	protected Tile[] tiles;
-	
+
 	/*
 	 * @requires tiles != null;
 	 * @requires n != null;
@@ -54,6 +54,15 @@ public abstract class Player {
 		
 		
 		return null;
+	}
+	
+	
+	/*
+	 * Put the Tile at the first null position of Tiles[].
+	 * @ requires There exists at least one null value in Tiles[] .
+	 */
+	public void takeTheTile(Tile t) {
+		
 	}
 	
 	

@@ -30,6 +30,7 @@ public class GameControl {
 	// ======================== Constructor ========================
 	public GameControl(List<Player> lp, boolean shuffle) {
 		this.board = new Board();
+//		this.tui = new GameTUI(this, this.board);
 		this.tui = new GameTUI(this);
 		
 		this.bag = new Bag(shuffle);
@@ -136,15 +137,15 @@ public class GameControl {
 		
 		Player firstPlayer = listPlayers.get(firstPlayerIdx);
 		
-		int theField = tui.askField(firstPlayer);
-		Tile theTile = tui.askRotation(firstPlayer);
+		int theField = tui.askField(firstPlayer, board);
+		Tile theTile = tui.askTileAndRotation(firstPlayer);
 		
 		// if userChoice is legal
-		if (sanitaryCheckFirstMove(theField, theTile)) {
+		if (firstMoveSanitary(theField, theTile)) {
 			// 1. place the chosen rotation of chosen tile on the chosen field
 			putTileOnBoard(theField, theTile);
-//			mapPlayers.get(firstPlayer)[userChoice[1]] = null;        // analogous to put off one tile at hand
-			// 2. draw another tile to restore to 4 tiles in hand
+
+			// 2. deal one tile to player, to restore to 4 tiles in hand
 //			mapPlayers.get(firstPlayer)[userChoice[1]] = drawATile(); // analogous draw a tile to fill the hole
 		} else {
 			System.out.println("Illegal first move, please try again.");
@@ -159,9 +160,9 @@ public class GameControl {
 	 * 				  [idxFieldOfChoice, idxOfTilesAtHand, rotationOfTile]
 	 * @return true if choice is a legal move by all means.
 	 */
-	private boolean sanitaryCheckFirstMove(int fieldIdx, Tile chosenTile) {
+	private boolean firstMoveSanitary(int fieldIdx, Tile chosenTile) {
 		// not a bonus field
-		boolean cond1 = !Board.isBonusField(fieldIdx);
+		boolean cond1 = !Board.isBonusField(fieldIdx) && board.fieldIsEmpty(fieldIdx);
 		// direction of field match rotation of tile
 		boolean cond2 = Board.isFacingUp(fieldIdx) == chosenTile.isFacingUp();
 		

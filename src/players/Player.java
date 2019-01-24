@@ -17,12 +17,18 @@ public abstract class Player {
 	
 	public abstract int chooseField(Board b);
 	
-	// This function is only meant for interaction between Player and TUI
-	// Return an intermediate product that GameControl do not need.
-	public abstract Tile chooseTile();
+	public Tile chooseTile(){
+		// choose a Tile, return the Tile
+		// and accordingly set the Tile in TileAtHand to null;
+		
+		return null;
+	}
 	
-	// the Tile t is the returned object of chooseTile()
-	public abstract Tile chooseRotation(Tile t);
+	public Tile chooseRotation(Tile[] allRotation) {
+		
+		// return the Tile of the chosen rotation
+		return null;
+	}
 	
 	
 }

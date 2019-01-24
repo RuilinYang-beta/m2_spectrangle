@@ -22,35 +22,78 @@ public class GameTUI {
 
     // =========== Instance Field ===========
 	private GameControl control;
+	private Board board;
+	private Boolean chosenFieldFacingUp = null;
 	
 	// =========== Constructor ===========
+//	public GameTUI(GameControl gc, Board bd) {
 	public GameTUI(GameControl gc) {
 		this.control = gc;
+//		this.board = bd;
 	}
 
 	// ========================= Ask User Input =========================
     /**
+     * Ask user to choose a field on board.
      * @param p Ask this player for input.
      * @return The index of the player's choice.
      */
-    public int askField(Player p) {
-    	return 0;
+    public int askField(Player p, Board b) {
+    	int i = 0; // this will be replaced by user input.
+    	chosenFieldFacingUp = Board.isFacingUp(i);
+    	return p.chooseField(b);
     }
     
     /**
+     * Ask user to choose a Tile and its rotation.
+     * @param p
+     * @return
+     */
+    public Tile askTileAndRotation(Player p) {
+    	Tile baseTile = askTile(p);
+    	Tile chosenTileAndRotation = askRotation(p, baseTile);
+    	return chosenTileAndRotation;
+    }
+    
+    /**
+     * Helper function of askTileAndRotation(Player p).
      * @param p Ask this player for input.
      * @return The Tile (cloned) of the player's choice. 
      */
-    public Tile askTile(Player p) {
-    	return null;
+    private Tile askTile(Player p) {
+    	// add interaction 
+    	return p.chooseTile();
     }
     
+    
     /**
-     * @param p Ask this player for input.
-     * @return The Tile (rotated and cloned) of the player's choice.s
+     * Helper function of askTileAndRotation(Player p).
+     * Generate 3 different rotation from the base Tile, ask user to choose one rotation.
+     * @param p The player to ask
+     * @param t The tile with rotation 0, as the base Tile
+     * @return
      */
-    public Tile askRotation(Player p) {
-    	return null;
+    private Tile askRotation(Player p, Tile baseT) {
+    	// Generate 3 different rotation from the base Tile,
+    	Tile[] allRotation = new Tile[3];
+    	// fill allRotation
+    	if (chosenFieldFacingUp) {
+    		// fill 3 rotation facing up
+    		
+    		// then, set chosenFieldFacingUp back to null;
+    		chosenFieldFacingUp = null;
+    	} else if (!chosenFieldFacingUp) {
+    		// fill 3 rotation facing down
+    		
+    		// then, set chosenFieldFacingUp back to null;
+    		chosenFieldFacingUp = null;
+    	} else {
+    		System.out.println("Error! chosen field direction unknow!");
+    	}
+    	
+    	// add interaction 
+    	
+    	return p.chooseRotation(allRotation);
     }
 
     

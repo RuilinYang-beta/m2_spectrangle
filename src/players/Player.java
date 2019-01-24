@@ -7,7 +7,7 @@ import spectranglegame.*;
 public abstract class Player {
 	protected String name;
 	protected Tile[] tilesAtHand;
-
+	protected int score;
 	/*
 	 * @requires tiles != null;
 	 * @requires n != null;
@@ -21,6 +21,7 @@ public abstract class Player {
 	public Player(String n, Tile[] tiles) {
 		this.name = n;
 		this.tilesAtHand = new Tile[4];
+		score = 0;
 	}
 	
 	public String getName() {
@@ -41,7 +42,7 @@ public abstract class Player {
 	
 //	public abstract int determineMove(Board b);
 
-	public abstract int chooseField(Board b);
+	//public abstract int chooseField(Board b);
 
 	// choose a Tile, return the Tile
 	// and accordingly set the Tile in TileAtHand to null

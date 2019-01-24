@@ -41,11 +41,11 @@ public class GameTUI {
     public int askField(Player p, Board b) {
     	Scanner in = new Scanner(System.in);
     	System.out.println("Chose a field to place a tile: ");
-    	String s = in.nextLine();
-    	int i = Integer.parseInt(s);
-    	if(s != null && i < 36 && i >= 0) {
+    	int i = in.nextInt();
+    	in.close();
+    	if(b.isLegalIdx(i)) {
     		chosenFieldFacingUp = Board.isFacingUp(i);
-    		return p.chooseField(b);
+    		return i;
     	}
     	else {
     		System.out.println("Incorrect field");
@@ -70,9 +70,16 @@ public class GameTUI {
      * @return The Tile (cloned) of the player's choice. 
      */
     private Tile askTile(Player p) {
-    	// add interaction 
-    //	return p.chooseTile();
-    	return null;
+    	Scanner in = new Scanner(System.in);
+    	int i = in.nextInt();
+    	Tile[] tilesinhand = p.getTiles();
+    	in.close();
+    	if(i >= 0 && i < 5) {
+    		return tilesinhand[i];
+    	}else {
+    		System.out.println("Incorrect input for tile.");
+    		return null;
+    	}
     }
     
     

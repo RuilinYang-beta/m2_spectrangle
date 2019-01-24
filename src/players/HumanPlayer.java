@@ -7,6 +7,8 @@ public class HumanPlayer extends Player{
 	
 	private String name;
 	private Tile[] tilesAtHand;
+	private int score;
+	
 	
 	public HumanPlayer(String n, Tile[] tiles) {
 		super(n,tiles);
@@ -21,18 +23,44 @@ public class HumanPlayer extends Player{
 		return null;
 	}
 	
-	public int chooseField(Board b) {
-		Scanner in = new Scanner(System.in);
-		int num = in.nextInt();
-		return num;
+	
+	public String determineMove(Board b) {
+		String prompt = "Player " + getName() + "what is your move?";
+		String choice = readLine(prompt);
+		Tile t = new Tile()
 	}
 	
-	public Tile chooseTile() {
-		return null;
-	}
+    private String readLine(String prompt) {
+        String value = "";
+        boolean intRead = false;
+        @SuppressWarnings("resource")
+        Scanner line = new Scanner(System.in);
+        do {
+            System.out.print(prompt);
+            try (Scanner scannerLine = new Scanner(line.nextLine());) {
+                if (scannerLine.hasNextLine()) {
+                    intRead = true;
+                    value = scannerLine.nextLine();
+                }
+            }
+        } while (!intRead);
+        return value;
+    }
+	// ====== These functions are already made in gameTUI, so there is no need to have them in here ===== 
+//	public int chooseField(Board b) {
+//		Scanner in = new Scanner(System.in);
+//		int num = in.nextInt();
+//		return num;
+//	}
+//	
+//	public Tile chooseTile() {
+//		return null;
+//	}
+//	
+//	public Tile chooseRotation(Tile t) {
+//		return null;
+//	}
+ // ===========================
 	
-	public Tile chooseRotation(Tile t) {
-		return null;
-	}
-
+	
 }

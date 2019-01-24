@@ -18,7 +18,7 @@ public class GameControl {
 	private GameTUI tui;
 	
 	private Bag bag;
-	private List<Tile> tilesCopy;  // for safety, don't want to change a collection when looping through it
+//	private List<Tile> tilesCopy;  // for safety, don't want to change a collection when looping through it
 	private int firstNonNullIdx;   // for safety, auxiliary to tilesCopy
 	
 	private final int numPlayers;
@@ -35,7 +35,7 @@ public class GameControl {
 		
 		this.bag = new Bag(shuffle);
 		// a clone of bag.getTiles()
-		this.tilesCopy = new ArrayList<>(bag.getTiles());
+//		this.tilesCopy = new ArrayList<>(bag.getTiles());
 		firstNonNullIdx = 0;
 		
 		this.numPlayers = lp.size();
@@ -62,11 +62,13 @@ public class GameControl {
 		
 		// for each of the 4 slot in Tile[4]
 		for (int j = 0; j < 4; j++) {
-			// give each user one tile and remove the tile from the tilesCopy
+			// give each user one tile and remove the tile from the bag
 			for (int i = 0; i < numPlayers; i++) {
-				mapPlayers.get(listPlayers.get(i))[j] = this.bag.getTiles().get(j * numPlayers + i);
-				this.tilesCopy.set(j * numPlayers + i, null); 
-				firstNonNullIdx++;
+//				mapPlayers.get(listPlayers.get(i))[j] = this.bag.getTiles().get(j * numPlayers + i);
+//				bag.getTiles().set(j * numPlayers + i, null); 
+//				firstNonNullIdx++;
+				dealATileToPlayer(listPlayers.get(i));
+//				mapPlayers.get(listPlayers.get(i))[j] = drawATile();
 			} 
 		
 			// if the player to make the first move is undetermined
@@ -144,9 +146,9 @@ public class GameControl {
 		if (firstMoveSanitary(theField, theTile)) {
 			// 1. place the chosen rotation of chosen tile on the chosen field
 			putTileOnBoard(theField, theTile);
-
 			// 2. deal one tile to player, to restore to 4 tiles in hand
-//			mapPlayers.get(firstPlayer)[userChoice[1]] = drawATile(); // analogous draw a tile to fill the hole
+			dealATileToPlayer(firstPlayer);
+
 		} else {
 			System.out.println("Illegal first move, please try again.");
 			// need a mechanism to make user try again.
@@ -201,15 +203,19 @@ public class GameControl {
 	}
 	
 	/**
-	 * Get a tile from the bag, and nullify the corresponding tile in the tilesCopy, 
-	 * and update firstNonNullIdx.
+	 * Draw the first non-null Tile, and set its position as null, and update firstNonNullIdx.
 	 * @return The tile being drew from the bag.
 	 */
 	public Tile drawATile() {
 		Tile t = bag.getTiles().get(firstNonNullIdx);
-		tilesCopy.set(firstNonNullIdx, null);
+		bag.getTiles().set(firstNonNullIdx, null);
 		firstNonNullIdx++;
 		return t;
+	}
+	
+	public void dealATileToPlayer(Player p) {
+		Tile t = drawATile();
+		p.takeTheTile(t);
 	}
 	
 	
@@ -267,9 +273,9 @@ public class GameControl {
 	 * A getter of tilesCopy.
 	 * @return
 	 */
-	public List<Tile> getTilesCopy() {
-		return tilesCopy;
-	}
+//	public List<Tile> getTilesCopy() {
+//		return tilesCopy;
+//	}
 
 	/**
 	 * A getter of this.bag.getTiles(); 

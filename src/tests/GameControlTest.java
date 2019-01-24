@@ -23,59 +23,59 @@ class GameControlTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		
-		shuffled3P = new GameControl( Arrays.asList(new HumanPlayer("A"),
-													 new HumanPlayer("B"),
-													 new HumanPlayer("C")), 
+		shuffled3P = new GameControl( Arrays.asList(new HumanPlayer("A", new Tile[4]),
+													 new HumanPlayer("B", new Tile[4]),
+													 new HumanPlayer("C", new Tile[4])), 
 									   true);
 
-		unshuffled3P = new GameControl( Arrays.asList(new HumanPlayer("A"),
-												 new HumanPlayer("B"),
-												 new HumanPlayer("C")), 
+		unshuffled3P = new GameControl( Arrays.asList(new HumanPlayer("A", new Tile[4]),
+												 new HumanPlayer("B", new Tile[4]),
+												 new HumanPlayer("C", new Tile[4])), 
 								  false);
 
-		unshuffled4P = new GameControl( Arrays.asList(new HumanPlayer("A"),
-												 new HumanPlayer("B"),
-												 new HumanPlayer("C"),
-												 new HumanPlayer("D")),
+		unshuffled4P = new GameControl( Arrays.asList(new HumanPlayer("A", new Tile[4]),
+												 new HumanPlayer("B", new Tile[4]),
+												 new HumanPlayer("C", new Tile[4]),
+												 new HumanPlayer("D", new Tile[4])),
 								  false);
 														
 	}
 
-//	@Test
-//	void testDealTilesUnshuffled() {
-//		// an unshu bag with 3 players will not determine the first player
-//		assertNull(unshuffled3P.dealTiles());
-//		// we know an unshu bag with 4 players
-//		// will result in the first player make the first move 
-//		assertEquals(0, (int) unshuffled4P.dealTiles());
-//	}
-//	
-//	
-//	/**
-//	 * Try to come up with a stronger test.
-//	 */
-//	@Test
-//	void testDealTilesShuffled() {
-//		// should be equal because when GameControl is created ,
-//		// order of tiles is determined.
-//		assertEquals(shuffled3P.dealTiles(), shuffled3P.dealTiles());
-////		System.out.println(shu3.getTiles());
-//	}
+	@Test
+	void testDealTilesUnshuffled() {
+		// an unshu bag with 3 players will not determine the first player
+		assertNull(unshuffled3P.dealTiles());
+		// we know an unshu bag with 4 players
+		// will result in the first player make the first move 
+		assertEquals(0, (int) unshuffled4P.dealTiles());
+	}
 	
-//	@Test
-//	void testDrawAtile() {
-//		List<Tile> tiles = shuffled3P.getTiles();
-//
-//		// draw each of the 36 Tiles and print them
-//		for (int i = 0; i < 36; i++) {
-//			Tile t = shuffled3P.drawATile();
-//			System.out.println(t);
-//		}
-//		
-//		// after draw 36 tiles, tiles should be a list of 36 null
-//		for (int i = 0; i < tiles.size(); i++) {
-//			assertNull(tiles.get(i));
-//		}
+	
+	/**
+	 * Try to come up with a stronger test.
+	 */
+	@Test
+	void testDealTilesShuffled() {
+		// should be equal because when GameControl is created ,
+		// order of tiles is determined.
+		assertEquals(shuffled3P.dealTiles(), shuffled3P.dealTiles());
+//		System.out.println(shu3.getTiles());
+	}
+	
+	@Test
+	void testDrawAtile() {
+		List<Tile> tiles = shuffled3P.getTiles();
+
+		// draw each of the 36 Tiles and print them
+		for (int i = 0; i < 36; i++) {
+			Tile t = shuffled3P.drawATile();
+			System.out.println(t);
+		}
+		
+		// after draw 36 tiles, tiles should be a list of 36 null
+		for (int i = 0; i < tiles.size(); i++) {
+			assertNull(tiles.get(i));
+		}
 		
 	}
 

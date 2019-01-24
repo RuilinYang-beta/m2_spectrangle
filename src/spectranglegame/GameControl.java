@@ -144,7 +144,7 @@ public class GameControl {
 		int theField = tui.askField(firstPlayer, board);
 		Tile theTile = tui.askTileAndRotation(firstPlayer);
 		
-		// if userChoice is legal
+		// consider moving sanitary check to GameTUI
 		if (firstMoveSanitary(theField, theTile)) {
 			// 1. place the chosen rotation of chosen tile on the chosen field
 			putTileOnBoard(theField, theTile);
@@ -179,16 +179,27 @@ public class GameControl {
 		Player currentPlayer = listPlayers.get(currentPlayerIdx);
 		
 		// while board is not full, do: 
-			// if currentPlayer is able to make a move:
-		int theField = tui.askField(currentPlayer, board);
-		Tile theTile = tui.askTileAndRotation(currentPlayer);
-		
+		while (!board.boardIsFull()) {
+			// for now suppose user can make a move,
+			// think about where to check whether user is able to make a move
+			int theFieldIdx = tui.askField(currentPlayer, board);
+			Tile theTile = tui.askTileAndRotation(currentPlayer);
+			
 			// sanitary check, put theTile on theField, player get a new Tile.
-		
-		
-		
-		
-		
+			if (normalMoveSanitary(theFieldIdx, theTile)) {
+				putTileOnBoard(theFieldIdx, theTile);
+				dealATileToPlayer(currentPlayer);
+			} else {
+				System.out.println("Move not sanitary");
+				// GameTUI should ensure only sanitary move be passed to GameControl
+				// if not sanitary, it's GameTUI's responsibility to 
+				// ask user for move until input sanitary move.
+			}
+			
+			currentPlayerIdx = (currentPlayerIdx + 1) % numPlayers;
+			currentPlayer = listPlayers.get(currentPlayerIdx);		
+			
+		} 
 		
 		// else if currentPlayer is not able to make a move
 			// either miss this turn
@@ -196,24 +207,17 @@ public class GameControl {
 		
 	}
 	
-//	private boolean sanitaryCheck() {
-//		
-//	}
-//	
-//	private boolean sanitaryField() {
-//		return false;
-//	}
-//	
-//	private boolean sanitaryRotation() {
-//		return false;
-//	}
-//	
-//	private boolean sanitaryTile() {
-//		return false;
-//	}
-//	
-
-
+	private boolean normalMoveSanitary(int fieldIdx, Tile chosenTile) {
+		// [direction, vBoarder, lBoarder, rBoarder]
+		Character[] srd = board.getSurroundingInfo(fieldIdx);
+		
+		boolean vMatch = (srd[1] != null) ? (srd[1] == chosenTile.getVertical()) : false;
+		boolean lMatch = (srd[2] != null) ? (srd[2] == chosenTile.getLeft()) : false;
+		boolean rMatch = (srd[3] != null) ? (srd[3] == chosenTile.getRight()) : false;
+		
+		return vMatch || lMatch || rMatch;
+		
+	}
 	
 	// ================== Gaming: other common functionalities ==================
 	// ------------------ that both FirstMove and NormalMove can use ------------------
@@ -311,10 +315,10 @@ public class GameControl {
 	// ======================== Main ========================
 	public static void main(String[] args) {
 		
-		GameControl shuffled3P = new GameControl( Arrays.asList(new HumanPlayer("A"),
-				 new HumanPlayer("B"),
-				 new HumanPlayer("C")), 
-  true);
+		GameControl shuffled3P = new GameControl( Arrays.asList(new HumanPlayer("A", new Tile[4]),
+																 new HumanPlayer("B", new Tile[4]),
+																 new HumanPlayer("C", new Tile[4])), 
+												  true);
 		
 		shuffled3P.printBoard(); // empty board
 		

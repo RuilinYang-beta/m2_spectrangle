@@ -201,7 +201,10 @@ public class Bag {
     		System.out.println("Invalid tile or already removed");
     	}
     }
-    
+    /*
+     * @ensures \result == true => s.getLeft() == tile.getLeft() && s.getRight() == tile.getRight() && 
+    			s.getLeft() == tile.getLeft() && s.getValue() == tile.getValue()
+     */
     /**
      * @param tile is the tile that is checked
      * @return true if the tile is a valid tile from the bag, or false in case it is not

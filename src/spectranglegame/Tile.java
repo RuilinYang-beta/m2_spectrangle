@@ -72,59 +72,7 @@ public class Tile {
 		return (rotation % 2 == 0);
 	}
 	
-	// =================== Setters ===================
-	// ------------ I would suggest not to use them ------------
-	/**
-	 * @param v gives the new value of the tile
-	 */
-	private void putVertical(char v) {
-		this.vertical = v;
-	}
-	
-	/**
-	 * @param v gives the new left color of the tile
-	 */
-	private void putLeft(char l) {
-		this.left = l;
-	}
-	
-	/**
-	 * @param v gives the new right color of the tile
-	 */
-	private void putRight(char r) {
-		this.right = r;
-	}
-
 	// =================== Rotation Related ===================
-	
-    /**
-     *  Function that rotates a tile with the tile given as a parameter
-	 * @param tile indicates the tile that will be rotated 
-	 */
-	// I would suggest not to rotate tile in place. 
-	public void rotateTile() {
-		if (this.getRotation() % 2 == 0) {
-			char v = getVertical();
-			char l = getLeft();
-			putLeft(v);
-			putVertical(l);
-//			this.rotate(this.getRotation() + 1);
-		} else {
-			char v = getVertical();
-			char l = getLeft();
-			char r = getRight();
-			putLeft(l);
-			putRight(v);
-			putVertical(r);
-//			if (this.getRotation() == 5) {
-//				this.rotate(0);
-//			} else {
-//				this.rotate(this.getRotation() + 1);
-//			}
-		}
-		rotation =  (rotation + 1) % 6;
-	} 
-	
 	/**
 	 * @return A new Tile generated from this tile, after rotate once.
 	 */
@@ -176,6 +124,7 @@ public class Tile {
 		return t;
 	}
 	
+
 	/**
 	 * @return A new Tile generated from this tile, after rotate four times.
 	 */
@@ -202,7 +151,55 @@ public class Tile {
 		return t;
 	}
 	
+	
+	
+//	public int getRotation() {
+//		return this.rotation;
+//	}
+	
+	/*
+	 * @ensures \result == this.left;
+	 */
+	/**
+	 * @return this.left
+	 */
+//	public char getLeft() {
+//		return this.left;
+//	}
+	
+	/*
+	 * @ensures this.getLeft() == l;
+	 */
+	/**
+	 * @param v gives the new left color of the tile
+	 */
+	
+	
+	/**
+	 * @return this.right.
+	 */
+//	public char getRight() {
+//		return this.right;
+//	}
+	
+	/*
+	 * @ensures this.getRight() == r;
+	 */
+	/**
+	 * @param v gives the new right color of the tile
+	 */
 
+	
+	/*
+	 * @ensures \result == this.value;
+	 */
+	/**
+	 * @return this.value. 
+	 */
+//	public int getValue() {
+//		return this.value;
+
+	
 	// =================== String Representations ===================
 	/**
 	 * @return String representation of the tile in the next format: rotation + String representing the colors + value;
@@ -229,8 +226,8 @@ public class Tile {
 	    return "" + stringTile().charAt(1) + stringTile().charAt(2) + stringTile().charAt(3) + stringTile().charAt(4);
 	 }
 	 
+
 	// =================== Visual Representations ===================
-	 
 	/**
 	 * Show a visual representation of a Tile.
 	 */
@@ -258,7 +255,6 @@ public class Tile {
 		System.out.println(template);
 	}
 	
-	
 	/**
 	 * Helper function of showTile().
 	 */
@@ -273,23 +269,6 @@ public class Tile {
 			     "    \\ /    \n" ;
 		System.out.print(template);
 	}
-	
-
-	// Show all up rotation or all down rotation should be the function of GameTUI.
-	// A Tile only has to show itself. Here this method can be removed.
-//	public void showTileRotations() {
-//		if (this.getRotation() % 2 == 0) {
-//			for (int i = 0; i < 3; i++) {
-//				this.showTile();
-//				this.rotateTile();
-//			}
-//		} else {
-//			for (int i = 0; i < 3; i++) {
-//				this.showTileDown();
-//				this.rotateTile();
-//			}
-//		}
-//	}
 	
 	// =================== Other ===================
 	public Tile deepCopy() {

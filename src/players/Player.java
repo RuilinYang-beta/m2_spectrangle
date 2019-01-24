@@ -7,8 +7,18 @@ import spectranglegame.*;
 public abstract class Player {
 	protected String name;
 	protected Tile[] tilesAtHand;
-	
-	public Player(String n) {
+
+	/*
+	 * @requires tiles != null;
+	 * @requires n != null;
+	 * @ensures this.getName() == n; 
+	 * @ensures this.getTiles() == tiles
+	 */
+	/**
+	 * @param n represents the name of the player
+	 * @param tiles represents the tiles that a player will have in hand
+	 */
+	public Player(String n, Tile[] tiles) {
 		this.name = n;
 		this.tilesAtHand = new Tile[4];
 	}
@@ -17,18 +27,32 @@ public abstract class Player {
 		return name;
 	}
 	
-	public abstract int chooseField(Board b);
-	
-	public Tile chooseTile(){
-		// choose a Tile, return the Tile
-		// and accordingly set the Tile in TileAtHand to null;
-		
-		return null;
+
+	/*
+	 * @requires tiles != null;
+	 * @ensures this.getTiles() == tiles;
+	 */
+	/*
+	 * Returns the tiles in the hand of ther player
+	 */
+	public Tile[] getTiles() {
+		return tilesAtHand;
 	}
+	
+//	public abstract int determineMove(Board b);
+
+	public abstract int chooseField(Board b);
+
+	// choose a Tile, return the Tile
+	// and accordingly set the Tile in TileAtHand to null
+//	public Tile chooseTile(){
+//	
+//		
+//	}
 	
 	public Tile chooseRotation(Tile[] allRotation) {
 		
-		// return the Tile of the chosen rotation
+		
 		return null;
 	}
 	

@@ -1,5 +1,9 @@
 package spectranglegame;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
+
 public class Tile {
 	
 	private int value;
@@ -287,9 +291,14 @@ public class Tile {
 //		}
 //	}
 	
+	// =================== Other ===================
+	public Tile deepCopy() {
+		return new Tile(value, vertical, left, right, rotation);
+	}
+	
 	// =================== Main ===================
 	public static void main(String[] args) {
-		Tile t = new Tile(3,"RGB");
+//		Tile t = new Tile(3,"RGB");
 //		Tile t1 = new Tile(3, "RGB");
 //		System.out.println(t.stringTile().equals(t1.stringTile()));
 //		t1.showTileRotations();
@@ -300,12 +309,20 @@ public class Tile {
 //		String s = t.stringTile();
 //		System.out.println(s);
 //		System.out.println(t.toString());
-		t.showTile();						// rotation 0
-		t.rotateTileOnce().showTile();		// rotation 1
-		t.rotateTileTwice().showTile();		// rotation 2
-		t.rotateTileOnce().rotateTileTwice().showTile();  		// rotation 3
-		t.rotateTileFourTimes().showTile();;					// rotation 4
-		t.rotateTileOnce().rotateTileFourTimes().showTile();    // rotation 5
+//		t.showTile();						// rotation 0
+//		t.rotateTileOnce().showTile();		// rotation 1
+//		t.rotateTileTwice().showTile();		// rotation 2
+//		t.rotateTileOnce().rotateTileTwice().showTile();  		// rotation 3
+//		t.rotateTileFourTimes().showTile();;					// rotation 4
+//		t.rotateTileOnce().rotateTileFourTimes().showTile();    // rotation 5
+		List<Tile> tiles = Arrays.asList(new Tile(1, "RRR"), 
+										 new Tile(2, "GGG"), 
+										 new Tile(3, "BBB"));
+		
+		Tile t = tiles.get(0);
+		tiles.set(0, null);
+		System.out.println(t);
+		System.out.println(tiles);
 	}
 
 }

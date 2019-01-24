@@ -39,9 +39,9 @@ public class GameTUI {
      * @return The index of the player's choice.
      */
     public int askField(Player p, Board b) {
-    	int i = 0; // this will be replaced by user input.
+    	int i = p.chooseField(b); // add interaction
     	chosenFieldFacingUp = Board.isFacingUp(i);
-    	return p.chooseField(b);
+    	return i;
     }
     
     /**

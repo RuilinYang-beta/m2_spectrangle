@@ -10,6 +10,7 @@ public abstract class Player {
 	
 	public Player(String n) {
 		this.name = n;
+		this.tilesAtHand = new Tile[4];
 	}
 	
 	public String getName() {
@@ -32,12 +33,16 @@ public abstract class Player {
 	}
 	
 	
-	/*
+	/**
 	 * Put the Tile at the first null position of Tiles[].
-	 * @ requires There exists at least one null value in Tiles[] .
+	 * @requires There exists at least one null value in Tiles[] .
 	 */
 	public void takeTheTile(Tile t) {
-		
+		for (int i = 0; i < tilesAtHand.length; i++) {
+			if (tilesAtHand[i] == null) {
+				tilesAtHand[i] = t;
+			}
+		}
 	}
 	
 	

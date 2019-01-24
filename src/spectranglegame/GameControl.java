@@ -24,6 +24,8 @@ public class GameControl {
 	private final int numPlayers;
 	private List<Player> listPlayers; // to have a order in players
 	private Integer firstPlayerIdx;   // not determined until dealTiles
+	
+	// Map<Player, Tile[]> mapPlayers will be deprecated
 	private Map<Player, Tile[]> mapPlayers; // to store player and its tiles
 	
 	
@@ -172,6 +174,28 @@ public class GameControl {
 	}
 	
 	// ----------------- NormalMove and its sanitaryCheck -----------------
+	public void makeNormalMove() {
+		int currentPlayerIdx = (firstPlayerIdx + 1) % numPlayers;
+		Player currentPlayer = listPlayers.get(currentPlayerIdx);
+		
+		// while board is not full, do: 
+			// if currentPlayer is able to make a move:
+		int theField = tui.askField(currentPlayer, board);
+		Tile theTile = tui.askTileAndRotation(currentPlayer);
+		
+			// sanitary check, put theTile on theField, player get a new Tile.
+		
+		
+		
+		
+		
+		
+		// else if currentPlayer is not able to make a move
+			// either miss this turn
+			// or replace a tile with bag: swap a random nun-null tile between bag and tilesAtHand.
+		
+	}
+	
 //	private boolean sanitaryCheck() {
 //		
 //	}
@@ -188,9 +212,7 @@ public class GameControl {
 //		return false;
 //	}
 //	
-//	public void makeNormalMove() {
-//		
-//	}
+
 
 	
 	// ================== Gaming: other common functionalities ==================

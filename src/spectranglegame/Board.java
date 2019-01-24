@@ -123,15 +123,11 @@ public class Board {
 	/**
 	 * Input a one-dimensional index, get the corresponding field's surrounding informations, see return.
 	 * @param i An one-dimension index of a field
-	 * @return An array of length 4.
-	 *         The first is a string of boolean indicating whether the field of interest is facing upward.
-	 *         The second is a string abbr. of vertical boarder surrounding color.
-	 *         The third is a string abbr. of left boarder surrounding color.
-	 *         The forth is a string abbr. of right boarder surrounding color.
-	 * 		   If one specific neighbor does not exist, then the corresponding surrounding color is null.
+	 * @return An array of length 4: [fieldDirection, verticalBoarder, leftBoarder, rightBoarder]
+	 * 			(verticalBoarder != null) ==> (field has a vertical neighbor field) && (there's a tile on vertical neighbor field);
 	 */
 	// public Integer[] getSurroundingInfo(Integer i) {
-	public String[] getSurroundingInfo(Integer i) {
+	public Character[] getSurroundingInfo(Integer i) {
 		if (!isLegalIdx(i)) {
 			return null;
 		}
@@ -162,14 +158,14 @@ public class Board {
 		//  vertical_boarder_color, 
 		//  left_boarder_color, 
 		//  right_boarder_color ]
-		String[] surroundings = new String[4];
-		// can be read to boolean using Boolean.parseBoolean(surroundings[0]);
-		surroundings[0] = (facingUp)? "true" : "false";
-		surroundings[1] = (isLegalIdx(vNeighborIdx)) ? "" + getTile(getOneDimIndex(vNeighborIdx)).getVertical() : null;
+		Character[] surroundings = new Character[4];
+		// U for up, D for down;
+		surroundings[0] = (facingUp)? 'U' : 'D';
+		surroundings[1] = (isLegalIdx(vNeighborIdx)) ? ((getTile(getOneDimIndex(vNeighborIdx)) != null)? getTile(getOneDimIndex(vNeighborIdx)).getVertical() : null)  : null;
 		// the surrounding color of left boarder should be the **right** color of the left neighbor
-		surroundings[2] = (isLegalIdx(lNeighborIdx)) ? "" + getTile(getOneDimIndex(lNeighborIdx)).getRight() : null;
+		surroundings[2] = (isLegalIdx(lNeighborIdx)) ? ((getTile(getOneDimIndex(lNeighborIdx)) != null)? getTile(getOneDimIndex(lNeighborIdx)).getRight() : null) : null;
 		// the surrounding color of right boarder should be the **left** color of the left neighbor
-		surroundings[3] = (isLegalIdx(rNeighborIdx)) ? "" + getTile(getOneDimIndex(rNeighborIdx)).getLeft() : null;
+		surroundings[3] = (isLegalIdx(rNeighborIdx)) ? ((getTile(getOneDimIndex(rNeighborIdx)) != null)? getTile(getOneDimIndex(rNeighborIdx)).getLeft() : null) : null;
 		
 //		return neighbors;
 		return surroundings;
@@ -218,7 +214,6 @@ public class Board {
 	protected List<Integer> getValuesOnBoard(){
 		return values;
 	}
-	
 	
 	/**
 	 * A getter of List<Character> vertical;

@@ -221,16 +221,7 @@ public class Bag {
     
     
 	public static void main(String[] args) {
-		Bag t = new Bag(true);
-		Tile t1 = new Tile(3, "RGB");
-		t1.rotateTile();
-		t1.rotateTile();
-		t1.rotateTile();
-		t1.rotateTile();
-		t1.rotateTile();
-		t1.rotateTile();
-		System.out.println(t1.stringTile());
-		t.showtiles();
+
 	}
 
 }

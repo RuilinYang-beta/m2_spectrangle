@@ -20,23 +20,6 @@ class TileTest {
 		assertEquals("0RGB3", t.stringTile());
 	}
 	
-	@Test 
-	public void testRotate() {
-		t.rotateTile();
-		assertEquals("1RGB3", t.stringTile());
-		assertEquals("R","" + t.getRight());
-		assertEquals("B","" + t.getVertical());
-		assertEquals("G","" + t.getLeft());
-		t.rotateTile();
-		assertEquals("2RGB3", t.stringTile());
-		assertEquals("B","" + t.getRight());
-		assertEquals("R","" + t.getVertical());
-		assertEquals("G","" + t.getLeft());
-		t.rotateTile();
-		assertEquals("3RGB3", t.stringTile());
-		assertEquals("BGR","" + t.getRight() + t.getVertical() +  t.getLeft());
-	}
-	
 	@Test
 	public void testValue() {
 		assertEquals(3,t.getValue());

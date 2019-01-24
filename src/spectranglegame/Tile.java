@@ -151,55 +151,6 @@ public class Tile {
 		return t;
 	}
 	
-	
-	
-//	public int getRotation() {
-//		return this.rotation;
-//	}
-	
-	/*
-	 * @ensures \result == this.left;
-	 */
-	/**
-	 * @return this.left
-	 */
-//	public char getLeft() {
-//		return this.left;
-//	}
-	
-	/*
-	 * @ensures this.getLeft() == l;
-	 */
-	/**
-	 * @param v gives the new left color of the tile
-	 */
-	
-	
-	/**
-	 * @return this.right.
-	 */
-//	public char getRight() {
-//		return this.right;
-//	}
-	
-	/*
-	 * @ensures this.getRight() == r;
-	 */
-	/**
-	 * @param v gives the new right color of the tile
-	 */
-
-	
-	/*
-	 * @ensures \result == this.value;
-	 */
-	/**
-	 * @return this.value. 
-	 */
-//	public int getValue() {
-//		return this.value;
-
-	
 	// =================== String Representations ===================
 	/**
 	 * @return String representation of the tile in the next format: rotation + String representing the colors + value;

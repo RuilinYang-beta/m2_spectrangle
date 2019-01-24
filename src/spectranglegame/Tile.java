@@ -178,6 +178,7 @@ public class Tile {
 	public void putRight(char r) {
 		this.right = r;
 	}
+	
 	/*
 	 * @ensures \result == this.value;
 	 */
@@ -189,8 +190,6 @@ public class Tile {
 	}
 	
 
-
-	
 	/**
 	 * @return String representation of the tile in the next format: rotation + String representing the colors + value;
 	 */
@@ -216,6 +215,9 @@ public class Tile {
 	    return "" + stringTile().charAt(1) + stringTile().charAt(2) + stringTile().charAt(3) + stringTile().charAt(4);
 	 }
 	 
+	 /**
+	  * Prints the TUI representation of a tile poining up
+	  */
 	/*
 	 * @ requires this.rotation % 2 == 0;
 	 */
@@ -229,6 +231,12 @@ public class Tile {
 		System.out.print(template);
 	}
 	
+	/**
+	 * Prints the TUI representation of a tile poining down
+	 */
+	/*
+	 * @requires this.rotation % 2 == 1;
+	 */
 	public void showTiledown() {
 		String template = 
 			     "   \\---------/\n" +

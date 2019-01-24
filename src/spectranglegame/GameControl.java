@@ -30,6 +30,7 @@ public class GameControl {
 	// ======================== Constructor ========================
 	public GameControl(List<Player> lp, boolean shuffle) {
 		this.board = new Board();
+//		this.tui = new GameTUI(this, this.board);
 		this.tui = new GameTUI(this);
 		
 		this.bag = new Bag(shuffle);
@@ -136,16 +137,16 @@ public class GameControl {
 		
 		Player firstPlayer = listPlayers.get(firstPlayerIdx);
 		
-		// An array of length 3: [idxFieldOfChoice, idxOfTilesAtHand, rotationOfTile]
-		int[] userChoice = firstPlayer.makeMove(board);
+		int theField = tui.askField(firstPlayer, board);
+		Tile theTile = tui.askTileAndRotation(firstPlayer);
 		
 		// if userChoice is legal
-		if (sanitaryCheckFirstMove(userChoice)) {
+		if (firstMoveSanitary(theField, theTile)) {
 			// 1. place the chosen rotation of chosen tile on the chosen field
-				// to-do
-			mapPlayers.get(firstPlayer)[userChoice[1]] = null;        // analogous to put off one tile at hand
-			// 2. draw another tile to restore to 4 tiles in hand
-			mapPlayers.get(firstPlayer)[userChoice[1]] = drawATile(); // analogous draw a tile to fill the hole
+			putTileOnBoard(theField, theTile);
+
+			// 2. deal one tile to player, to restore to 4 tiles in hand
+//			mapPlayers.get(firstPlayer)[userChoice[1]] = drawATile(); // analogous draw a tile to fill the hole
 		} else {
 			System.out.println("Illegal first move, please try again.");
 			// need a mechanism to make user try again.
@@ -159,11 +160,11 @@ public class GameControl {
 	 * 				  [idxFieldOfChoice, idxOfTilesAtHand, rotationOfTile]
 	 * @return true if choice is a legal move by all means.
 	 */
-	private boolean sanitaryCheckFirstMove(int[] choices) {
+	private boolean firstMoveSanitary(int fieldIdx, Tile chosenTile) {
 		// not a bonus field
-		boolean cond1 = !Board.isBonusField(choices[0]);
+		boolean cond1 = !Board.isBonusField(fieldIdx) && board.fieldIsEmpty(fieldIdx);
 		// direction of field match rotation of tile
-		boolean cond2 = Board.isFacingUp(choices[0]) == (choices[2] % 2 == 0);
+		boolean cond2 = Board.isFacingUp(fieldIdx) == chosenTile.isFacingUp();
 		
 		return cond1 && cond2;
 	}

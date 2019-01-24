@@ -7,26 +7,99 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Stream;
+import players.*;
 
 import javax.swing.text.html.HTMLDocument.HTMLReader.CharacterAction;
 
 public class GameTUI {
 	
-	private GameControl control;
-	
-	public GameTUI(GameControl gc) {
-		this.control = gc;
-	}
-
-	
-    private static final List<Integer> bonuses =       Arrays.asList(1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 4, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2, 1, 1, 1, 3, 1);
+	// =========== Static Fields: only for test purpose ===========
+	private static final List<Integer> bonuses =       Arrays.asList(1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 4, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2, 1, 1, 1, 3, 1);
     private static List<Integer> values =        Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     private static List<Character> vertical =    Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     private static List<Character> left =        Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     private static List<Character> right =       Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
+    // =========== Instance Field ===========
+	private GameControl control;
+	private Board board;
+	private Boolean chosenFieldFacingUp = null;
+	
+	// =========== Constructor ===========
+//	public GameTUI(GameControl gc, Board bd) {
+	public GameTUI(GameControl gc) {
+		this.control = gc;
+//		this.board = bd;
+	}
 
-    public void printBoardDynamic(List<Integer> values, List<Character> vertical, List<Character> left, List<Character> right) {
+	// ========================= Ask User Input =========================
+    /**
+     * Ask user to choose a field on board.
+     * @param p Ask this player for input.
+     * @return The index of the player's choice.
+     */
+    public int askField(Player p, Board b) {
+    	int i = 0; // this will be replaced by user input.
+    	chosenFieldFacingUp = Board.isFacingUp(i);
+    	return p.chooseField(b);
+    }
+    
+    /**
+     * Ask user to choose a Tile and its rotation.
+     * @param p
+     * @return
+     */
+    public Tile askTileAndRotation(Player p) {
+    	Tile baseTile = askTile(p);
+    	Tile chosenTileAndRotation = askRotation(p, baseTile);
+    	return chosenTileAndRotation;
+    }
+    
+    /**
+     * Helper function of askTileAndRotation(Player p).
+     * @param p Ask this player for input.
+     * @return The Tile (cloned) of the player's choice. 
+     */
+    private Tile askTile(Player p) {
+    	// add interaction 
+    	return p.chooseTile();
+    }
+    
+    
+    /**
+     * Helper function of askTileAndRotation(Player p).
+     * Generate 3 different rotation from the base Tile, ask user to choose one rotation.
+     * @param p The player to ask
+     * @param t The tile with rotation 0, as the base Tile
+     * @return
+     */
+    private Tile askRotation(Player p, Tile baseT) {
+    	// Generate 3 different rotation from the base Tile,
+    	Tile[] allRotation = new Tile[3];
+    	// fill allRotation
+    	if (chosenFieldFacingUp) {
+    		// fill 3 rotation facing up
+    		
+    		// then, set chosenFieldFacingUp back to null;
+    		chosenFieldFacingUp = null;
+    	} else if (!chosenFieldFacingUp) {
+    		// fill 3 rotation facing down
+    		
+    		// then, set chosenFieldFacingUp back to null;
+    		chosenFieldFacingUp = null;
+    	} else {
+    		System.out.println("Error! chosen field direction unknow!");
+    	}
+    	
+    	// add interaction 
+    	
+    	return p.chooseRotation(allRotation);
+    }
+
+    
+    // ========================= Print the board =========================
+	
+	public void printBoardDynamic(List<Integer> values, List<Character> vertical, List<Character> left, List<Character> right) {
     	System.out.println(getBoardString(values, vertical, left, right));
     }
 
@@ -35,7 +108,7 @@ public class GameTUI {
     	System.out.println(getBoardString(values, vertical, left, right));
     }
     
-    // ========================= Print the board =========================
+	
     /* if a field is empty         =>      its index showed, its bonus (if not 1) showed
      * if a field has a tile on it =>      its index hidden, its bonus (if not 1) showed,
      *  								   its value showed.

@@ -2,12 +2,13 @@ package spectranglegame;
 
 public class Tile {
 	
-	int value;
-	char vertical;
-	char left;
-	char right;
-	int rotation;
+	private int value;
+	private char vertical;
+	private char left;
+	private char right;
+	private int rotation;
 	
+	// =================== Constructors ===================
 	/** Constructs the tile object
 	 * @param value gives the value of the tile
 	 * @param colors gives the string of the colors in the order right, vertical, left
@@ -23,49 +24,80 @@ public class Tile {
 		rotation = 0;
 	}
 	
-	/**
-	 * An alternative constructor. 
-	 * @param value
-	 * @param vColor
-	 * @param lColor
-	 * @param rColor
+	/*
+	 * A public constructor that builds Tile with rotation 0;
 	 */
-	public Tile(int v, char vColor, char lColor, char rColor) {
-		this.value = v;
-		this.vertical = vColor;
-		this.left = lColor;
-		this.right = rColor;
-		this.rotation = 0;
+	public Tile(int val, char vColor, char lColor, char rColor) {
+		this(val, vColor, lColor, rColor, 0);
 	}
 	
 	/*
-	 * @ensures \result == this.vertical;
+	 * A private constructor that can build Tile with any rotation;
 	 */
-	/**
-	 * @return this.vertical
-	 */
+	private Tile(int val, char vColor, char lColor, char rColor, int rot) {
+		this.value = val;
+		this.vertical = vColor;
+		this.left = lColor;
+		this.right = rColor;
+		this.rotation = rot;
+	}
+	
+
+	// =================== Queries ===================
+	public int getValue() {
+		return this.value;
+	}
+	
 	public char getVertical() {
 		return this.vertical;
 	}
 	
-	/*
-	 * @ensures this.getVertical() == v;
-	 */
+	public char getRight() {
+		return this.right;
+	}
+	
+	public char getLeft() {
+		return this.left;
+	}
+	
+	public int getRotation() {
+		return this.rotation;
+	}
+	
+	public boolean isFacingUp() {
+		return (rotation % 2 == 0);
+	}
+	
+	// =================== Setters ===================
+	// ------------ I would suggest not to use them ------------
 	/**
 	 * @param v gives the new value of the tile
 	 */
-	public void putVertical(char v) {
+	private void putVertical(char v) {
 		this.vertical = v;
 	}
 	
-    /*
-     * @ensures (tile.getRotation() == \old.tile.getRotation() + 1 || tile.getRotation() == 0) ;
-     * @ensures \old.tile.getVertical() == tile.getRight() && \old.tile.getLeft() == tile.getVertical() && \old.tile.getRight() == tile.getLeft();
-     */
+	/**
+	 * @param v gives the new left color of the tile
+	 */
+	private void putLeft(char l) {
+		this.left = l;
+	}
+	
+	/**
+	 * @param v gives the new right color of the tile
+	 */
+	private void putRight(char r) {
+		this.right = r;
+	}
+
+	// =================== Rotation Related ===================
+	
     /**
      *  Function that rotates a tile with the tile given as a parameter
 	 * @param tile indicates the tile that will be rotated 
 	 */
+	// I would suggest not to rotate tile in place. 
 	public void rotateTile() {
 		if (this.getRotation() % 2 == 0) {
 			char v = getVertical();
@@ -90,54 +122,62 @@ public class Tile {
 	} 
 	
 	/**
-	 * @return A new Tile of this tile, after rotate once.
+	 * @return A new Tile generated from this tile, after rotate once.
 	 */
 	public Tile rotateTileOnce() {
-		Tile t = new Tile(this.value, "BBB"); // this color doesn't really exist, only to fill constructor
+		Tile t;
 		
-		if (this.getRotation() % 2 == 0) {
-			t.putRight(right);
-			t.putVertical(left);
-			t.putLeft(vertical);
+		if (this.isFacingUp()) {
+			// constructor order (t.val, t.vertical, t.left, t.right, t.rotation)
+			// when this.isFacingUp, rotate once, color changes as follows: 
+			// this.left     -->  t.vertical
+			// this.vertical -->  t.left
+			// this.right    -->  t.right
+			t = new Tile(value, left, vertical, right, 
+					     (rotation + 1) % 6);
 		} else {
-			t.putLeft(left);
-			t.putRight(vertical);
-			t.putVertical(right);
+			// when !this.isFacingUp, rotate once, color changes as follows: 
+			// this.left     -->  t.left
+			// this.vertical -->  t.right
+			// this.right    -->  t.vertical
+			t = new Tile(value, right, left, vertical, 
+						 (rotation + 1) % 6);
 		}
-		t.rotation =  (rotation + 1) % 6;
 		return t;
 	}
 	
-	public Tile rotateTileTwice() {
-		Tile t = new Tile(this.value, "BBB"); // this color doesn't really exist, only to fill constructor
-		
-		t.putVertical(right);
-		t.putRight(left);
-		t.putLeft(vertical);
-		
-		t.rotation =  (rotation + 2) % 6;
-		return t;
-	}
-	
-	
-	
-
-
-//	public void rotate(int rotation) {
-//		if(rotation >= 0 && rotation < 6) {
-//			this.rotation = rotation;
-//		}
-//	}
-	
-	/*
-	 * @ensures \result == this.rotation;
-	 */
 	/**
-	 * @return this.rotation 
+	 * @return A new Tile generated from this tile, after rotate twice.
 	 */
-	public int getRotation() {
-		return this.rotation;
+	public Tile rotateTileTwice() {
+		Tile t;
+		
+		if (this.isFacingUp()) {
+			// constructor order (t.val, t.vertical, t.left, t.right, t.rotation)
+			// when this.isFacingUp, rotate twice, color changes as follows: 
+			// this.left     -->  t.right
+			// this.vertical -->  t.left
+			// this.right    -->  t.vertical
+			t = new Tile(value, right, vertical, left, 
+					     (rotation + 2) % 6);
+		} else {
+			// constructor order (t.val, t.vertical, t.left, t.right, t.rotation)
+			// when !this.isFacingUp, rotate twice, color changes as follows: 
+			// this.left     -->  t.vertical
+			// this.vertical -->  t.right
+			// this.right    -->  t.left
+			t = new Tile(value, left, right, vertical, 
+						 (rotation + 2) % 6);
+		}
+		return t;
 	}
+	
+	/**
+	 * @return A new Tile generated from this tile, after rotate four times.
+	 */
+//	public int getRotation() {
+//		return this.rotation;
+//	}
 	
 	/*
 	 * @ensures \result == this.left;
@@ -145,9 +185,9 @@ public class Tile {
 	/**
 	 * @return this.left
 	 */
-	public char getLeft() {
-		return this.left;
-	}
+//	public char getLeft() {
+//		return this.left;
+//	}
 	
 	/*
 	 * @ensures this.getLeft() == l;
@@ -155,9 +195,9 @@ public class Tile {
 	/**
 	 * @param v gives the new left color of the tile
 	 */
-	public void putLeft(char l) {
-		this.left = l;
-	}
+//	public void putLeft(char l) {
+//		this.left = l;
+//	}
 	
 	/*
 	 * @ensures \result == this.right;
@@ -165,9 +205,9 @@ public class Tile {
 	/**
 	 * @return this.right.
 	 */
-	public char getRight() {
-		return this.right;
-	}
+//	public char getRight() {
+//		return this.right;
+//	}
 	
 	/*
 	 * @ensures this.getRight() == r;
@@ -175,9 +215,9 @@ public class Tile {
 	/**
 	 * @param v gives the new right color of the tile
 	 */
-	public void putRight(char r) {
-		this.right = r;
-	}
+//	public void putRight(char r) {
+//		this.right = r;
+//	}
 	
 	/*
 	 * @ensures \result == this.value;
@@ -185,11 +225,33 @@ public class Tile {
 	/**
 	 * @return this.value. 
 	 */
-	public int getValue() {
-		return this.value;
+//	public int getValue() {
+//		return this.value;
+
+	public Tile rotateTileFourTimes() {
+		Tile t;
+		
+		if (this.isFacingUp()) {
+			// constructor order (t.val, t.vertical, t.left, t.right, t.rotation)
+			// when this.isFacingUp, rotate four times, color changes as follows: 
+			// this.left     -->  t.vertical
+			// this.vertical -->  t.right
+			// this.right    -->  t.left
+			t = new Tile(value, left, right, vertical, 
+					     (rotation + 4) % 6);
+		} else {
+			// constructor order (t.val, t.vertical, t.left, t.right, t.rotation)
+			// when !this.isFacingUp, rotate four times, color changes as follows: 
+			// this.left     -->  t.right
+			// this.vertical -->  t.left
+			// this.right    -->  t.vertical
+			t = new Tile(value, right, vertical, left, 
+						 (rotation + 4) % 6);
+		}
+		return t;
 	}
 	
-
+	// =================== String Representations ===================
 	/**
 	 * @return String representation of the tile in the next format: rotation + String representing the colors + value;
 	 */
@@ -210,16 +272,21 @@ public class Tile {
 		}
 		return null;
 	}
-	
-	 public String toString() {
+
+	public String toString() {
 	    return "" + stringTile().charAt(1) + stringTile().charAt(2) + stringTile().charAt(3) + stringTile().charAt(4);
 	 }
 	 
+
 	 /**
 	  * Prints the TUI representation of a tile poining up
 	  */
 	/*
 	 * @ requires this.rotation % 2 == 0;
+	// =================== Visual Representations ===================
+	/**
+	 * Show a visual representation of a Tile.
+
 	 */
 	public void showTile() {
 		String template =" " +
@@ -254,26 +321,81 @@ public class Tile {
 				this.showTile();
 				this.rotateTile();
 			}
+		if (isFacingUp()) {
+			showTileUp();
 		} else {
-			for (int i = 0; i < 3; i++) {
-				this.showTiledown();
-				this.rotateTile();
-			}
+			showTileDown();
 		}
 	}
+	}
+	/**
+	 * Helper function of showTile(). 
+	 */
+	private void showTileUp() {
+		String template =
+				// make sure each line is of the same total length
+				// for GameTUI to display 3 tiles horizontally
+                "    / \\    \n" +
+                "   / " + value + " \\   \n" +
+                "  / " + left + " " + right + " \\  \n" +
+                " /   " + vertical + "   \\ \n" +
+                " --------- \n"  ;
+		
+		System.out.println(template);
+	}
 	
+	
+	/**
+	 * Helper function of showTile().
+	 */
+	private void showTileDown() {
+		String template = 
+				// make sure each line is of the same total length
+				// for GameTUI to display 3 tiles horizontally
+			     " --------- \n" +
+			     " \\   " + vertical + "   / \n" +
+                 "  \\ " + left + " " + right + " /  \n" +
+                 "   \\ " + value + " /   \n" +
+			     "    \\ /    \n" ;
+		System.out.print(template);
+	}
+	
+
+	// Show all up rotation or all down rotation should be the function of GameTUI.
+	// A Tile only has to show itself. Here this method can be removed.
+//	public void showTileRotations() {
+//		if (this.getRotation() % 2 == 0) {
+//			for (int i = 0; i < 3; i++) {
+//				this.showTile();
+//				this.rotateTile();
+//			}
+//		} else {
+//			for (int i = 0; i < 3; i++) {
+//				this.showTileDown();
+//				this.rotateTile();
+//			}
+//		}
+//	}
+	
+	// =================== Main ===================
 	public static void main(String[] args) {
 		Tile t = new Tile(3,"RGB");
-		Tile t1 = new Tile(3, "RGB");
-		//System.out.println(t.stringTile().equals(t1.stringTile()));
-		//t1.showTileRotations();
-		t1.rotateTile();
-		t1.showTileRotations();
-//		t1.showTiledown();
+//		Tile t1 = new Tile(3, "RGB");
+//		System.out.println(t.stringTile().equals(t1.stringTile()));
+//		t1.showTileRotations();
+//		t1.rotateTile();
+//		t1.showTileRotations();
+//		t1.showTileDown();
 //		t1.showTile();
 //		String s = t.stringTile();
 //		System.out.println(s);
 //		System.out.println(t.toString());
+		t.showTile();						// rotation 0
+		t.rotateTileOnce().showTile();		// rotation 1
+		t.rotateTileTwice().showTile();		// rotation 2
+		t.rotateTileOnce().rotateTileTwice().showTile();  		// rotation 3
+		t.rotateTileFourTimes().showTile();;					// rotation 4
+		t.rotateTileOnce().rotateTileFourTimes().showTile();    // rotation 5
 	}
 
 }

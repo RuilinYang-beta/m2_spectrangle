@@ -6,9 +6,9 @@ import spectranglegame.Tile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class Tiletest1 {
+class TileTest {
 
-	Tile t = new Tile(3,"RGB");
+	Tile t;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -47,23 +47,16 @@ class Tiletest1 {
 		assertEquals("RGB3", t.toString());
 	}
 	
-	@Test
-	public void testShowTileAllUpRotation() {
-		t.showTile();    // show rotation 0
-		
-		t.rotateTile();
-		t.rotateTile();
-		t.showTile();    // show rotation 2
-		
-		t.rotateTile();
-		t.rotateTile();
-		t.showTile();    // show rotation 4
-		
-	}
 	
 	@Test
-	public void testShowTileAllDownRotation() {
-		;
+	public void testShowTile() {
+		// You have to examine the console visually.
+		t.showTile();						// rotation 0
+		t.rotateTileOnce().showTile();		// rotation 1
+		t.rotateTileTwice().showTile();		// rotation 2
+		t.rotateTileOnce().rotateTileTwice().showTile();  		// rotation 3
+		t.rotateTileFourTimes().showTile();;					// rotation 4
+		t.rotateTileOnce().rotateTileFourTimes().showTile();    // rotation 5
 	}
 
 }

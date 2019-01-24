@@ -212,26 +212,39 @@ public class Board {
 		return tilesOnBoard[i];
 	}
 	
+	/**
+	 * A getter of List<Integer> values;
+	 */
 	protected List<Integer> getValuesOnBoard(){
 		return values;
 	}
 	
+	
+	/**
+	 * A getter of List<Character> vertical;
+	 */
 	protected List<Character> getVerticalOnBoard(){
 		return vertical;
 	}
 	
+	/**
+	 * A getter of List<Character> left;
+	 */
 	protected List<Character> getLeftOnBoard(){
 		return left;
 	}
 	
+	/**
+	 * A getter of List<Character> right;
+	 */
 	protected List<Character> getRightOnBoard(){
 		return right;
 	}
 	
 	// ======================== Instance Commands ========================
+	
 	/**
-	 * Put a tile t on the field with index i, 
-	 * update Tile[] and also 4 arrayLists.
+	 * Put a tile t on the field with index i, update Tile[] and also 4 arrayLists accordingly.
 	 * @param i The index you want to put a tile on.
 	 * @param t The tile object.
 	 */
@@ -243,8 +256,14 @@ public class Board {
 		right.set(i, t.getRight());
 	}
 	
+	/**
+	 * 
+	 */
 	public void resetBoard() {
-		Arrays.fill(tilesOnBoard, null);
+		values = new ArrayList<>(Collections.nCopies(FIELDSNUM, null));
+		vertical = new ArrayList<>(Collections.nCopies(FIELDSNUM, null));
+		left = new ArrayList<>(Collections.nCopies(FIELDSNUM, null));
+		right = new ArrayList<>(Collections.nCopies(FIELDSNUM, null));
 	}
 	
 }

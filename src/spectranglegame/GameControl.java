@@ -32,8 +32,8 @@ public class GameControl {
 	// ======================== Constructor ========================
 	public GameControl(List<Player> lp, boolean shuffle) {
 		this.board = new Board();
-//		this.tui = new GameTUI(this, this.board);
-		this.tui = new GameTUI(this);
+		this.tui = new GameTUI(this, this.board);
+//		this.tui = new GameTUI(this);
 		
 		this.bag = new Bag(shuffle);
 		// a clone of bag.getTiles()
@@ -141,7 +141,7 @@ public class GameControl {
 		
 		Player firstPlayer = listPlayers.get(firstPlayerIdx);
 		
-		int theField = tui.askField(firstPlayer, board);
+		int theField = tui.askField(firstPlayer, board, true);
 		Tile theTile = tui.askTileAndRotation(firstPlayer);
 		
 		// consider moving sanitary check to GameTUI
@@ -182,7 +182,7 @@ public class GameControl {
 		while (!board.boardIsFull()) {
 			// for now suppose user can make a move,
 			// think about where to check whether user is able to make a move
-			int theFieldIdx = tui.askField(currentPlayer, board);
+			int theFieldIdx = tui.askField(currentPlayer, board, false);
 			Tile theTile = tui.askTileAndRotation(currentPlayer);
 			
 			// sanitary check, put theTile on theField, player get a new Tile.
@@ -208,6 +208,8 @@ public class GameControl {
 	}
 	
 	private boolean normalMoveSanitary(int fieldIdx, Tile chosenTile) {
+		boolean isEmptyField = board.fieldIsEmpty(fieldIdx);
+		
 		// [direction, vBoarder, lBoarder, rBoarder]
 		Character[] srd = board.getSurroundingInfo(fieldIdx);
 		
@@ -215,7 +217,7 @@ public class GameControl {
 		boolean lMatch = (srd[2] != null) ? (srd[2] == chosenTile.getLeft()) : false;
 		boolean rMatch = (srd[3] != null) ? (srd[3] == chosenTile.getRight()) : false;
 		
-		return vMatch || lMatch || rMatch;
+		return isEmptyField && (vMatch || lMatch || rMatch);
 		
 	}
 	
@@ -269,10 +271,7 @@ public class GameControl {
 	 * Get data from board, ask tui to print them.
 	 */
 	public void printBoard() {
-		tui.printBoardDynamic(board.getValuesOnBoard(), 
-							  board.getVerticalOnBoard(), 
-							  board.getLeftOnBoard(),
-							  board.getRightOnBoard());
+		tui.printBoardDynamic(board);
 	}
 	
 	public void putTileOnBoard(int idx, Tile t) {
@@ -314,6 +313,8 @@ public class GameControl {
 	
 	// ======================== Main ========================
 	public static void main(String[] args) {
+		
+		// later can start one-man game here.
 		
 		GameControl shuffled3P = new GameControl( Arrays.asList(new HumanPlayer("A", new Tile[4]),
 																 new HumanPlayer("B", new Tile[4]),

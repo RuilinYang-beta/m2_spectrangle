@@ -20,37 +20,59 @@ public class GameTUI {
     private static List<Character> left =        Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     private static List<Character> right =       Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
+    private static final String FIELD = "Field?";
+    private static final String FIELD_WRONG = "Wrong Field";
+    private static final String TILE = "Tile?";
+    private static final String ROTATION = "Rotation?";
+    
     // =========== Instance Field ===========
 	private GameControl control;
 	private Board board;
 	private Boolean chosenFieldFacingUp = null;
 	
 	// =========== Constructor ===========
-//	public GameTUI(GameControl gc, Board bd) {
-	public GameTUI(GameControl gc) {
+	public GameTUI(GameControl gc, Board bd) {
+//	public GameTUI(GameControl gc) {
 		this.control = gc;
-//		this.board = bd;
+		this.board = bd;
 	}
 
 	// ========================= Ask User Input =========================
     /**
-     * Ask user to choose a field on board.
+     * Ask user to give a valid field, if not valid, keep asking until valid.
      * @param p Ask this player for input.
      * @return The index of the player's choice.
      */
-    public int askField(Player p, Board b) {
-    	Scanner in = new Scanner(System.in);
-    	System.out.println("Chose a field to place a tile: ");
-    	int i = in.nextInt();
-    	in.close();
-    	if(b.isLegalIdx(i)) {
-    		chosenFieldFacingUp = Board.isFacingUp(i);
-    		return i;
-    	}
-    	else {
-    		System.out.println("Incorrect field");
-    		return -1;
-    	}
+    public Integer askField(Player p, Board b, boolean isFirstMove) {
+    	Integer chosenFieldIdx = null;
+    	boolean isLegalField = false;
+    	
+    	do {
+    		// later this will be sent to p via socket, and p will parse it 
+    		System.out.println(FIELD); 
+    		
+    		// Perhaps TUI should send a long string of current board, for p to print out to see
+    		// or TUI sent user the Board object b, and give user the ability to print a Board for itself to see.
+    		// For now TUI temporarily print board at TUI console.
+    		printBoardDynamic(board);
+    		int returnVal = p.chooseField(b);
+    		
+    		// TUI doing the sanitary check, if not sanitary, keep asking until user give legal fieldIdx.
+    		boolean cond0 = Board.isLegalIdx(returnVal);
+    		boolean cond1 = !Board.isBonusField(returnVal); // applies to first move only
+    		boolean cond2 = board.fieldIsEmpty(returnVal);
+    		isLegalField = (isFirstMove) ? (cond0 && cond1 && cond2) : (cond0 && cond2);
+    		
+    		if (isLegalField) {
+    			chosenFieldIdx = returnVal;
+    			chosenFieldFacingUp = Board.isFacingUp(chosenFieldIdx);
+    		} else {
+    			// later this will be sent to p via socket, and p will parse it 
+    			System.out.println(FIELD_WRONG);
+    		}
+    	} while (chosenFieldIdx == null);
+    	
+    	return chosenFieldIdx;
     }
     
     /**
@@ -65,7 +87,7 @@ public class GameTUI {
     }
     
     /**
-     * Helper function of askTileAndRotation(Player p).
+     * Helper function of askTileAndRotation, if not valid, keep asking until valid.
      * @param p Ask this player for input.
      * @return The Tile (cloned) of the player's choice. 
      */
@@ -115,9 +137,8 @@ public class GameTUI {
 
     
     // ========================= Print the board =========================
-	
-	public void printBoardDynamic(List<Integer> values, List<Character> vertical, List<Character> left, List<Character> right) {
-    	System.out.println(getBoardString(values, vertical, left, right));
+    public void printBoardDynamic(Board b) {
+    	System.out.println(getBoardString(b.getValuesOnBoard(), b.getVerticalOnBoard(), b.getLeftOnBoard(), b.getRightOnBoard()));
     }
 
     

@@ -42,7 +42,7 @@ public class Board {
 	 * @param i The one dimensional index.
 	 * @return True if this index is legal.
 	 */
-	public boolean isLegalIdx(Integer i) {
+	public static boolean isLegalIdx(Integer i) {
 		return (0 <= i) && (i <= 35);
 	}
 	
@@ -104,7 +104,7 @@ public class Board {
 	 * 		   of which first element is row index, second element is column index.
 	 */
 	public static Integer[] getRCIndex(Integer i) {
-		if (!isLegalIdx(i)) {
+		if (!Board.isLegalIdx(i)) {
 			return null;
 		}
 		

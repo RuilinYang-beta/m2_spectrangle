@@ -55,7 +55,7 @@ public class GameTUI {
     		// or TUI sent user the Board object b, and give user the ability to print a Board for itself to see.
     		// For now TUI temporarily print board at TUI console.
     		printBoardDynamic(board);
-    		int returnVal = p.chooseField(b);
+    		int returnVal = p.chooseField();
     		
     		// TUI doing the sanitary check, if not sanitary, keep asking until user give legal fieldIdx.
     		boolean cond0 = Board.isLegalIdx(returnVal);
@@ -80,7 +80,7 @@ public class GameTUI {
      * @param p
      * @return
      */
-    public Tile askTileAndRotation(Player p) {
+    public Tile askTileAndRotation(HumanPlayer p) {
     	Tile baseTile = askTile(p);
     	Tile chosenTileAndRotation = askRotation(p, baseTile);
     	return chosenTileAndRotation;
@@ -91,15 +91,13 @@ public class GameTUI {
      * @param p Ask this player for input.
      * @return The Tile (cloned) of the player's choice. 
      */
-    private Tile askTile(Player p) {
-    	Scanner in = new Scanner(System.in);
-    	int i = in.nextInt();
-    	Tile[] tilesinhand = p.getTiles();
-    	in.close();
-    	if(i >= 0 && i < 5) {
-    		return tilesinhand[i];
+    private Tile askTile(HumanPlayer p) {
+    	System.out.println("Chose a tile");
+    	Tile t = p.chooseTile();
+    	if(t != null) {
+    		return t;
     	}else {
-    		System.out.println("Incorrect input for tile.");
+    		System.out.println("Incorrect tile");
     		return null;
     	}
     }

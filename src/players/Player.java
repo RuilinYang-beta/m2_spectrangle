@@ -42,7 +42,7 @@ public abstract class Player {
 	
 //	public abstract int determineMove(Board b);
 
-	public abstract int chooseField(Board b);
+	public abstract int chooseField();
 
 	// choose a Tile, return the Tile
 	// and accordingly set the Tile in TileAtHand to null

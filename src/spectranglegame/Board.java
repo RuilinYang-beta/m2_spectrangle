@@ -42,7 +42,7 @@ public class Board {
 	 * @param i The one dimensional index.
 	 * @return True if this index is legal.
 	 */
-	public boolean isLegalIdx(Integer i) {
+	public static boolean isLegalIdx(Integer i) {
 		return (0 <= i) && (i <= 35);
 	}
 	

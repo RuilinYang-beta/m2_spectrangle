@@ -38,16 +38,12 @@ public class GameTUI {
      * @param p Ask this player for input.
      * @return The index of the player's choice.
      */
-    public int askField(Player p, Board b) {
-    	Scanner in = new Scanner(System.in);
+    public int askField(HumanPlayer p, Board b) {
     	System.out.println("Chose a field to place a tile: ");
-    	int i = in.nextInt();
-    	in.close();
-    	if(b.isLegalIdx(i)) {
-    		chosenFieldFacingUp = Board.isFacingUp(i);
+    	int i = p.chooseField(b);
+    	if(i != -1) {
     		return i;
-    	}
-    	else {
+    	}else {
     		System.out.println("Incorrect field");
     		return -1;
     	}
@@ -58,7 +54,7 @@ public class GameTUI {
      * @param p
      * @return
      */
-    public Tile askTileAndRotation(Player p) {
+    public Tile askTileAndRotation(HumanPlayer p) {
     	Tile baseTile = askTile(p);
     	Tile chosenTileAndRotation = askRotation(p, baseTile);
     	return chosenTileAndRotation;
@@ -69,15 +65,13 @@ public class GameTUI {
      * @param p Ask this player for input.
      * @return The Tile (cloned) of the player's choice. 
      */
-    private Tile askTile(Player p) {
-    	Scanner in = new Scanner(System.in);
-    	int i = in.nextInt();
-    	Tile[] tilesinhand = p.getTiles();
-    	in.close();
-    	if(i >= 0 && i < 5) {
-    		return tilesinhand[i];
+    private Tile askTile(HumanPlayer p) {
+    	System.out.println("Chose a tile");
+    	Tile t = p.chooseTile();
+    	if(t != null) {
+    		return t;
     	}else {
-    		System.out.println("Incorrect input for tile.");
+    		System.out.println("Incorrect tile");
     		return null;
     	}
     }

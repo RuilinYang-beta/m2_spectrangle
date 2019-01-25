@@ -27,7 +27,7 @@ public class HumanPlayer extends Player{
 	public String determineMove(Board b) {
 		String prompt = "Player " + getName() + "what is your move?";
 		String choice = readLine(prompt);
-		Tile t = new Tile()
+		
 	}
 	
     private String readLine(String prompt) {
@@ -46,21 +46,34 @@ public class HumanPlayer extends Player{
         } while (!intRead);
         return value;
     }
-	// ====== These functions are already made in gameTUI, so there is no need to have them in here ===== 
-//	public int chooseField(Board b) {
-//		Scanner in = new Scanner(System.in);
-//		int num = in.nextInt();
-//		return num;
-//	}
-//	
-//	public Tile chooseTile() {
-//		return null;
-//	}
-//	
-//	public Tile chooseRotation(Tile t) {
-//		return null;
-//	}
- // ===========================
+    
+	public int chooseField(Board b) {
+		Scanner in = new Scanner(System.in);
+		int i = in.nextInt();
+    	in.close();
+    	if(Board.isLegalIdx(i)) {
+    		return i;
+    	}else {
+    		return -1;
+    	}
+	}
+
+	
+	public Tile chooseTile() {
+		Scanner in = new Scanner(System.in);
+    	int i = in.nextInt();
+    	Tile[] tiles = tilesAtHand;
+    	in.close();
+    	if(i >= 0 && i < 5) {
+    		return tiles[i];
+    	}else {
+    		return null;
+    	}
+	}
+	public Tile chooseRotation(Tile t) {
+		return null;
+	}
+
 	
 	
 }

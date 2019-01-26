@@ -19,6 +19,7 @@ public class ClientHandler implements Runnable {
 	protected Socket sock;
 	protected BufferedReader in;
 	protected BufferedWriter out;
+	protected ClientHandler[] clients;
 
 	/*
 	 * @requires (nameArg != null) && (sockArg != null);
@@ -29,9 +30,10 @@ public class ClientHandler implements Runnable {
 	 * @param nameArg name of the Client Handler-process
 	 * @param sockArg Socket of the Client Handler-process
 	 */
-	public ClientHandler(String nameArg, Socket sockArg) throws IOException {
+	public ClientHandler(String nameArg, Socket sockArg, ClientHandler[] clients) throws IOException {
 		name = nameArg;
 		sock = sockArg;
+		this.clients = clients;
 		in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 		out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 	}

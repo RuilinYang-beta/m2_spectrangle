@@ -7,10 +7,10 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
 
-public class Server extends Thread{
+public class Server{
 
 	private static final String USAGE = "usage: " + Server.class.getName() + " <ip> ";
-	private List<Socket> clients;
+	private static ClientHandler[] clients;
 	
 	/** Starts a Server-application. */
 	public static void main(String[] args) {
@@ -43,13 +43,17 @@ public class Server extends Thread{
 		// try to open a Socket server
 		try {
 			System.out.println("Server starting. \n  What is your name?");
+			clients = new ClientHandler[10];
+			int i = 0;
 			while (true) {
 				sersock = new ServerSocket(port);
 				sock = sersock.accept();
-				System.out.println("Client connected");
+				System.out.println("Client" + i +  " connected");
 				Scanner in = new Scanner(System.in);
 				String clientname = in.nextLine();
-				ClientHandler handler = new ClientHandler(clientname, sock);
+				ClientHandler handler = new ClientHandler(clientname, sock, clients);
+				clients[i] = handler;
+				i++;
 				(new Thread(handler)).start();
 				handler.handleTerminalInput();
 				handler.shutDown();

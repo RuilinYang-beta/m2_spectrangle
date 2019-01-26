@@ -1,15 +1,21 @@
 package networking;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
 
-public class PlayerClient {
+public class PlayerClient extends Thread {
 
 	private static final String USAGE = "usage: java week7.cmdline.Client <address> <port>";
-
+	protected static BufferedReader in;
+	protected static BufferedWriter out;
+	
 	/** Starts a Client application. */
 	public static void main(String[] args) {
 		if (args.length != 2) {
@@ -17,7 +23,6 @@ public class PlayerClient {
 			System.exit(0);
 		}
 
-//		String name = args[0];
 		InetAddress addr = null;
 		int port = 0;
 		Socket sock = null;
@@ -45,27 +50,38 @@ public class PlayerClient {
 		// try to open a Socket to the server
 		try {
 			sock = new Socket(addr, port);
+			out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
+			in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 		} catch (IOException e) {
 			System.out.println("ERROR: could not create a socket on " + addr + " and port " + port + "\n");
 		}
 
 		// create Peer object and start the two-way communication
 		//int i = 0;
-		Scanner in = new Scanner(System.in);
-		String name;
-		try {
-			//while (i < 4) {
-				name = in.nextLine();
-				ClientHandler client = new ClientHandler(name,sock);
-				Thread streamInputHandler = new Thread(client);
-				streamInputHandler.start();
-				client.handleTerminalInput();
-			//	i++;
-				client.shutDown();
-		//	}
-		} catch (IOException e) {
-			e.printStackTrace();
+//		Scanner in = new Scanner(System.in);
+//		String name;
+//		try {
+//			
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+	//	}
+		Scanner input = new Scanner(System.in);
+		if(sock != null && in != null && out != null) {
+			try {
+				PlayerClient client = new PlayerClient();
+				client.start();
+				String s = input.nextLine();
+				out.write(s);
+				out.flush();
+			}catch(IOException e) {
+				e.printStackTrace();
+			}
 		}
+	}
+	@Override
+	public void run() {
+		
 	}
 
 }

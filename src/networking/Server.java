@@ -42,12 +42,14 @@ public class Server extends Thread{
 
 		// try to open a Socket server
 		try {
-			sersock = new ServerSocket(port);
-			System.out.println("Server starting.");
+			System.out.println("Server starting. \n  What is your name?");
 			while (true) {
+				sersock = new ServerSocket(port);
 				sock = sersock.accept();
 				System.out.println("Client connected");
-				ClientHandler handler = new ClientHandler("one", sock);
+				Scanner in = new Scanner(System.in);
+				String clientname = in.nextLine();
+				ClientHandler handler = new ClientHandler(clientname, sock);
 				(new Thread(handler)).start();
 				handler.handleTerminalInput();
 				handler.shutDown();

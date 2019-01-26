@@ -50,7 +50,7 @@ public class ClientHandler implements Runnable {
 					break;
 				} else {
 					// out.print(s);
-					System.out.println("Client " + s + "is connected \n");
+					System.out.println(s);
 				}
 			}
 		} catch (IOException e) {

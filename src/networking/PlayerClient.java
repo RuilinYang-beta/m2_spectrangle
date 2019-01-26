@@ -22,8 +22,7 @@ public class PlayerClient {
 		int port = 0;
 		Socket sock = null;
 		//getting the name of the client
-		Scanner in = new Scanner(System.in);
-		String name = in.nextLine();		
+				
 		
 		// check args[0] - the IP-adress
 		try {
@@ -51,12 +50,19 @@ public class PlayerClient {
 		}
 
 		// create Peer object and start the two-way communication
+		//int i = 0;
+		Scanner in = new Scanner(System.in);
+		String name;
 		try {
-			ClientHandler client = new ClientHandler(name, sock);
-			Thread streamInputHandler = new Thread(client);
-			streamInputHandler.start();
-			client.handleTerminalInput();
-			client.shutDown();
+			//while (i < 4) {
+				name = in.nextLine();
+				ClientHandler client = new ClientHandler(name,sock);
+				Thread streamInputHandler = new Thread(client);
+				streamInputHandler.start();
+				client.handleTerminalInput();
+			//	i++;
+				client.shutDown();
+		//	}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

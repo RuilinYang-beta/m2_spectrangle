@@ -5,11 +5,13 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.*;
 
-public class Server {
+public class Server extends Thread{
 
-	private static final String USAGE = "usage: " + Server.class.getName() + " <ip> <port>";
-
+	private static final String USAGE = "usage: " + Server.class.getName() + " <ip> ";
+	private List<Socket> clients;
+	
 	/** Starts a Server-application. */
 	public static void main(String[] args) {
 		if (args.length != 2) {
@@ -23,11 +25,15 @@ public class Server {
 
 		// parse args[1] - the port
 		try {
-			do {
-				
 			port = Integer.parseInt(args[1]);
-			
-			}while(port !=  1024);
+			if(port != 1024) {
+				System.out.print("The port should be 1024. Introduce it here: ");
+				do {
+					Scanner in = new Scanner(System.in);
+					port = in.nextInt();
+					in.close();
+				}while(port != 1024);
+			}
 		} catch (NumberFormatException e) {
 			System.out.println(USAGE);
 			System.out.println("ERROR: port " + args[2] + " is not an integer");

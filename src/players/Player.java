@@ -20,8 +20,12 @@ public abstract class Player {
 	 */
 	public Player(String n, Tile[] tiles) {
 		this.name = n;
-		this.tilesAtHand = new Tile[4];
+		this.tilesAtHand = tiles;
 		score = 0;
+	}
+	
+	public Player(String n) {
+		this.name = n;
 	}
 	
 	public String getName() {
@@ -42,13 +46,13 @@ public abstract class Player {
 	
 //	public abstract int determineMove(Board b);
 
-	public abstract int chooseField();
+	public abstract int chooseFieldIdx();
 
 	// choose a Tile, return the Tile
 	// and accordingly set the Tile in TileAtHand to null
-	public abstract Tile chooseTile();
+	public abstract int chooseTileIdx(int numOfTile);
 	
-	public abstract Tile chooseRotation(Tile[] allRotation) ;
+	public abstract int chooseRotationIdx() ;
 	
 	
 	/**

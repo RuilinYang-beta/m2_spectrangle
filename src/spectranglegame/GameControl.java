@@ -18,8 +18,7 @@ public class GameControl {
 	private GameTUI tui;
 	
 	private Bag bag;
-//	private List<Tile> tilesCopy;  // for safety, don't want to change a collection when looping through it
-	private int firstNonNullIdx;   // for safety, auxiliary to tilesCopy
+	private int firstNonNullIdx;   // for safety, auxiliary to bag.getTiles
 	
 	private final int numPlayers;
 	private List<Player> listPlayers; // to have a order in players
@@ -36,8 +35,6 @@ public class GameControl {
 //		this.tui = new GameTUI(this);
 		
 		this.bag = new Bag(shuffle);
-		// a clone of bag.getTiles()
-//		this.tilesCopy = new ArrayList<>(bag.getTiles());
 		firstNonNullIdx = 0;
 		
 		this.numPlayers = lp.size();
@@ -144,34 +141,27 @@ public class GameControl {
 		int theField = tui.askField(firstPlayer, board, true);
 		Tile theTile = tui.askTileAndRotation(firstPlayer);
 		
-		// consider moving sanitary check to GameTUI
-		if (firstMoveSanitary(theField, theTile)) {
-			// 1. place the chosen rotation of chosen tile on the chosen field
-			putTileOnBoard(theField, theTile);
-			// 2. deal one tile to player, to restore to 4 tiles in hand
-			dealATileToPlayer(firstPlayer);
-
-		} else {
-			System.out.println("Illegal first move, please try again.");
-			// need a mechanism to make user try again.
-		}
+		// 1. place the chosen rotation of chosen tile on the chosen field
+		putTileOnBoard(theField, theTile);
+		// 2. deal one tile to player, to restore to 4 tiles in hand
+		dealATileToPlayer(firstPlayer);
 		
 	}
-	
-	/**
-	 * A helper function of makeFirstMove().
-	 * @param choices An array of length 3: 
-	 * 				  [idxFieldOfChoice, idxOfTilesAtHand, rotationOfTile]
-	 * @return true if choice is a legal move by all means.
-	 */
-	private boolean firstMoveSanitary(int fieldIdx, Tile chosenTile) {
-		// not a bonus field
-		boolean cond1 = !Board.isBonusField(fieldIdx) && board.fieldIsEmpty(fieldIdx);
-		// direction of field match rotation of tile
-		boolean cond2 = Board.isFacingUp(fieldIdx) == chosenTile.isFacingUp();
-		
-		return cond1 && cond2;
-	}
+//	
+//	/**
+//	 * A helper function of makeFirstMove().
+//	 * @param choices An array of length 3: 
+//	 * 				  [idxFieldOfChoice, idxOfTilesAtHand, rotationOfTile]
+//	 * @return true if choice is a legal move by all means.
+//	 */
+//	private boolean firstMoveSanitary(int fieldIdx, Tile chosenTile) {
+//		// not a bonus field
+//		boolean cond1 = !Board.isBonusField(fieldIdx) && board.fieldIsEmpty(fieldIdx);
+//		// direction of field match rotation of tile
+//		boolean cond2 = Board.isFacingUp(fieldIdx) == chosenTile.isFacingUp();
+//		
+//		return cond1 && cond2;
+//	}
 	
 	// ----------------- NormalMove and its sanitaryCheck -----------------
 	public void makeNormalMove() {
@@ -294,13 +284,9 @@ public class GameControl {
 		return bag;
 	}
 
-	/**
-	 * A getter of tilesCopy.
-	 * @return
-	 */
-//	public List<Tile> getTilesCopy() {
-//		return tilesCopy;
-//	}
+	public List<Player> getListPlayers(){
+		return this.listPlayers;
+	}
 
 	/**
 	 * A getter of this.bag.getTiles(); 

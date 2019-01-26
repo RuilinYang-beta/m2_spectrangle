@@ -67,21 +67,32 @@ public class PlayerClient extends Thread {
 //		}
 	//	}
 		Scanner input = new Scanner(System.in);
-		if(sock != null && in != null && out != null) {
+		if (sock != null && in != null && out != null) {
 			try {
 				PlayerClient client = new PlayerClient();
 				client.start();
-				String s = input.nextLine();
-				out.write(s);
-				out.flush();
-			}catch(IOException e) {
+				while (true) {
+					String s = input.nextLine();
+					out.write(s + "\n");
+					out.flush();
+				}
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	@Override
 	public void run() {
-		
+		while(true) {
+			try {
+				String s = in.readLine();
+				if(s == null)
+					break;
+				System.out.println(s);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }

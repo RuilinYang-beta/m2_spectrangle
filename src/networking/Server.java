@@ -10,7 +10,7 @@ import java.util.*;
 public class Server{
 
 	private static final String USAGE = "usage: " + Server.class.getName() + " <ip> ";
-	private static ClientHandler[] clients;
+	private static Thread[] clients;
 	
 	/** Starts a Server-application. */
 	public static void main(String[] args) {
@@ -21,7 +21,6 @@ public class Server{
 		String name = args[0];
 		int port = 0;
 		Socket sock = null;
-		ServerSocket sersock = null;
 
 		// parse args[1] - the port
 		try {
@@ -41,25 +40,22 @@ public class Server{
 		}
 
 		// try to open a Socket server
-		try {
-			System.out.println("Server starting. \n  What is your name?");
-			clients = new ClientHandler[10];
+			System.out.println("Server starting. \nWhat is your name?");
+			clients = new Thread[10];
 			int i = 0;
 			while (true) {
-				sersock = new ServerSocket(port);
+				try(ServerSocket sersock = new ServerSocket(port)) {
 				sock = sersock.accept();
-				System.out.println("Client" + i +  " connected");
-				Scanner in = new Scanner(System.in);
-				String clientname = in.nextLine();
-				ClientHandler handler = new ClientHandler(clientname, sock, clients);
-				clients[i] = handler;
+				System.out.println("Client " + i +  " connected");
+				ClientHandler handler = new ClientHandler(sock, clients);
+				clients[i] = (new Thread(handler));
+				clients[i].start();
 				i++;
-				(new Thread(handler)).start();
-				handler.handleTerminalInput();
-				handler.shutDown();
+//				handler.handleTerminalInput();
+//				handler.shutDown();
+			} catch (IOException e) {
+				System.out.println("ERROR: could not create a server socket on port " + port);
 			}
-		} catch (IOException e) {
-			System.out.println("ERROR: could not create a server socket on port " + port);
 		}
 	}
 

@@ -19,7 +19,7 @@ public class ClientHandler implements Runnable {
 	protected Socket sock;
 	protected BufferedReader in;
 	protected BufferedWriter out;
-	protected ClientHandler[] clients;
+	protected Thread[] clients;
 
 	/*
 	 * @requires (nameArg != null) && (sockArg != null);
@@ -30,8 +30,7 @@ public class ClientHandler implements Runnable {
 	 * @param nameArg name of the Client Handler-process
 	 * @param sockArg Socket of the Client Handler-process
 	 */
-	public ClientHandler(String nameArg, Socket sockArg, ClientHandler[] clients) throws IOException {
-		name = nameArg;
+	public ClientHandler(Socket sockArg, Thread[] clients) throws IOException {
 		sock = sockArg;
 		this.clients = clients;
 		in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
@@ -43,17 +42,15 @@ public class ClientHandler implements Runnable {
 	 * characters to the default output.
 	 */
 	public void run() {
-		String s;
 		try {
 			while (true) {
-				s = in.readLine();
+				String s = in.readLine();
 				if (s == null || s.isEmpty() || s.equals("exit")) {
 					shutDown();
 					break;
-				} else {
-					// out.print(s);
-					System.out.println(s);
 				}
+				name = s;
+				System.out.println(s);
 			}
 		} catch (IOException e) {
 			// System.out.println("Stream is closed" + "\n");
@@ -65,11 +62,10 @@ public class ClientHandler implements Runnable {
 	 * socket-connection to the Peer process. On Peer.EXIT the method ends
 	 */
 	public void handleTerminalInput() throws IOException {
-		String s;
 		try {
 			while (true) {
 				Scanner inn = new Scanner(System.in);
-				s = inn.nextLine();
+				String s = inn.nextLine();
 				if (s.equals("exit")) {
 					out.write(EXIT + "\n");
 					out.flush();

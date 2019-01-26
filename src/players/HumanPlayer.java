@@ -34,23 +34,23 @@ public class HumanPlayer extends Player{
 //		return null;
 //	}
 	
-    private String readLine(String prompt) {
-        String value = "";
-        boolean intRead = false;
-        @SuppressWarnings("resource")
-        Scanner line = new Scanner(System.in);
-        do {
-            System.out.print(prompt);
-            try (Scanner scannerLine = new Scanner(line.nextLine());) {
-                if (scannerLine.hasNextLine()) {
-                    intRead = true;
-                    value = scannerLine.nextLine();
-                }
-            }
-        } while (!intRead);
-        return value;
-    }
-    
+//    private String readLine(String prompt) {
+//        String value = "";
+//        boolean intRead = false;
+//        @SuppressWarnings("resource")
+//        Scanner line = new Scanner(System.in);
+//        do {
+//            System.out.print(prompt);
+//            try (Scanner scannerLine = new Scanner(line.nextLine());) {
+//                if (scannerLine.hasNextLine()) {
+//                    intRead = true;
+//                    value = scannerLine.nextLine();
+//                }
+//            }
+//        } while (!intRead);
+//        return value;
+//    }
+//    
     public int chooseField() {
 		System.out.print("Chose a field to place a tile: "); 
 		Scanner in = null;

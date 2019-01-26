@@ -80,7 +80,7 @@ public class GameTUI {
      * @param p
      * @return
      */
-    public Tile askTileAndRotation(HumanPlayer p) {
+    public Tile askTileAndRotation(Player p) {
     	Tile baseTile = askTile(p);
     	Tile chosenTileAndRotation = askRotation(p, baseTile);
     	return chosenTileAndRotation;

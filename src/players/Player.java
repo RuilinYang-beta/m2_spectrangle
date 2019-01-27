@@ -33,25 +33,22 @@ public abstract class Player {
 		return name;
 	}
 	
-
-	/*
-	 * @requires tiles != null;
-	 * @ensures this.getTiles() == tiles;
-	 */
 	/*
 	 * Returns the tiles in the hand of ther player
 	 */
 	public Tile[] getTiles() {
 		return tilesAtHand;
 	}
-	
-//	public abstract int determineMove(Board b);
 
-	public abstract int chooseFieldIdx();
+	
 
 	// choose a Tile, return the Tile
 	// and accordingly set the Tile in TileAtHand to null
 	public abstract int chooseTileIdx(int numOfTile, boolean isFirstM);
+	
+	public abstract int chooseTileIdxToSwap(int numOfTile);
+	
+	public abstract int chooseFieldIdx();
 	
 	public abstract int chooseRotationIdx() ;
 	

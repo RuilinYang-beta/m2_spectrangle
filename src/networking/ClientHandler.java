@@ -46,14 +46,15 @@ public class ClientHandler implements Runnable {
 			while (true) {
 				String s = in.readLine();
 				if (s == null || s.isEmpty() || s.equals("exit")) {
+					System.out.println("Client " + getName()+ " disconnectd");
 					shutDown();
 					break;
 				}
 				name = s;
-				System.out.println(s);
+				System.out.println("Hello " + s + "!");
 			}
 		} catch (IOException e) {
-			// System.out.println("Stream is closed" + "\n");
+			// System.out.println("C" + "\n");
 		}
 	}
 
@@ -66,10 +67,9 @@ public class ClientHandler implements Runnable {
 			while (true) {
 				Scanner inn = new Scanner(System.in);
 				String s = inn.nextLine();
-				if (s.equals("exit")) {
+				if (s.equals(EXIT)) {
 					out.write(EXIT + "\n");
 					out.flush();
-					System.out.println("Stream closed");
 					shutDown();
 				} else {
 					out.write(getName() + ":" + s + "\n");
@@ -89,7 +89,7 @@ public class ClientHandler implements Runnable {
 			in.close();
 			sock.close();
 			out.close();
-			System.exit(0);
+		//	System.exit(0);
 		} catch (IOException e) {
 
 		}

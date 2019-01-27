@@ -12,7 +12,7 @@ import java.util.*;
 
 public class PlayerClient extends Thread {
 
-	private static final String USAGE = "usage: java week7.cmdline.Client <address> <port>";
+	private static final String USAGE = "Client <address> <port>";
 	protected static BufferedReader in;
 	protected static BufferedWriter out;
 	
@@ -56,16 +56,6 @@ public class PlayerClient extends Thread {
 			System.out.println("ERROR: could not create a socket on " + addr + " and port " + port + "\n");
 		}
 
-		// create Peer object and start the two-way communication
-		//int i = 0;
-//		Scanner in = new Scanner(System.in);
-//		String name;
-//		try {
-//			
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-	//	}
 		Scanner input = new Scanner(System.in);
 		if (sock != null && in != null && out != null) {
 			try {
@@ -86,8 +76,13 @@ public class PlayerClient extends Thread {
 		while(true) {
 			try {
 				String s = in.readLine();
-				if(s == null)
+				if(s == null || s.equals("exit")) {
+//					out.write("Client disconnectd \n");
+//					in.close();
+//					out.close();
+					System.exit(0);
 					break;
+				}
 				System.out.println(s);
 			} catch (IOException e) {
 				e.printStackTrace();

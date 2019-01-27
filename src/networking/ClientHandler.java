@@ -51,10 +51,13 @@ public class ClientHandler implements Runnable {
 					shutDown();
 					break;
 				}
+				String[] a = s.split(" ");
 				if (first) {
-					name = s;
-					System.out.println("Hello " + s + "!");
-					first = false;
+					if (a[0].equals("hello") || a[0].equals("Hello")) {
+						name = a[1];
+						System.out.println("Hello " + name + " false false false false");
+						first = false;
+					}
 				}else {
 					System.out.println("Client " + getName() + ": " + s);
 				}

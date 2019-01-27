@@ -72,6 +72,9 @@ public class Tile {
 		return (rotation % 2 == 0);
 	}
 	
+	public boolean isJoker() {
+		return this.toString().equals("WWW1");
+	}
 	// =================== Rotation Related ===================
 	/**
 	 * @return A new Tile generated from this tile, after rotate once.

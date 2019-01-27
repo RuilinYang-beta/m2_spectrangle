@@ -94,11 +94,15 @@ public class GameTUI {
     			// First Move: Not a BONUS Field; field is empty
     			// Normal Move: field is empty; has at least one matching boarder with tiles already on the board.
     		Character[] srd = board.getSurroundingInfo(returnVal);
-    		// cond0 only applies to Normal Move, make sure chosenTile can have at least 1 potential matching boarder, no matter rotation.
-    		boolean cond0_0 = (srd[1] != null) ? (chosenBaseTile.toString().indexOf(srd[1]) >= 0) : false; // yield true if (has a vertical neighbor tile) && (vertical boarder is possible to match)
-    		boolean cond0_1 = (srd[2] != null) ? (chosenBaseTile.toString().indexOf(srd[2]) >= 0) : false; // yield true if (has a left neighbor tile) && (left boarder is possible to match)
-    		boolean cond0_2 = (srd[3] != null) ? (chosenBaseTile.toString().indexOf(srd[3]) >= 0) : false; // yield true if (has a right neighbor tile) && (right boarder is possible to match)
-    		boolean cond0 = (cond0_0 || cond0_1 || cond0_2);
+    		// For non-joker Tile, make sure chosenTile can have at least 1 potential matching boarder, no matter rotation.
+    		boolean cond0_nj0 = (srd[1] != null) ? ((chosenBaseTile.toString() + "W").indexOf(srd[1]) >= 0) : false; // yield true if (has a vertical neighbor tile) && (vertical boarder is possible to match)
+    		boolean cond0_nj1 = (srd[2] != null) ? ((chosenBaseTile.toString() + "W").indexOf(srd[2]) >= 0) : false; // yield true if (has a left neighbor tile) && (left boarder is possible to match)
+    		boolean cond0_nj2 = (srd[3] != null) ? ((chosenBaseTile.toString() + "W").indexOf(srd[3]) >= 0) : false; // yield true if (has a right neighbor tile) && (right boarder is possible to match)
+    		// For joker Tile, make sure chosenField have at least 1 boarder Tile
+    		boolean cond0_j = ((srd[1] != null) || (srd[2] != null) || (srd[3] != null));
+    		
+    		// cond0 only applies to Normal Move, 
+    		boolean cond0 = (chosenBaseTile.isJoker()) ? (cond0_j) : (cond0_nj0 || cond0_nj1 || cond0_nj2);
     		// cond1 only applies to First Move.
     		boolean cond1 = !Board.isBonusField(returnVal); 
     		boolean cond2 = board.fieldIsEmpty(returnVal);

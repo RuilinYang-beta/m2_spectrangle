@@ -125,6 +125,47 @@ public class HumanPlayer extends Player{
 	
 	
 	
+
+//    private String readLine(String prompt) {
+//        String value = "";
+//        boolean intRead = false;
+//        @SuppressWarnings("resource")
+//        Scanner line = new Scanner(System.in);
+//        do {
+//            System.out.print(prompt);
+//            try (Scanner scannerLine = new Scanner(line.nextLine());) {
+//                if (scannerLine.hasNextLine()) {
+//                    intRead = true;
+//                    value = scannerLine.nextLine();
+//                }
+//            }
+//        } while (!intRead);
+//        return value;
+//    }
+//    
+    public int chooseField() {
+		System.out.print("Chose a field to place a tile: "); 
+		Scanner in = null;
+		// make sure this is a number && is a index on board; if not, ask again.
+		Integer i = null;
+		do {
+			try {
+				in = new Scanner(System.in);
+				i = in.nextInt();
+				if ((i < 0) || (36 <= i)) {
+					System.out.print("Your input index does not exist on the board, please try again: ");
+					i = null;
+				}
+			} catch(InputMismatchException e) {
+				System.out.print("Your input is not a number, please try again: ");
+				i = null;
+			}
+		} while (i == null);
+		
+    	in.close();
+    	return i;
+	}
+
     private String readLine(String prompt) {
         String value = "";
         boolean intRead = false;
@@ -142,6 +183,7 @@ public class HumanPlayer extends Player{
         return value;
     }
     
+
 
 
 	

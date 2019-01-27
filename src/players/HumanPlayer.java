@@ -1,6 +1,9 @@
 package players;
 
 import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.InputMismatchException;
@@ -10,9 +13,10 @@ import spectranglegame.*;
 
 public class HumanPlayer extends Player{
 	
-	private String name;
-	private Tile[] tilesAtHand;
+//	private String name;
+//	private Tile[] tilesAtHand;
 	private int score;
+	private Scanner in;
 	// later move this to PlayerClient
 	private static final List<Integer> BONUSES =       Arrays.asList(1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 4, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2, 1, 1, 1, 3, 1);
 	
@@ -27,74 +31,117 @@ public class HumanPlayer extends Player{
 	
 	
 	// ======================== Making Choices ========================
-    public int chooseFieldIdx() {
-    	Integer choice = null;
-    	
-    	while (true) {
-			System.out.print("> Please chose a field: ");
-			Scanner in = new Scanner(System.in);
+	public int chooseTileIdx(int numOfTile, boolean isFirstMove) {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		Integer i = null;
+		String s = null;
+		while (true) {
 			
-			if (in.hasNextLine()) {
-				try {
-					choice = in.nextInt();
-					if ((0 <= choice) && (choice <= 35)) {
+			System.out.println("> Player " + name + ", Chose a Tile from :[0, " + (numOfTile - 1) + "] (inclusive): ");
+			if (!isFirstMove) {
+				System.out.println("- Or enter 8 to skip turn");
+				System.out.println("- Or enter 9 to exchange a Tile and pass turn");
+			}
+			
+			try {
+				s = br.readLine();
+			} catch (IOException e) {
+				System.out.println("IOException happens in chooseTileIdx br.readLine.");
+			}
+			
+			try {
+				i = Integer.parseInt(s);
+				
+				if ((0 <= i) && (i < numOfTile)) {
+					break;
+				} 
+				else {
+					// First Move input out of range
+					if (isFirstMove) {
+						System.out.println("Input number out of range. Please try again.");
+						i = null;
+					} 
+					// Normal Move: user wants to skip
+					else if ((!isFirstMove) && (i == 8)) {
+						System.out.println("Player " + name + " choose to skip this turn.");
 						break;
-					} else {
-						System.out.println("Index is not on board. Please try again.");
-						choice = null;
+					} 
+					// Normal Move: user wants to exchange and pass turn
+					else if ((!isFirstMove) && (i == 9)) {
+						System.out.println("You are going to exchange a Tile with bag.");
 					}
-				} catch (InputMismatchException e) {
-					System.out.println("InputMismatch. Please try again.");
+					// Normal Move: input out of range
+					else {
+						System.out.println("Input number out of range. Please try again.");
+						i = null;
+					}					
 				}
+				
+			} catch (NumberFormatException e) {
+				System.out.println("Try again. Please input a number.");
 			}
 		}
-		System.out.println("Player is going to return " + choice + " to TUI");
-		return choice;	
+		
+		return i;
 	}
-
-	public int chooseTileIdx(int numOfTile) {
-		System.out.print("Chose a Tile from :[0, " + (numOfTile - 1) + "] (inclusive): "); 
-		Scanner in = null;
-		// make sure this is a number && is a index on board; if not, ask again.
+	
+	
+	public int chooseFieldIdx() {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		Integer i = null;
-		do {
+		String s = null;
+		while (true) {
+			System.out.print("> Player " + name + ", Please chose a field: ");
 			try {
-				in = new Scanner(System.in);
-				i = in.nextInt();
-				if ((i < 0) || (numOfTile <= i)) {
-					System.out.print("Index out of bound, please try again: ");
+				s = br.readLine();
+			} catch (IOException e) {
+				System.out.println("IOException happens in br.readLine.");
+			}
+			
+			try {
+				i = Integer.parseInt(s);
+				if ((0 <= i) && (i <= 35)) {
+					break;
+				} else {
+					System.out.println("Index is not on board. Please try again.");
 					i = null;
 				}
-			} catch(InputMismatchException e) {
-				System.out.print("Your input is not a number, please try again: ");
-				i = null;
+			} catch (NumberFormatException e) {
+				System.out.println("Try again. Please input a number.");
 			}
-		} while (i == null);
+		}
 		
-		System.out.println("Player is going to return " + i + " to TUI.");
-    	return i;
+		return i;
 	}
 
+	
+	
 	public int chooseRotationIdx() {
-		System.out.print("Chose a Rotation from :[0, 2] (inclusive): "); 
-		Scanner in = null;
-		// make sure this is a number && is a index on board; if not, ask again.
-		Integer i = null;
-		do {
-			try {
-				in = new Scanner(System.in);
-				i = in.nextInt();
-				if ((i < 0) || (3 <= i)) {
-					System.out.print("Index out of bound, please try again: ");
-					i = null;
-				}
-			} catch(InputMismatchException e) {
-				System.out.print("Your input is not a number, please try again: ");
-				i = null;
-			}
-		} while (i == null);
-		
-    	in.close();
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        Integer i = null;
+        String s = null;
+        
+		while (true) {
+			System.out.print("> Player " + name + ", Chose a Rotation from :[0, 2] (inclusive): ");
+            try {
+                s = br.readLine();
+            } catch (IOException e) {
+                System.out.println("IOException happens in br.readLine.");
+            }
+            
+            try {
+                i = Integer.parseInt(s);
+                if ((0 <= i) && (i <= 2)) {
+                    break;
+                } else {
+                    System.out.println("Index is out of range. Please try again.");
+                    i = null;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Try again. Please input a number.");
+            }
+		}
+
     	return i;
 	}
 	
@@ -168,9 +215,14 @@ public class HumanPlayer extends Player{
 	
 	public static void main(String[] args) {
 		HumanPlayer p = new HumanPlayer("joke");
-//		p.chooseFieldIdx();
-//		p.chooseTileIdx(3);
-//		p.chooseRotationIdx();
+
+//		System.out.println("chosen Field Idx is: " + p.chooseFieldIdx());
+//		System.out.println("chosen Tile Idx is: " + p.chooseTileIdx(3));
+//		System.out.println("chosen Rotation Idx is: " + p.chooseRotationIdx());
+		
+		System.out.println(p.readLine("> Question 1:"));
+		System.out.println(p.readLine("> Question 2:"));
+		System.out.println(p.readLine("> Question 3:"));
 		
 		
 	}

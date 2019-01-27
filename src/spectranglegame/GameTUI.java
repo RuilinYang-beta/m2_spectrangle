@@ -29,30 +29,69 @@ public class GameTUI {
     // =========== Instance Field ===========
 	private GameControl control;
 	private Board board;
+	private Tile chosenBaseTile = null;
+	private Integer chosenFieldIdx = null;
 	private Boolean chosenFieldFacingUp = null;
 //	private Boolean chosenFieldFacingUp = true;
-	private Map<Player, Tile[]> mapPlayersTiles = null;
+
+	private List<Player> listPlayers; // to have a order in players
 	
 	// =========== Constructor ===========
-	public GameTUI(GameControl gc, Board bd) {
+	public GameTUI(GameControl gc, Board bd, List<Player> lp) {
 //	public GameTUI(GameControl gc) {
 		this.control = gc;
 		this.board = bd;
+		this.listPlayers = lp;
 	}
 
 	// ========================= Ask User Input =========================
+	/**
+     * Helper function of askTileAndRotation, if not valid, keep asking until valid.
+     * @param p Ask this player for input.
+     * @return The Tile (cloned) of the player's choice. 
+     */
+    public Tile askTile(Player p, boolean isFirstMove) {
+    	chosenBaseTile = null;
+    	// later this will be sent to p via socket, and p will parse it 
+		System.out.println(TILE); 
+		
+		ArrayList<Tile> nonNulls = getNonNullTiles(p);
+		// Later TUI should send this String representation to PlayerClient
+		// For now TUI print this String at TUI's console.
+		showMultiTilesUp(nonNulls);
+		
+		int nonNullTileIdx = p.chooseTileIdx(nonNulls.size(), isFirstMove);
+		
+		if ((nonNullTileIdx != 8) && (nonNullTileIdx != 9)) {
+			// copy the current chosen Tile in TUI
+			// for TUI to later check normal move sanitary (surrounding sanitary)
+			chosenBaseTile = nonNulls.get(nonNullTileIdx).deepCopy();
+			
+			return chosenBaseTile;
+			
+		} else if (nonNullTileIdx == 8){
+			
+			return null; // choose no tile, and do nothing else
+			
+		} else { // when nonNullTileIdx = 9, user wants to exchange a tile with bag 
+			// make a function to let the user exchange a tile with the bag
+			return null;  // and choose no tile
+		}
+		
+    }
+    
     /**
      * Ask user to give a valid field, if not valid, keep asking until valid.
      * @param p Ask this player for input.
      * @return The index of the player's choice.
      */
     public Integer askField(Player p, Board b, boolean isFirstMove) {
-    	Integer chosenFieldIdx = null;
+    	chosenFieldIdx = null;
+    	chosenFieldFacingUp = null;
     	boolean isLegalField = false;
     	
-    	// Later TUI will send this board string to PlayerClient.
-		// For now TUI temporarily print board at TUI console.
-		printBoardDynamic(board);
+    	// Move to showInfoToPlayer
+//		printBoardDynamic(board);
 		
     	do {
     		// later this will be sent to p via socket, and p will parse it 
@@ -63,16 +102,30 @@ public class GameTUI {
     		System.out.println(returnVal);
     		
     		// TUI doing the sanitary check, if not sanitary, keep asking until user give legal fieldIdx.
-    		boolean cond0 = Board.isLegalIdx(returnVal);
-    		boolean cond1 = !Board.isBonusField(returnVal); // applies to first move only
+    			// First Move: Not a BONUS Field; field is empty
+    			// Normal Move: field is empty; has at least one matching boarder with tiles already on the board.
+    		Character[] srd = board.getSurroundingInfo(returnVal);
+    		// For non-joker Tile, make sure chosenTile can have at least 1 potential matching boarder, no matter rotation.
+    		boolean cond0_nj0 = (srd[1] != null) ? ((chosenBaseTile.toString() + "W").indexOf(srd[1]) >= 0) : false; // yield true if (has a vertical neighbor tile) && (vertical boarder is possible to match)
+    		boolean cond0_nj1 = (srd[2] != null) ? ((chosenBaseTile.toString() + "W").indexOf(srd[2]) >= 0) : false; // yield true if (has a left neighbor tile) && (left boarder is possible to match)
+    		boolean cond0_nj2 = (srd[3] != null) ? ((chosenBaseTile.toString() + "W").indexOf(srd[3]) >= 0) : false; // yield true if (has a right neighbor tile) && (right boarder is possible to match)
+    		// For joker Tile, make sure chosenField have at least 1 boarder Tile
+    		boolean cond0_j = ((srd[1] != null) || (srd[2] != null) || (srd[3] != null));
+    		
+    		// cond0 only applies to Normal Move, 
+    		boolean cond0 = (chosenBaseTile.isJoker()) ? (cond0_j) : (cond0_nj0 || cond0_nj1 || cond0_nj2);
+    		// cond1 only applies to First Move.
+    		boolean cond1 = !Board.isBonusField(returnVal); 
     		boolean cond2 = board.fieldIsEmpty(returnVal);
-    		isLegalField = (isFirstMove) ? (cond0 && cond1 && cond2) : (cond0 && cond2);
+    		
+    		isLegalField = (isFirstMove) ? (cond1 && cond2) : (cond0 && cond2);
     		
     		if (isLegalField) {
     			chosenFieldIdx = returnVal;
     			chosenFieldFacingUp = Board.isFacingUp(chosenFieldIdx);
     		} else {
     			// later this will be sent to p via socket, and p will parse it 
+    			// after parsing, will show a bunch of message to tell the rule to player
     			System.out.println(FIELD_WRONG);
     		}
     	} while (chosenFieldIdx == null);
@@ -81,45 +134,18 @@ public class GameTUI {
     }
     
     /**
-     * Ask user to choose a Tile and its rotation.
-     * @param p
-     * @return
-     */
-    public Tile askTileAndRotation(Player p) {
-    	Tile baseTile = askTile(p);
-    	Tile chosenTileAndRotation = askRotation(p, baseTile);
-    	return chosenTileAndRotation;
-    }
-    
-    /**
-     * Helper function of askTileAndRotation, if not valid, keep asking until valid.
-     * @param p Ask this player for input.
-     * @return The Tile (cloned) of the player's choice. 
-     */
-    private Tile askTile(Player p) {
-    	
-    	// later this will be sent to p via socket, and p will parse it 
-		System.out.println(TILE); 
-		
-		ArrayList<Tile> nonNulls = getNonNullTiles(p);
-		// Later TUI should send this String representation to PlayerClient
-		// For now TUI print this String at TUI's console.
-		showMultiTilesUp(nonNulls);
-		
-		int nonNullTileIdx = p.chooseTileIdx(nonNulls.size());
-		
-		return nonNulls.get(nonNullTileIdx);
-    }
-    
-
-    /**
      * Helper function of askTileAndRotation(Player p).
      * Generate 3 different rotation from the base Tile, ask user to choose one rotation.
      * @param p The player to ask
      * @param t The tile with rotation 0, as the base Tile
      * @return
      */
-    private Tile askRotation(Player p, Tile baseT) {
+    public Tile askRotation(Player p, Tile baseT, boolean isFirstMove) {
+    	boolean isLegalRotation = false;
+    	Tile chosenRotation = null;
+    	
+    	// ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ Below are printing all possible Rotation  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    	// ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ Later TUI should send this String representation to PlayerClient ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
     	// Generate 3 different rotation from the base Tile,
     	ArrayList<Tile> allRotation = new ArrayList<>();
 
@@ -130,30 +156,59 @@ public class GameTUI {
     										  baseT.rotateTileFourTimes()
     										  )
     				);
-    		
-    		// Later TUI should send this String representation to PlayerClient
-    		// For now TUI print this String at TUI's console.
+
     		showMultiTilesUp(allRotation);
     		
-    		// then, set chosenFieldFacingUp back to null;
-    		chosenFieldFacingUp = null;
     	} else if (!chosenFieldFacingUp) {
     		// fill 3 rotation facing down
-    		System.out.println("showMultiTilesDown not implemented yet.");
+    		allRotation.addAll( Arrays.asList(baseT.rotateTileOnce(), 
+    										  baseT.rotateTileOnce().rotateTileTwice(), 
+    										  baseT.rotateTileOnce().rotateTileFourTimes()
+    										  )
+    				);
     		
-    		// then, set chosenFieldFacingUp back to null;
-    		chosenFieldFacingUp = null;
+    		showThreeTilesDown(allRotation);
+    		
     	} else {
-    		System.out.println("Error! chosen field direction unknow!");
+    		System.out.println("Error! chosen field direction unknow!"); // impossible to happen.
     	}
+    	// ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ Above are printing all possible Rotation ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
     	
-    	int rotationIdx = p.chooseRotationIdx();
+    	do {
+    		chosenRotation = allRotation.get(p.chooseRotationIdx());
+        	
+        	// TUI doing the sanitary check, if not sanitary, keep asking until user give legal fieldIdx.
+    		// Only for Normal Move: surrounding sanitary check:
+        	Character[] srd = board.getSurroundingInfo(chosenFieldIdx);
+        	boolean cond1 = (srd[1] != null) ? (chosenRotation.getVertical() == srd[1] ) : false; // yield true if (has a vertical neighbor tile) && (vertical boarder MATCHES)
+    		boolean cond2 = (srd[2] != null) ? (chosenRotation.getLeft() == srd[2])      : false; // yield true if (has a left neighbor tile) && (left boarder MATCHES)
+    		boolean cond3 = (srd[3] != null) ? (chosenRotation.getRight() == srd[3])     : false; // yield true if (has a right neighbor tile) && (right boarder MATCHES)
+    		boolean isLegalNormalMove = (cond1 || cond2 || cond3);
+    		
+    		isLegalRotation = (isFirstMove) ? true : isLegalNormalMove;
+    		
+    	} while (!isLegalRotation);
     	
-    	return allRotation.get(rotationIdx);
+    	return chosenRotation;
     }
 
-    
     // ========================= Display Tiles Related =========================
+    // Later this whole bunch of string will be sent to PlayerClient via socket
+    // For now TUI print to TUI's console.
+    public void showInfoToPlayer(Player sendToThisPlayer) {
+    	// show each Player's Tile 
+    	for (Player p : listPlayers) {
+    		System.out.println("Player " + p.getName() + "'s Tiles: ");
+    		ArrayList<Tile> nonNulls = getNonNullTiles(p);
+    		// Later TUI should send this String representation to PlayerClient
+    		// For now TUI print this String at TUI's console.
+    		showMultiTilesUp(nonNulls);
+    	}
+    	
+    	// show board
+    	printBoardDynamic(board);
+    }
+    
     private ArrayList<Tile> getNonNullTiles(Player p){
     	Tile[] tilesArray =  p.getTiles();
     	
@@ -195,6 +250,11 @@ public class GameTUI {
        
 	private void showOneTileUp(List<Tile> tiles) {
 		Tile t0 = tiles.get(0);
+		
+		if (t0.getRotation() % 2 != 0) {
+			System.out.println("Warning! Tile facing down passed to showOneTileUp!");
+		}
+		
 		String val0 = "" + t0.getValue();
 		String lef0 = "" + t0.getLeft();
 		String rig0 = "" + t0.getRight();
@@ -213,6 +273,10 @@ public class GameTUI {
 	private void showTwoTilesUp(List<Tile> tiles) {
 		Tile t0 = tiles.get(0);
 		Tile t1 = tiles.get(1);
+		
+		if ((t0.getRotation() % 2 != 0) || (t1.getRotation() % 2 != 0)){
+			System.out.println("Warning! Tile(s) facing down passed to showTwoTilesUp!");
+		}
 		
 		String val0 = "" + t0.getValue();		String val1 = "" + t1.getValue();
 		String lef0 = "" + t0.getLeft();		String lef1 = "" + t1.getLeft();
@@ -233,6 +297,10 @@ public class GameTUI {
 		Tile t0 = tiles.get(0);
 		Tile t1 = tiles.get(1);
 		Tile t2 = tiles.get(2);
+		
+		if ((t0.getRotation() % 2 != 0) || (t1.getRotation() % 2 != 0) || (t2.getRotation() % 2 != 0)) {
+			System.out.println("Warning! Tile(s) facing down passed to showThreeTilesUp!");
+		}
 		
 		String val0 = "" + t0.getValue();		String val1 = "" + t1.getValue();
 		String lef0 = "" + t0.getLeft();		String lef1 = "" + t1.getLeft();
@@ -262,6 +330,10 @@ public class GameTUI {
 		Tile t2 = tiles.get(2);
 		Tile t3 = tiles.get(3);
 		
+		if ((t0.getRotation() % 2 != 0) || (t1.getRotation() % 2 != 0) || (t2.getRotation() % 2 != 0) || (t3.getRotation() % 2 != 0)){
+			System.out.println("Warning! Tile(s) facing down passed to showFourTilesUp!");
+		}
+		
 		String val0 = "" + t0.getValue();		String val1 = "" + t1.getValue();
 		String lef0 = "" + t0.getLeft();		String lef1 = "" + t1.getLeft();
 		String rig0 = "" + t0.getRight();		String rig1 = "" + t1.getRight();
@@ -281,17 +353,44 @@ public class GameTUI {
 		System.out.println(template4);
 	}
 	
+	private void showThreeTilesDown(List<Tile> tiles) {
+		Tile t0 = tiles.get(0);
+		Tile t1 = tiles.get(1);
+		Tile t2 = tiles.get(2);
+		
+		if ((t0.getRotation() % 2 == 0) || (t1.getRotation() % 2 == 0) || (t2.getRotation() % 2 == 0)){
+			System.out.println("Warning! Tile(s) facing up passed to showThreeTilesDown!");
+		}
+		
+		String val0 = "" + t0.getValue();		String val1 = "" + t1.getValue();
+		String lef0 = "" + t0.getLeft();		String lef1 = "" + t1.getLeft();
+		String rig0 = "" + t0.getRight();		String rig1 = "" + t1.getRight();
+		String ver0 = "" + t0.getVertical();	String ver1 = "" + t1.getVertical();
+		
+		String val2 = "" + t2.getValue();
+		String lef2 = "" + t2.getLeft();
+		String rig2 = "" + t2.getRight();
+		String ver2 = "" + t2.getVertical();
+		String template = 
+				// make sure each line is of the same total length
+				// for GameTUI to display 3 tiles horizontally
+			     " --------- " + " --------- " + " --------- \n" +
+			     " \\   " + ver0 + "   / " + " \\   " + ver1 + "   / " + " \\   " + ver2 + "   / \n" +
+                 "  \\ " + lef0 + " " + rig0 + " /  " + "  \\ " + lef1 + " " + rig1 + " /  " + "  \\ " + lef2 + " " + rig2 + " /  \n" +
+                 "   \\ " + val0 + " /   " + "   \\ " + val1 + " /   " + "   \\ " + val2 + " /   \n" +
+			     "    \\ /    " + "    \\ /    " + "    \\ /    \n" ; 
+		System.out.print(template);
+	}
+
     // ========================= Print the board =========================
     public void printBoardDynamic(Board b) {
     	System.out.println(getBoardString(b.getValuesOnBoard(), b.getVerticalOnBoard(), b.getLeftOnBoard(), b.getRightOnBoard()));
     }
 
-    
     public void printBoardStatic() {
     	System.out.println(getBoardString(values, vertical, left, right));
     }
     
-	
     /* if a field is empty         =>      its index showed, its bonus (if not 1) showed
      * if a field has a tile on it =>      its index hidden, its bonus (if not 1) showed,
      *  								   its value showed.
@@ -360,22 +459,26 @@ public class GameTUI {
 	
     // ========================= Main =========================
     public static void main(String[] args) {
-    	
-    	// test of askField, askTileAndRotation:
     	Tile[] tiles = {new Tile(3, "RGB")};
     	List<Player> pl = Arrays.asList(new HumanPlayer("player", tiles));
     	
 		GameTUI temp = new GameTUI(new GameControl(pl, true), 
-								   new Board());
+								   new Board(), pl);
 		
+		// test of showTile
+//		temp.showThreeTilesUp(Arrays.asList(new Tile(3, "RGB"), new Tile(1, "HEY"), new Tile(2, "OOP")));
+//		temp.showThreeTilesDown(Arrays.asList(new Tile(3, "RGB"), new Tile(1, "HEY"), new Tile(2, "OOP")));
+		
+		// test of askField, askTileAndRotation:
 		Tile[] tiles1 = {new Tile(3, "RGB"), null, null, null};
-		Tile[] tiles2 = {new Tile(3, "RGB"), null, new Tile(1, "HEY")};
+		Tile[] tiles2 = {new Tile(3, "RGB"), null, new Tile(1, "HEY"), null};
 		Tile[] tiles3 = {new Tile(3, "RGB"), new Tile(1, "HEY"), null, new Tile(2, "OOP")};
 		Tile[] tiles4 = {new Tile(3, "RGB"), new Tile(1, "HEY"), new Tile(2, "OOP"), new Tile(4, "WHO")};
 		
 		HumanPlayer p = new HumanPlayer("player", tiles2);
-		temp.askField(p, new Board(), false);
-		temp.askTileAndRotation(p);
+		Tile t0 = temp.askTile(p);
+		int i = temp.askField(p, new Board(), true);
+		Tile t1 = temp.askRotation(p, t0, true);
 		
 		
 		

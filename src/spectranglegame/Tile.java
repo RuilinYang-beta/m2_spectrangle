@@ -228,31 +228,28 @@ public class Tile {
 	
 	// =================== Main ===================
 	public static void main(String[] args) {
-//		Tile t = new Tile(3,"RGB");
-//		Tile t1 = new Tile(3, "RGB");
-//		System.out.println(t.stringTile().equals(t1.stringTile()));
-//		t1.showTileRotations();
-//		t1.rotateTile();
-//		t1.showTileRotations();
-//		t1.showTileDown();
-//		t1.showTile();
-//		String s = t.stringTile();
-//		System.out.println(s);
-//		System.out.println(t.toString());
-//		t.showTile();						// rotation 0
-//		t.rotateTileOnce().showTile();		// rotation 1
-//		t.rotateTileTwice().showTile();		// rotation 2
-//		t.rotateTileOnce().rotateTileTwice().showTile();  		// rotation 3
-//		t.rotateTileFourTimes().showTile();;					// rotation 4
-//		t.rotateTileOnce().rotateTileFourTimes().showTile();    // rotation 5
-		List<Tile> tiles = Arrays.asList(new Tile(1, "RRR"), 
-										 new Tile(2, "GGG"), 
-										 new Tile(3, "BBB"));
+		Tile t0 = new Tile(3,"RGB");
+		Tile t1 = t0.rotateTileOnce();
+		Tile t2 = t1.rotateTileOnce();
+		Tile t3 = t2.rotateTileOnce();
+		Tile t4 = t3.rotateTileOnce();
+		Tile t5 = t4.rotateTileOnce();
 		
-		Tile t = tiles.get(0);
-		tiles.set(0, null);
-		System.out.println(t);
-		System.out.println(tiles);
+		System.out.println(t0);
+		System.out.println(t1);
+		System.out.println(t2);
+//		t1.showTile();
+//		t3.showTile();
+//		t5.showTile();
+
+//		List<Tile> tiles = Arrays.asList(new Tile(1, "RRR"), 
+//										 new Tile(2, "GGG"), 
+//										 new Tile(3, "BBB"));
+//		
+//		Tile t = tiles.get(0);
+//		tiles.set(0, null);
+//		System.out.println(t);
+//		System.out.println(tiles);
 	}
 
 }

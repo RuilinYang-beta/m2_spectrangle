@@ -8,8 +8,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.*;
 
-import players.HumanPlayer;
-import players.Player;
+import players.*;
 
 public class GameControl {
 	
@@ -23,15 +22,16 @@ public class GameControl {
 	private final int numPlayers;
 	private List<Player> listPlayers; // to have a order in players
 	private Integer firstPlayerIdx;   // not determined until dealTiles
+	private Integer currentPlayerIdx;
 	
 	// Map<Player, Tile[]> mapPlayers will be deprecated
-	private Map<Player, Tile[]> mapPlayers; // to store player and its tiles
+//	private Map<Player, Tile[]> mapPlayers; // to store player and its tiles
 	
 	
 	// ======================== Constructor ========================
 	public GameControl(List<Player> lp, boolean shuffle) {
 		this.board = new Board();
-		this.tui = new GameTUI(this, this.board);
+		this.tui = new GameTUI(this, this.board, lp);
 //		this.tui = new GameTUI(this);
 		
 		this.bag = new Bag(shuffle);
@@ -40,7 +40,7 @@ public class GameControl {
 		this.numPlayers = lp.size();
 		this.listPlayers = lp;
 		firstPlayerIdx = null;
-		this.mapPlayers = new HashMap<>();
+//		this.mapPlayers = new HashMap<>();
 	}
 	
 	// ============ Preparation: deal the initial tiles ============
@@ -52,12 +52,11 @@ public class GameControl {
 	 *         (which is very unlikely for shuffled bag)
 	 */
 	public Integer dealTiles() {
-		// initiate each player with an empty array
-		// that can hold at most 4 Tiles object
-		for (Player p : this.listPlayers) {
-			Tile[] tiles = new Tile[4];
-			mapPlayers.put(p, tiles);
-		}
+		// this is achieved by newly initialized Player
+//		for (Player p : this.listPlayers) {
+//			Tile[] tiles = new Tile[4];
+//			mapPlayers.put(p, tiles);
+//		}
 		
 		// for each of the 4 slot in Tile[4]
 		for (int j = 0; j < 4; j++) {
@@ -98,7 +97,8 @@ public class GameControl {
 	 */
 	private Integer getValuesAtHand(Player p) {
 		Integer sum = 0;
-		for (Tile t : mapPlayers.get(p)) {
+		Tile[] tilesAtHand = p.getTiles();
+		for (Tile t : tilesAtHand) {
 			if (t != null) {
 				sum += t.getValue();
 			}
@@ -138,81 +138,86 @@ public class GameControl {
 		
 		Player firstPlayer = listPlayers.get(firstPlayerIdx);
 		
+		tui.showInfoToPlayer(firstPlayer);
+		Tile theBaseTile = tui.askTile(firstPlayer);
 		int theField = tui.askField(firstPlayer, board, true);
-		Tile theTile = tui.askTileAndRotation(firstPlayer);
+		Tile theTile = tui.askRotation(firstPlayer, theBaseTile, true);
 		
 		// 1. place the chosen rotation of chosen tile on the chosen field
 		putTileOnBoard(theField, theTile);
-		// 2. deal one tile to player, to restore to 4 tiles in hand
+		// 2. nullify the chosen Tile at Player's hand
+		nullifyChosenTile(firstPlayer, theTile);
+		// 3. deal one tile to player, to restore to 4 tiles in hand
 		dealATileToPlayer(firstPlayer);
 		
+		currentPlayerIdx = (firstPlayerIdx + 1) % numPlayers;
 	}
-//	
-//	/**
-//	 * A helper function of makeFirstMove().
-//	 * @param choices An array of length 3: 
-//	 * 				  [idxFieldOfChoice, idxOfTilesAtHand, rotationOfTile]
-//	 * @return true if choice is a legal move by all means.
-//	 */
-//	private boolean firstMoveSanitary(int fieldIdx, Tile chosenTile) {
-//		// not a bonus field
-//		boolean cond1 = !Board.isBonusField(fieldIdx) && board.fieldIsEmpty(fieldIdx);
-//		// direction of field match rotation of tile
-//		boolean cond2 = Board.isFacingUp(fieldIdx) == chosenTile.isFacingUp();
-//		
-//		return cond1 && cond2;
-//	}
 	
 	// ----------------- NormalMove and its sanitaryCheck -----------------
 	public void makeNormalMove() {
-		int currentPlayerIdx = (firstPlayerIdx + 1) % numPlayers;
 		Player currentPlayer = listPlayers.get(currentPlayerIdx);
 		
-		// while board is not full, do: 
-		while (!board.boardIsFull()) {
-			// for now suppose user can make a move,
-			// think about where to check whether user is able to make a move
-			int theFieldIdx = tui.askField(currentPlayer, board, false);
-			Tile theTile = tui.askTileAndRotation(currentPlayer);
-			
-			// sanitary check, put theTile on theField, player get a new Tile.
-			if (normalMoveSanitary(theFieldIdx, theTile)) {
-				putTileOnBoard(theFieldIdx, theTile);
-				dealATileToPlayer(currentPlayer);
-			} else {
-				System.out.println("Move not sanitary");
-				// GameTUI should ensure only sanitary move be passed to GameControl
-				// if not sanitary, it's GameTUI's responsibility to 
-				// ask user for move until input sanitary move.
-			}
-			
-			currentPlayerIdx = (currentPlayerIdx + 1) % numPlayers;
-			currentPlayer = listPlayers.get(currentPlayerIdx);		
-			
-		} 
+		tui.showInfoToPlayer(currentPlayer);
+		// for now suppose user can make a move,
+		// think about where to check whether user is able to make a move
+		Tile theBaseTile = tui.askTile(currentPlayer);
+		int theField = tui.askField(currentPlayer, board, false);
+		Tile theTile = tui.askRotation(currentPlayer, theBaseTile, false);
 		
-		// else if currentPlayer is not able to make a move
-			// either miss this turn
-			// or replace a tile with bag: swap a random nun-null tile between bag and tilesAtHand.
+		// 1. place the chosen rotation of chosen tile on the chosen field
+		putTileOnBoard(theField, theTile);
+		// 2. nullify the chosen Tile at Player's hand
+		nullifyChosenTile(currentPlayer, theTile);
+		// 3. deal one tile to player, to restore to 4 tiles in hand
+		dealATileToPlayer(currentPlayer);
 		
+		currentPlayerIdx = (currentPlayerIdx + 1) % numPlayers;
 	}
+		
 	
-	private boolean normalMoveSanitary(int fieldIdx, Tile chosenTile) {
-		boolean isEmptyField = board.fieldIsEmpty(fieldIdx);
-		
-		// [direction, vBoarder, lBoarder, rBoarder]
-		Character[] srd = board.getSurroundingInfo(fieldIdx);
-		
-		boolean vMatch = (srd[1] != null) ? (srd[1] == chosenTile.getVertical()) : false;
-		boolean lMatch = (srd[2] != null) ? (srd[2] == chosenTile.getLeft()) : false;
-		boolean rMatch = (srd[3] != null) ? (srd[3] == chosenTile.getRight()) : false;
-		
-		return isEmptyField && (vMatch || lMatch || rMatch);
-		
-	}
+//	private boolean normalMoveSanitary(int fieldIdx, Tile chosenTile) {
+//		boolean isEmptyField = board.fieldIsEmpty(fieldIdx);
+//		
+//		// [direction, vBoarder, lBoarder, rBoarder]
+//		Character[] srd = board.getSurroundingInfo(fieldIdx);
+//		
+//		boolean vMatch = (srd[1] != null) ? (srd[1] == chosenTile.getVertical()) : false;
+//		boolean lMatch = (srd[2] != null) ? (srd[2] == chosenTile.getLeft()) : false;
+//		boolean rMatch = (srd[3] != null) ? (srd[3] == chosenTile.getRight()) : false;
+//		
+//		return isEmptyField && (vMatch || lMatch || rMatch);
+//		
+//	}
 	
 	// ================== Gaming: other common functionalities ==================
 	// ------------------ that both FirstMove and NormalMove can use ------------------
+	public void putTileOnBoard(int idx, Tile t) {
+		board.setTile(idx, t);
+	}
+	
+	private void nullifyChosenTile(Player p, Tile chosenTile) {
+		for (int i = 0; i < 4; i++) {
+			Tile t = p.getTiles()[i];
+			if (t.toString().equals(chosenTile.toString())) {
+				p.getTiles()[i] = null;
+				
+			}
+		}
+	}
+	
+	public void dealATileToPlayer(Player p) {
+		Tile t = drawATile();
+		p.takeTheTile(t);
+	}
+	
+	/**
+	 * Get data from board, ask tui to print them.
+	 */
+	public void printBoard() {
+		tui.printBoardDynamic(board);
+	}
+	
+
 	/**
 	 * Safety measurement before every new game.
 	 */
@@ -231,51 +236,8 @@ public class GameControl {
 		return t;
 	}
 	
-	public void dealATileToPlayer(Player p) {
-		Tile t = drawATile();
-		p.takeTheTile(t);
-	}
-	
-	
-	/**
-	 * [to be tested] Show all tiles at one player's hand, it should accommodate the situation
-	 * that the player has 4 tiles, or less than 4 tiles.
-	 * The latter can happen when the bag is empty, no more tile to draw to restore to 4.
-	 */
-	public void showtiles() {
-		for (int j = 0; j < 4; j++) {
-			for (int i = 0; i < mapPlayers.values().size(); i++) {
-					String template =                     " ʌ\n" +
-			                "                              / \\\n" +
-			                "                             /  \\\n" +
-			                "                            /"+ mapPlayers.get(listPlayers.get(i))[j].getLeft() + "  " + mapPlayers.get(listPlayers.get(i))[j].getValue() + "  " + mapPlayers.get(listPlayers.get(i))[j].getLeft() +"\\\n" +
-			                "                           /   " + mapPlayers.get(listPlayers.get(i))[j].getVertical() +"   \\\n" +
-			                "                          /---------\\\n" ;
-			System.out.print(template + "  ");
-			}
-		}
-		
-	}
-
-	/**
-	 * Get data from board, ask tui to print them.
-	 */
-	public void printBoard() {
-		tui.printBoardDynamic(board);
-	}
-	
-	public void putTileOnBoard(int idx, Tile t) {
-		board.setTile(idx, t);
-	}
 	
 	// ======================== Queries ========================
-
-	/**
-	 * A getter of mapPlayers.
-	 */
-	public Map<Player, Tile[]> getMapPlayers() {
-		return mapPlayers; 
-	}
 
 	/**
 	 * A getter of bag.
@@ -300,40 +262,38 @@ public class GameControl {
 	// ======================== Main ========================
 	public static void main(String[] args) {
 		
-		// later can start one-man game here.
+		// Test of dealTiles
+		Player A = new HumanPlayer("A");
+		Player B = new HumanPlayer("B");
+		Player C = new HumanPlayer("C");
 		
-		GameControl shuffled3P = new GameControl( Arrays.asList(new HumanPlayer("A", new Tile[4]),
-																 new HumanPlayer("B", new Tile[4]),
-																 new HumanPlayer("C", new Tile[4])), 
+		GameControl shuffled3P = new GameControl( Arrays.asList(A, B, C), 
 												  true);
+
+		int firstIdx = shuffled3P.dealTiles();
+		System.out.println("First player is Player at index: " + firstIdx);
 		
-		shuffled3P.printBoard(); // empty board
+		System.out.println("Initial Tiles of each player: ");
+		System.out.println(Arrays.deepToString(A.getTiles()));
+		System.out.println(Arrays.deepToString(B.getTiles()));
+		System.out.println(Arrays.deepToString(C.getTiles()));
+		System.out.println("First non null tile index in bag is : " + shuffled3P.firstNonNullIdx);
 		
-		Tile t = new Tile(3, "RGB");
+		shuffled3P.makeFirstMove();
+//		shuffled3P.tui.printBoardDynamic(shuffled3P.board);
+//		System.out.println("Tiles of each player, after the first move: ");
+//		System.out.println(Arrays.deepToString(A.getTiles()));
+//		System.out.println(Arrays.deepToString(B.getTiles()));
+//		System.out.println(Arrays.deepToString(C.getTiles()));
+//		System.out.println("First non null tile index in bag is : " + shuffled3P.firstNonNullIdx);
 		
-		// test rotateTileOnce
-		shuffled3P.putTileOnBoard(25, t);
-		shuffled3P.printBoard();  // idx 25 filled with rotation 0 of the tile
+//		while (!shuffled3P.board.boardIsFull()) {
+//			shuffled3P.makeNormalMove();
+//		}
 		
-		shuffled3P.putTileOnBoard(27, t.rotateTileOnce().rotateTileOnce());
-		shuffled3P.printBoard(); // additionally, idx 27 filled with rotation 2 of the tile
-		
-		shuffled3P.putTileOnBoard(29, t.rotateTileOnce().rotateTileOnce().rotateTileOnce().rotateTileOnce());
-		shuffled3P.printBoard(); // additionally, idx 27 filled with rotation 4 of the tile
-		
-//		System.out.println(t.rotateTileOnce().rotateTileOnce().rotation);
-		
-		// test rotateTileTwice
-		shuffled3P.putTileOnBoard(31, t);
-		shuffled3P.printBoard();  // idx 31 filled with rotation 0 of the tile
-		
-		shuffled3P.putTileOnBoard(33, t.rotateTileTwice());
-		shuffled3P.printBoard(); // additionally, idx 33 filled with rotation 2 of the tile
-		
-		shuffled3P.putTileOnBoard(35, t.rotateTileTwice().rotateTileTwice());
-		shuffled3P.printBoard(); // additionally, idx 35 filled with rotation 4 of the tile
-		
-		// the appearence of 25 and 31, 27 and 33, 29 and 35 should be identical
+		shuffled3P.makeNormalMove();
+		shuffled3P.makeNormalMove();
+		shuffled3P.makeNormalMove();
 	}
 
 }

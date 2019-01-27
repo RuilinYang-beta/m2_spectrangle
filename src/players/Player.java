@@ -26,6 +26,7 @@ public abstract class Player {
 	
 	public Player(String n) {
 		this.name = n;
+		this.tilesAtHand = new Tile[4];
 	}
 	
 	public String getName() {
@@ -62,7 +63,9 @@ public abstract class Player {
 	public void takeTheTile(Tile t) {
 		for (int i = 0; i < tilesAtHand.length; i++) {
 			if (tilesAtHand[i] == null) {
+//				System.out.println("Here's a null Tile slot.");
 				tilesAtHand[i] = t;
+				break;
 			}
 		}
 	}

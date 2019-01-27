@@ -198,10 +198,14 @@ public class GameControl {
 	private void nullifyChosenTile(Player p, Tile chosenTile) {
 		for (int i = 0; i < 4; i++) {
 			Tile t = p.getTiles()[i];
-			if (t.toString().equals(chosenTile.toString())) {
-				p.getTiles()[i] = null;
-				
+			// you don't want to call toString on a null object.
+			if (t != null) {
+			
+				if (t.toString().equals(chosenTile.toString())) {
+					p.getTiles()[i] = null;
+				}
 			}
+			
 		}
 	}
 	
@@ -284,23 +288,11 @@ public class GameControl {
 		System.out.println("First non null tile index in bag is : " + shuffled3P.firstNonNullIdx);
 		
 		shuffled3P.makeFirstMove();
-//		shuffled3P.tui.printBoardDynamic(shuffled3P.board);
-//		System.out.println("Tiles of each player, after the first move: ");
-//		System.out.println(Arrays.deepToString(A.getTiles()));
-//		System.out.println(Arrays.deepToString(B.getTiles()));
-//		System.out.println(Arrays.deepToString(C.getTiles()));
-//		System.out.println("First non null tile index in bag is : " + shuffled3P.firstNonNullIdx);
-		
-//		while (!shuffled3P.board.boardIsFull()) {
-//			shuffled3P.makeNormalMove();
-//		}
 		
 		while (!shuffled3P.board.boardIsFull()) {
 			shuffled3P.makeNormalMove();
 		}
 		
-//		shuffled3P.makeNormalMove();
-//		shuffled3P.makeNormalMove();
 	}
 
 }

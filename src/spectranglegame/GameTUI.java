@@ -95,9 +95,9 @@ public class GameTUI {
     			// Normal Move: field is empty; has at least one matching boarder with tiles already on the board.
     		Character[] srd = board.getSurroundingInfo(returnVal);
     		// cond0 only applies to Normal Move, make sure chosenTile can have at least 1 potential matching boarder, no matter rotation.
-    		boolean cond0_0 = (srd[1] != null) ? (chosenBaseTile.toString().indexOf(srd[1]) > 0) : false; // yield true if (has a vertical neighbor tile) && (vertical boarder is possible to match)
-    		boolean cond0_1 = (srd[2] != null) ? (chosenBaseTile.toString().indexOf(srd[2]) > 0) : false; // yield true if (has a left neighbor tile) && (left boarder is possible to match)
-    		boolean cond0_2 = (srd[3] != null) ? (chosenBaseTile.toString().indexOf(srd[3]) > 0) : false; // yield true if (has a right neighbor tile) && (right boarder is possible to match)
+    		boolean cond0_0 = (srd[1] != null) ? (chosenBaseTile.toString().indexOf(srd[1]) >= 0) : false; // yield true if (has a vertical neighbor tile) && (vertical boarder is possible to match)
+    		boolean cond0_1 = (srd[2] != null) ? (chosenBaseTile.toString().indexOf(srd[2]) >= 0) : false; // yield true if (has a left neighbor tile) && (left boarder is possible to match)
+    		boolean cond0_2 = (srd[3] != null) ? (chosenBaseTile.toString().indexOf(srd[3]) >= 0) : false; // yield true if (has a right neighbor tile) && (right boarder is possible to match)
     		boolean cond0 = (cond0_0 || cond0_1 || cond0_2);
     		// cond1 only applies to First Move.
     		boolean cond1 = !Board.isBonusField(returnVal); 
@@ -110,6 +110,7 @@ public class GameTUI {
     			chosenFieldFacingUp = Board.isFacingUp(chosenFieldIdx);
     		} else {
     			// later this will be sent to p via socket, and p will parse it 
+    			// after parsing, will show a bunch of message to tell the rule to player
     			System.out.println(FIELD_WRONG);
     		}
     	} while (chosenFieldIdx == null);
@@ -180,9 +181,6 @@ public class GameTUI {
     // Later this whole bunch of string will be sent to PlayerClient via socket
     // For now TUI print to TUI's console.
     public void showInfoToPlayer(Player sendToThisPlayer) {
-    	// show board
-    	printBoardDynamic(board);
-    	
     	// show each Player's Tile 
     	for (Player p : listPlayers) {
     		System.out.println("Player " + p.getName() + "'s Tiles: ");
@@ -191,6 +189,9 @@ public class GameTUI {
     		// For now TUI print this String at TUI's console.
     		showMultiTilesUp(nonNulls);
     	}
+    	
+    	// show board
+    	printBoardDynamic(board);
     }
     
     private ArrayList<Tile> getNonNullTiles(Player p){
@@ -359,9 +360,9 @@ public class GameTUI {
 				// make sure each line is of the same total length
 				// for GameTUI to display 3 tiles horizontally
 			     " --------- " + " --------- " + " --------- \n" +
-			     " \\   " + val0 + "   / " + " \\   " + val1 + "   / " + " \\   " + val2 + "   / \n" +
+			     " \\   " + ver0 + "   / " + " \\   " + ver1 + "   / " + " \\   " + ver2 + "   / \n" +
                  "  \\ " + lef0 + " " + rig0 + " /  " + "  \\ " + lef1 + " " + rig1 + " /  " + "  \\ " + lef2 + " " + rig2 + " /  \n" +
-                 "   \\ " + ver0 + " /   " + "   \\ " + ver1 + " /   " + "   \\ " + ver2 + " /   \n" +
+                 "   \\ " + val0 + " /   " + "   \\ " + val1 + " /   " + "   \\ " + val2 + " /   \n" +
 			     "    \\ /    " + "    \\ /    " + "    \\ /    \n" ; 
 		System.out.print(template);
 	}

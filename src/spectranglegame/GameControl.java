@@ -205,6 +205,22 @@ public class GameControl {
 		}
 	}
 	
+	/**
+	 * Draw the first non-null Tile, and set its position as null, and update firstNonNullIdx.
+	 * @return The tile being drew from the bag.
+	 */
+	public Tile drawATile() {
+		if (firstNonNullIdx < 36) {
+			Tile t = bag.getTiles().get(firstNonNullIdx);
+			bag.getTiles().set(firstNonNullIdx, null);
+			firstNonNullIdx++;
+			return t;
+		} else {
+			return null;
+		}
+		
+	}
+	
 	public void dealATileToPlayer(Player p) {
 		Tile t = drawATile();
 		p.takeTheTile(t);
@@ -225,16 +241,7 @@ public class GameControl {
 		board.resetBoard();
 	}
 	
-	/**
-	 * Draw the first non-null Tile, and set its position as null, and update firstNonNullIdx.
-	 * @return The tile being drew from the bag.
-	 */
-	public Tile drawATile() {
-		Tile t = bag.getTiles().get(firstNonNullIdx);
-		bag.getTiles().set(firstNonNullIdx, null);
-		firstNonNullIdx++;
-		return t;
-	}
+
 	
 	
 	// ======================== Queries ========================
@@ -266,17 +273,14 @@ public class GameControl {
 		Player A = new HumanPlayer("A");
 		Player B = new HumanPlayer("B");
 		Player C = new HumanPlayer("C");
+		Player D = new HumanPlayer("D");
 		
-		GameControl shuffled3P = new GameControl( Arrays.asList(A, B, C), 
+		GameControl shuffled3P = new GameControl( Arrays.asList(A, B, C, D), 
 												  true);
 
 		int firstIdx = shuffled3P.dealTiles();
 		System.out.println("First player is Player at index: " + firstIdx);
-		
-		System.out.println("Initial Tiles of each player: ");
-		System.out.println(Arrays.deepToString(A.getTiles()));
-		System.out.println(Arrays.deepToString(B.getTiles()));
-		System.out.println(Arrays.deepToString(C.getTiles()));
+
 		System.out.println("First non null tile index in bag is : " + shuffled3P.firstNonNullIdx);
 		
 		shuffled3P.makeFirstMove();
@@ -291,9 +295,12 @@ public class GameControl {
 //			shuffled3P.makeNormalMove();
 //		}
 		
-		shuffled3P.makeNormalMove();
-		shuffled3P.makeNormalMove();
-		shuffled3P.makeNormalMove();
+		while (!shuffled3P.board.boardIsFull()) {
+			shuffled3P.makeNormalMove();
+		}
+		
+//		shuffled3P.makeNormalMove();
+//		shuffled3P.makeNormalMove();
 	}
 
 }

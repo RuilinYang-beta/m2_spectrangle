@@ -22,12 +22,12 @@ public class ClientHandler implements Runnable {
 	protected Thread[] clients;
 
 	/*
-	 * @requires (nameArg != null) && (sockArg != null);
+	 * @requires (clients != null) && (sockArg != null);
 	 */
 	/**
 	 * Constructor. creates a ClientHandler object based in the given parameters.
 	 * 
-	 * @param nameArg name of the Client Handler-process
+	 * @param clients the thread array for every client that connects to the server
 	 * @param sockArg Socket of the Client Handler-process
 	 */
 	public ClientHandler(Socket sockArg, Thread[] clients) throws IOException {
@@ -42,6 +42,7 @@ public class ClientHandler implements Runnable {
 	 * characters to the default output.
 	 */
 	public void run() {
+		boolean first = true;
 		try {
 			while (true) {
 				String s = in.readLine();
@@ -50,8 +51,13 @@ public class ClientHandler implements Runnable {
 					shutDown();
 					break;
 				}
-				name = s;
-				System.out.println("Hello " + s + "!");
+				if (first) {
+					name = s;
+					System.out.println("Hello " + s + "!");
+					first = false;
+				}else {
+					System.out.println("Client " + getName() + ": " + s);
+				}
 			}
 		} catch (IOException e) {
 			// System.out.println("C" + "\n");

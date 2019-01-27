@@ -77,9 +77,6 @@ public class PlayerClient extends Thread {
 			try {
 				String s = in.readLine();
 				if(s == null || s.equals("exit")) {
-//					out.write("Client disconnectd \n");
-//					in.close();
-//					out.close();
 					System.exit(0);
 					break;
 				}

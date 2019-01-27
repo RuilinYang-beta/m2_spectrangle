@@ -31,12 +31,18 @@ public class HumanPlayer extends Player{
 	
 	
 	// ======================== Making Choices ========================
-	public int chooseTileIdx(int numOfTile) {
+	public int chooseTileIdx(int numOfTile, boolean isFirstMove) {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		Integer i = null;
 		String s = null;
 		while (true) {
-			System.out.print("> Player " + name + ", Chose a Tile from :[0, " + (numOfTile - 1) + "] (inclusive): ");
+			
+			System.out.println("> Player " + name + ", Chose a Tile from :[0, " + (numOfTile - 1) + "] (inclusive): ");
+			if (!isFirstMove) {
+				System.out.println("- Or enter 8 to skip turn");
+				System.out.println("- Or enter 9 to exchange a Tile and pass turn");
+			}
+			
 			try {
 				s = br.readLine();
 			} catch (IOException e) {
@@ -45,12 +51,32 @@ public class HumanPlayer extends Player{
 			
 			try {
 				i = Integer.parseInt(s);
+				
 				if ((0 <= i) && (i < numOfTile)) {
 					break;
-				} else {
-					System.out.println("Input number out of range. Please try again.");
-					i = null;
+				} 
+				else {
+					// First Move input out of range
+					if (isFirstMove) {
+						System.out.println("Input number out of range. Please try again.");
+						i = null;
+					} 
+					// Normal Move: user wants to skip
+					else if ((!isFirstMove) && (i == 8)) {
+						System.out.println("Player " + name + " choose to skip this turn.");
+						break;
+					} 
+					// Normal Move: user wants to exchange and pass turn
+					else if ((!isFirstMove) && (i == 9)) {
+						System.out.println("You are going to exchange a Tile with bag.");
+					}
+					// Normal Move: input out of range
+					else {
+						System.out.println("Input number out of range. Please try again.");
+						i = null;
+					}					
 				}
+				
 			} catch (NumberFormatException e) {
 				System.out.println("Try again. Please input a number.");
 			}

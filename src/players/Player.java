@@ -51,7 +51,7 @@ public abstract class Player {
 
 	// choose a Tile, return the Tile
 	// and accordingly set the Tile in TileAtHand to null
-	public abstract int chooseTileIdx(int numOfTile);
+	public abstract int chooseTileIdx(int numOfTile, boolean isFirstM);
 	
 	public abstract int chooseRotationIdx() ;
 	

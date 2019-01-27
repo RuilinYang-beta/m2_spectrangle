@@ -50,7 +50,7 @@ public class GameTUI {
      * @param p Ask this player for input.
      * @return The Tile (cloned) of the player's choice. 
      */
-    public Tile askTile(Player p) {
+    public Tile askTile(Player p, boolean isFirstMove) {
     	chosenBaseTile = null;
     	// later this will be sent to p via socket, and p will parse it 
 		System.out.println(TILE); 
@@ -60,13 +60,24 @@ public class GameTUI {
 		// For now TUI print this String at TUI's console.
 		showMultiTilesUp(nonNulls);
 		
-		int nonNullTileIdx = p.chooseTileIdx(nonNulls.size());
+		int nonNullTileIdx = p.chooseTileIdx(nonNulls.size(), isFirstMove);
 		
-		// copy the current chosen Tile in TUI
-		// for TUI to later check normal move sanitary (surrounding sanitary)
-		chosenBaseTile = nonNulls.get(nonNullTileIdx).deepCopy();
+		if ((nonNullTileIdx != 8) && (nonNullTileIdx != 9)) {
+			// copy the current chosen Tile in TUI
+			// for TUI to later check normal move sanitary (surrounding sanitary)
+			chosenBaseTile = nonNulls.get(nonNullTileIdx).deepCopy();
+			
+			return chosenBaseTile;
+			
+		} else if (nonNullTileIdx == 8){
+			
+			return null; // choose no tile, and do nothing else
+			
+		} else { // when nonNullTileIdx = 9, user wants to exchange a tile with bag 
+			// make a function to let the user exchange a tile with the bag
+			return null;  // and choose no tile
+		}
 		
-		return chosenBaseTile;
     }
     
     /**

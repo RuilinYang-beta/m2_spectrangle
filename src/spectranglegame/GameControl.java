@@ -139,7 +139,8 @@ public class GameControl {
 		Player firstPlayer = listPlayers.get(firstPlayerIdx);
 		
 		tui.showInfoToPlayer(firstPlayer);
-		Tile theBaseTile = tui.askTile(firstPlayer);
+		Tile theBaseTile = tui.askTile(firstPlayer, true);
+		
 		int theField = tui.askField(firstPlayer, board, true);
 		Tile theTile = tui.askRotation(firstPlayer, theBaseTile, true);
 		
@@ -149,7 +150,7 @@ public class GameControl {
 		nullifyChosenTile(firstPlayer, theTile);
 		// 3. deal one tile to player, to restore to 4 tiles in hand
 		dealATileToPlayer(firstPlayer);
-		
+
 		currentPlayerIdx = (firstPlayerIdx + 1) % numPlayers;
 	}
 	
@@ -160,16 +161,20 @@ public class GameControl {
 		tui.showInfoToPlayer(currentPlayer);
 		// for now suppose user can make a move,
 		// think about where to check whether user is able to make a move
-		Tile theBaseTile = tui.askTile(currentPlayer);
-		int theField = tui.askField(currentPlayer, board, false);
-		Tile theTile = tui.askRotation(currentPlayer, theBaseTile, false);
+		Tile theBaseTile = tui.askTile(currentPlayer, false);
 		
-		// 1. place the chosen rotation of chosen tile on the chosen field
-		putTileOnBoard(theField, theTile);
-		// 2. nullify the chosen Tile at Player's hand
-		nullifyChosenTile(currentPlayer, theTile);
-		// 3. deal one tile to player, to restore to 4 tiles in hand
-		dealATileToPlayer(currentPlayer);
+		if (theBaseTile != null) { // that is, user did chose a Tile
+			int theField = tui.askField(currentPlayer, board, false);
+			Tile theTile = tui.askRotation(currentPlayer, theBaseTile, false);
+			
+			// 1. place the chosen rotation of chosen tile on the chosen field
+			putTileOnBoard(theField, theTile);
+			// 2. nullify the chosen Tile at Player's hand
+			nullifyChosenTile(currentPlayer, theTile);
+			// 3. deal one tile to player, to restore to 4 tiles in hand
+			dealATileToPlayer(currentPlayer);
+		}
+		
 		
 		currentPlayerIdx = (currentPlayerIdx + 1) % numPlayers;
 	}

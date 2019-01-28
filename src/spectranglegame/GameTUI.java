@@ -32,13 +32,11 @@ public class GameTUI {
 	private Tile chosenBaseTile = null;
 	private Integer chosenFieldIdx = null;
 	private Boolean chosenFieldFacingUp = null;
-//	private Boolean chosenFieldFacingUp = true;
 
-	private List<Player> listPlayers; // to have a order in players
+	private List<Player> listPlayers; 
 	
 	// =========== Constructor ===========
 	public GameTUI(GameControl gc, Board bd, List<Player> lp) {
-//	public GameTUI(GameControl gc) {
 		this.control = gc;
 		this.board = bd;
 		this.listPlayers = lp;
@@ -73,8 +71,15 @@ public class GameTUI {
 			
 			return null; // choose no tile, and do nothing else
 			
-		} else { // when nonNullTileIdx = 9, user wants to exchange a tile with bag 
-			// make a function to let the user exchange a tile with the bag
+		} else { 
+			// when nonNullTileIdx = 9, user wants to exchange a tile with bag 
+			Integer tileIdxToSwap = askTileToSwap(p, nonNulls); 
+			
+			if (tileIdxToSwap != null) {
+				Tile fromPlayer = nonNulls.get(tileIdxToSwap);
+				Tile fromBag = control.swapRandomTileInBag(fromPlayer);
+				swapTileAtPlayer(p, fromPlayer, fromBag);
+			}
 			return null;  // and choose no tile
 		}
 		
@@ -141,7 +146,6 @@ public class GameTUI {
      * @return
      */
     public Tile askRotation(Player p, Tile baseT, boolean isFirstMove) {
-    	boolean isLegalRotation = false;
     	Tile chosenRotation = null;
     	
     	// ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ Below are printing all possible Rotation  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
@@ -174,24 +178,74 @@ public class GameTUI {
     	}
     	// ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ Above are printing all possible Rotation ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
     	
-    	do {
+    	// TUI doing the sanitary check, if not sanitary, keep asking until user give legal fieldIdx.
+    	while (true) {
     		chosenRotation = allRotation.get(p.chooseRotationIdx());
-        	
-        	// TUI doing the sanitary check, if not sanitary, keep asking until user give legal fieldIdx.
-    		// Only for Normal Move: surrounding sanitary check:
-        	Character[] srd = board.getSurroundingInfo(chosenFieldIdx);
+    		
+    		if (isFirstMove) {
+    			// First Move don't care about neighbors
+    			break;
+    		}
+    		
+    		// Normal Move Case 1: chosenBaseTile is Joker : direct pass
+    		if (chosenBaseTile.isJoker()) {
+    			// Normal Move: askField has make sure chosenField has at least one neighbor
+    			// Then Joker don't care boarder color.
+    			break;
+    		}
+    		
+    		Character[] srd = board.getSurroundingInfo(chosenFieldIdx);
+    			
+			// Normal Move Case 2: chosenBaseTile is not Joker, has No Joker neighbor : (cond1 || cond2 || cond3)
         	boolean cond1 = (srd[1] != null) ? (chosenRotation.getVertical() == srd[1] ) : false; // yield true if (has a vertical neighbor tile) && (vertical boarder MATCHES)
     		boolean cond2 = (srd[2] != null) ? (chosenRotation.getLeft() == srd[2])      : false; // yield true if (has a left neighbor tile) && (left boarder MATCHES)
     		boolean cond3 = (srd[3] != null) ? (chosenRotation.getRight() == srd[3])     : false; // yield true if (has a right neighbor tile) && (right boarder MATCHES)
-    		boolean isLegalNormalMove = (cond1 || cond2 || cond3);
+    		if (cond1 || cond2 || cond3) {
+    			break;
+    		}
     		
-    		isLegalRotation = (isFirstMove) ? true : isLegalNormalMove;
+    		// Normal Move Case 3: chosenBaseTile is not Joker, HAS Joker neighbor
+    		boolean cond4 = (srd[1] != null) ? (srd[1] == 'W') : false;
+    		boolean cond5 = (srd[2] != null) ? (srd[2] == 'W') : false;
+    		boolean cond6 = (srd[3] != null) ? (srd[3] == 'W') : false;
     		
-    	} while (!isLegalRotation);
+        	if ( cond4 || cond5 || cond6 ) {
+        		break;
+        	}
+    		
+    	};
     	
     	return chosenRotation;
     }
-
+ 
+    public Integer askTileToSwap(Player p, List<Tile> nonNullAtPlayer) {
+    	
+    	int firstNonNullInBag = control.getFirstNonNullIdx();
+    	
+    	if (firstNonNullInBag < 36) {
+    		int toSwapIdx = p.chooseTileIdxToSwap(nonNullAtPlayer.size());
+    		return toSwapIdx;
+    	} else {
+    		// Later this msg will be send to player via socket
+    		System.out.println("Bag is empty, no tile to swap. Your turn ends.");
+    		return null;
+    	}
+    	
+    }
+  
+    public void swapTileAtPlayer(Player p, Tile toToss, Tile toEquip) {
+		for (int i = 0; i < p.getTiles().length; i++) {
+			if ( (p.getTiles()[i] != null) && 
+					(p.getTiles()[i].toString().equals(toToss.toString())) ) {
+				p.getTiles()[i] = toEquip;
+				break;
+			}
+		}
+		// Later this msg will be sent to Player p via socket
+		// For now print msg to TUI's console.
+		System.out.println("Your tile is swapped!");
+    	
+    }
     // ========================= Display Tiles Related =========================
     // Later this whole bunch of string will be sent to PlayerClient via socket
     // For now TUI print to TUI's console.
@@ -476,7 +530,7 @@ public class GameTUI {
 		Tile[] tiles4 = {new Tile(3, "RGB"), new Tile(1, "HEY"), new Tile(2, "OOP"), new Tile(4, "WHO")};
 		
 		HumanPlayer p = new HumanPlayer("player", tiles2);
-		Tile t0 = temp.askTile(p);
+		Tile t0 = temp.askTile(p, true);
 		int i = temp.askField(p, new Board(), true);
 		Tile t1 = temp.askRotation(p, t0, true);
 		

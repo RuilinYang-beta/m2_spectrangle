@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.*;
+import java.util.Random;
 
 import players.*;
 
@@ -17,12 +18,13 @@ public class GameControl {
 	private GameTUI tui;
 	
 	private Bag bag;
-	private int firstNonNullIdx;   // for safety, auxiliary to bag.getTiles
+	private int firstNonNullIdx;   // auxiliary to bag.getTiles
 	
-	private final int numPlayers;
+	
 	private List<Player> listPlayers; // to have a order in players
-	private Integer firstPlayerIdx;   // not determined until dealTiles
-	private Integer currentPlayerIdx;
+	private final int numPlayers;     // auxiliary to listPlayers
+	private Integer firstPlayerIdx;   // auxiliary to listPlayers, not determined until dealTiles
+	private Integer currentPlayerIdx; // auxiliary to listPlayers
 	
 	// Map<Player, Tile[]> mapPlayers will be deprecated
 //	private Map<Player, Tile[]> mapPlayers; // to store player and its tiles
@@ -32,7 +34,6 @@ public class GameControl {
 	public GameControl(List<Player> lp, boolean shuffle) {
 		this.board = new Board();
 		this.tui = new GameTUI(this, this.board, lp);
-//		this.tui = new GameTUI(this);
 		
 		this.bag = new Bag(shuffle);
 		firstNonNullIdx = 0;
@@ -40,7 +41,6 @@ public class GameControl {
 		this.numPlayers = lp.size();
 		this.listPlayers = lp;
 		firstPlayerIdx = null;
-//		this.mapPlayers = new HashMap<>();
 	}
 	
 	// ============ Preparation: deal the initial tiles ============
@@ -180,20 +180,6 @@ public class GameControl {
 	}
 		
 	
-//	private boolean normalMoveSanitary(int fieldIdx, Tile chosenTile) {
-//		boolean isEmptyField = board.fieldIsEmpty(fieldIdx);
-//		
-//		// [direction, vBoarder, lBoarder, rBoarder]
-//		Character[] srd = board.getSurroundingInfo(fieldIdx);
-//		
-//		boolean vMatch = (srd[1] != null) ? (srd[1] == chosenTile.getVertical()) : false;
-//		boolean lMatch = (srd[2] != null) ? (srd[2] == chosenTile.getLeft()) : false;
-//		boolean rMatch = (srd[3] != null) ? (srd[3] == chosenTile.getRight()) : false;
-//		
-//		return isEmptyField && (vMatch || lMatch || rMatch);
-//		
-//	}
-	
 	// ================== Gaming: other common functionalities ==================
 	// ------------------ that both FirstMove and NormalMove can use ------------------
 	public void putTileOnBoard(int idx, Tile t) {
@@ -235,13 +221,25 @@ public class GameControl {
 		p.takeTheTile(t);
 	}
 	
+	/** 
+	 * Choose a random non-null Tile in bag, replace it with the Tile t, 
+	 * and return the replaced Tile.
+	 */
+	public Tile swapRandomTileInBag(Tile t) {
+		Random r = new Random();
+		// generate a random int within [firstNonNullIdx, 35] (inclusive)
+		int randNonNullIdx = r.nextInt(36 - firstNonNullIdx) + firstNonNullIdx;
+		Tile getFromBag = bag.getTile(randNonNullIdx).deepCopy();
+		bag.getTiles().set(randNonNullIdx, t);
+		return getFromBag;
+	}
+	
 	/**
 	 * Get data from board, ask tui to print them.
 	 */
 	public void printBoard() {
 		tui.printBoardDynamic(board);
 	}
-	
 
 	/**
 	 * Safety measurement before every new game.
@@ -251,16 +249,7 @@ public class GameControl {
 	}
 	
 
-	
-	
 	// ======================== Queries ========================
-
-	/**
-	 * A getter of bag.
-	 */
-	public Bag getBag() {
-		return bag;
-	}
 
 	public List<Player> getListPlayers(){
 		return this.listPlayers;
@@ -273,6 +262,10 @@ public class GameControl {
 	 */
 	public List<Tile> getTiles(){
 		return bag.getTiles();
+	}
+	
+	public int getFirstNonNullIdx() {
+		return this.firstNonNullIdx;
 	}
 	
 	// ======================== Main ========================
@@ -297,6 +290,8 @@ public class GameControl {
 		while (!shuffled3P.board.boardIsFull()) {
 			shuffled3P.makeNormalMove();
 		}
+		
+		System.out.println("Congrats! You have run the whole game!");
 		
 	}
 

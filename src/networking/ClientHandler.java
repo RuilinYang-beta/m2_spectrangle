@@ -40,6 +40,9 @@ public class ClientHandler implements Runnable {
 		this.clients = clients;
 		in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 		out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
+		twoplayers = new ArrayList<Socket>();
+		threeplayers = new ArrayList<Socket>();
+		fourplayers = new ArrayList<Socket>();
 	}
 
 	/**
@@ -66,15 +69,15 @@ public class ClientHandler implements Runnable {
 				} else {
 					System.out.println("Client " + getName() + ": " + s);
 					if (a[0].equals("Play") || a[0].equals("play")) {
-						int i = Integer.parseInt(a[1]);
-						if (i == 2) {
-							twoplayers.add(sock);
+						int nr = Integer.parseInt(a[1]);
+						if (nr == 2) {
+							twoplayers.add(this.sock);
 						} else {
-							if (i == 3) {
-								threeplayers.add(sock);
+							if (nr == 3) {
+								threeplayers.add(this.sock);
 							} else {
-								if (i == 4) {
-									fourplayers.add(sock);
+								if (nr == 4) {
+									fourplayers.add(this.sock);
 								}else {
 									System.out.println("The game can be player only in 2, 3 or 4 players!");
 								}

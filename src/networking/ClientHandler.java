@@ -1,12 +1,14 @@
 package networking;
 
 import java.io.BufferedReader;
+import java.util.*;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.Scanner;
+import spectranglegame.GameControl;
 
 /**
  * Client handler for a client of the game
@@ -20,7 +22,10 @@ public class ClientHandler implements Runnable {
 	protected BufferedReader in;
 	protected BufferedWriter out;
 	protected Thread[] clients;
-
+	protected GameControl gamecontrol;
+	protected List<Socket> twoplayers;
+	protected List<Socket> threeplayers;
+	protected List<Socket> fourplayers;
 	/*
 	 * @requires (clients != null) && (sockArg != null);
 	 */
@@ -46,8 +51,8 @@ public class ClientHandler implements Runnable {
 		try {
 			while (true) {
 				String s = in.readLine();
-				if (s == null || s.isEmpty() || s.equals("exit")) {
-					System.out.println("Client " + getName()+ " disconnectd");
+				if (/* s == null || */ s.isEmpty() || s.equals("exit")) {
+					System.out.println("Client " + getName() + " disconnectd");
 					shutDown();
 					break;
 				}
@@ -58,8 +63,25 @@ public class ClientHandler implements Runnable {
 						System.out.println("Hello " + name + " false false false false");
 						first = false;
 					}
-				}else {
+				} else {
 					System.out.println("Client " + getName() + ": " + s);
+					if (a[0].equals("Play") || a[0].equals("play")) {
+						int i = Integer.parseInt(a[1]);
+						if (i == 2) {
+							twoplayers.add(sock);
+						} else {
+							if (i == 3) {
+								threeplayers.add(sock);
+							} else {
+								if (i == 4) {
+									fourplayers.add(sock);
+								}else {
+									System.out.println("The game can be player only in 2, 3 or 4 players!");
+								}
+							}
+						}
+					}
+					
 				}
 			}
 		} catch (IOException e) {

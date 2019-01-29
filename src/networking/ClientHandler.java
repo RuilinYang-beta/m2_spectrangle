@@ -72,19 +72,37 @@ public class ClientHandler implements Runnable {
 						int nr = Integer.parseInt(a[1]);
 						if (nr == 2) {
 							twoplayers.add(this.sock);
+							while(twoplayers.size() != 2) {
+								System.out.println("Waiting " + (twoplayers.size() % 2));
+							}
+							//start the game
+							System.out.println("Waiting 0");
+							twoplayers = new ArrayList<Socket>();
 						} else {
 							if (nr == 3) {
 								threeplayers.add(this.sock);
+								while(threeplayers.size() != 3) {
+									System.out.println("Waiting" + (threeplayers.size() % 3));
+								}
+								// play the game on a new thread
+								System.out.println("Waiting 0");
+								threeplayers = new ArrayList<Socket>();
 							} else {
 								if (nr == 4) {
 									fourplayers.add(this.sock);
-								}else {
+									while(fourplayers.size() != 4) {
+										System.out.println("Waiting " + (fourplayers.size() % 4));
+									}
+									//play the game on a new thread
+									System.out.println("Waiting 0");
+									fourplayers = new ArrayList<Socket>();
+								} else {
 									System.out.println("The game can be player only in 2, 3 or 4 players!");
 								}
 							}
 						}
 					}
-					
+
 				}
 			}
 		} catch (IOException e) {

@@ -70,6 +70,7 @@ public class PlayerClient extends Thread {
 				e.printStackTrace();
 			}
 		}
+		input.close();
 	}
 	@Override
 	public void run() {

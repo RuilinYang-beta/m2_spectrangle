@@ -26,6 +26,7 @@ public class ClientHandler implements Runnable {
 	protected List<Socket> twoplayers;
 	protected List<Socket> threeplayers;
 	protected List<Socket> fourplayers;
+
 	/*
 	 * @requires (clients != null) && (sockArg != null);
 	 */
@@ -72,16 +73,16 @@ public class ClientHandler implements Runnable {
 						int nr = Integer.parseInt(a[1]);
 						if (nr == 2) {
 							twoplayers.add(this.sock);
-							while(twoplayers.size() != 2) {
+							while (twoplayers.size() != 2) {
 								System.out.println("Waiting " + (twoplayers.size() % 2));
 							}
-							//start the game
+							// start the game
 							System.out.println("Waiting 0");
 							twoplayers = new ArrayList<Socket>();
 						} else {
 							if (nr == 3) {
 								threeplayers.add(this.sock);
-								while(threeplayers.size() != 3) {
+								while (threeplayers.size() != 3) {
 									System.out.println("Waiting" + (threeplayers.size() % 3));
 								}
 								// play the game on a new thread
@@ -90,10 +91,10 @@ public class ClientHandler implements Runnable {
 							} else {
 								if (nr == 4) {
 									fourplayers.add(this.sock);
-									while(fourplayers.size() != 4) {
+									while (fourplayers.size() != 4) {
 										System.out.println("Waiting " + (fourplayers.size() % 4));
 									}
-									//play the game on a new thread
+									// play the game on a new thread
 									System.out.println("Waiting 0");
 									fourplayers = new ArrayList<Socket>();
 								} else {
@@ -141,7 +142,7 @@ public class ClientHandler implements Runnable {
 			in.close();
 			sock.close();
 			out.close();
-		//	System.exit(0);
+			// System.exit(0);
 		} catch (IOException e) {
 
 		}

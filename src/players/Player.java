@@ -50,7 +50,7 @@ public abstract class Player {
 	
 	public abstract int chooseFieldIdx();
 	
-	public abstract int chooseRotationIdx() ;
+	public abstract int chooseRotationIdx();
 	
 	
 	/**

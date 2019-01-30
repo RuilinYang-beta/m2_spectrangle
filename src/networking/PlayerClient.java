@@ -18,35 +18,41 @@ public class PlayerClient extends Thread {
 	
 	/** Starts a Client application. */
 	public static void main(String[] args) {
-		if (args.length != 2) {
-			System.out.println(USAGE);
-			System.exit(0);
-		}
+//		if (args.length != 2) {
+//			System.out.println(USAGE);
+//			System.exit(0);
+//		}
 
 		InetAddress addr = null;
 		int port = 0;
 		Socket sock = null;
-		//getting the name of the client
+		String ip = "";
 				
-		
-		// check args[0] - the IP-adress
+		Scanner inn = new Scanner(System.in);
+		//  the IP-adress
 		try {
-			addr = InetAddress.getByName(args[0]);
+			System.out.println("Please introduce the ip address: ");
+			ip = inn.nextLine();
+			addr = InetAddress.getByName(ip);
 		} catch (UnknownHostException e) {
 			System.out.println(USAGE);
-			System.out.println("ERROR: host " + args[0] + " unknown" + "\n");
+			System.out.println("ERROR: host " + ip + " unknown" + "\n");
 			System.exit(0);
 		}
-
-		// parse args[1] - the port
+		
+		// the port
 		try {
-			port = Integer.parseInt(args[1]);
+			System.out.println("Please introduce the port: ");
+			ip = inn.nextLine();
+			port = Integer.parseInt(ip);
 		} catch (NumberFormatException e) {
 			System.out.println(USAGE);
-			System.out.println("ERROR: port " + args[1] + " is not an integer" + "\n");
+			System.out.println("ERROR: port " + ip + " is not an integer" + "\n");
 			System.exit(0);
 		}
-
+		
+	//	inn.close();
+		
 		// try to open a Socket to the server
 		try {
 			sock = new Socket(addr, port);
@@ -56,21 +62,23 @@ public class PlayerClient extends Thread {
 			System.out.println("ERROR: could not create a socket on " + addr + " and port " + port + "\n");
 		}
 
-		Scanner input = new Scanner(System.in);
+	//	Scanner input = new Scanner(System.in);
 		if (sock != null && in != null && out != null) {
 			try {
 				PlayerClient client = new PlayerClient();
 				client.start();
 				while (true) {
-					String s = input.nextLine();
+					String s = inn.nextLine();
 					out.write(s + "\n");
 					out.flush();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
+			}catch(NoSuchElementException e) {
+				e.printStackTrace();
 			}
 		}
-		input.close();
+		inn.close();
 	}
 	@Override
 	public void run() {

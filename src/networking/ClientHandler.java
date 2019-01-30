@@ -9,12 +9,12 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.Scanner;
 import spectranglegame.GameControl;
-
+import players.HumanPlayer;
 /**
  * Client handler for a client of the game
  */
 
-public class ClientHandler implements Runnable {
+public class ClientHandler /*extends HumanPlayer*/ implements Runnable{
 
 	public static final String EXIT = "exit";
 	protected String name;
@@ -23,9 +23,9 @@ public class ClientHandler implements Runnable {
 	protected BufferedWriter out;
 	protected Thread[] clients;
 	protected GameControl gamecontrol;
-	protected List<Socket> twoplayers;
-	protected List<Socket> threeplayers;
-	protected List<Socket> fourplayers;
+	protected List<ClientHandler> twoplayers;
+	protected List<ClientHandler> threeplayers;
+	protected List<ClientHandler> fourplayers;
 
 	/*
 	 * @requires (clients != null) && (sockArg != null);
@@ -41,9 +41,9 @@ public class ClientHandler implements Runnable {
 		this.clients = clients;
 		in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 		out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
-		twoplayers = new ArrayList<Socket>();
-		threeplayers = new ArrayList<Socket>();
-		fourplayers = new ArrayList<Socket>();
+		twoplayers = new ArrayList<ClientHandler>();
+		threeplayers = new ArrayList<ClientHandler>();
+		fourplayers = new ArrayList<ClientHandler>();
 	}
 
 	/**
@@ -72,38 +72,40 @@ public class ClientHandler implements Runnable {
 					if (a[0].equals("Play") || a[0].equals("play")) {
 						int nr = Integer.parseInt(a[1]);
 						if (nr == 2) {
-							twoplayers.add(this.sock);
+							twoplayers.add(this);
+							out.write("Waiting " + (twoplayers.size() % 2) + "\n");
 							while (twoplayers.size() != 2) {
-								System.out.println("Waiting " + (twoplayers.size() % 2));
+								;
 							}
 							// start the game
 							System.out.println("Waiting 0");
-							twoplayers = new ArrayList<Socket>();
+							twoplayers = new ArrayList<ClientHandler>();
 						} else {
 							if (nr == 3) {
-								threeplayers.add(this.sock);
+								threeplayers.add(this);
+								System.out.println("Waiting" + (3 - (threeplayers.size() % 3)));
 								while (threeplayers.size() != 3) {
-									System.out.println("Waiting" + (threeplayers.size() % 3));
+									;
 								}
 								// play the game on a new thread
 								System.out.println("Waiting 0");
-								threeplayers = new ArrayList<Socket>();
+								threeplayers = new ArrayList<ClientHandler>();
 							} else {
 								if (nr == 4) {
-									fourplayers.add(this.sock);
+									fourplayers.add(this);
+									System.out.println("Waiting " + (4 - (fourplayers.size() % 4)));
 									while (fourplayers.size() != 4) {
-										System.out.println("Waiting " + (fourplayers.size() % 4));
+										;
 									}
 									// play the game on a new thread
 									System.out.println("Waiting 0");
-									fourplayers = new ArrayList<Socket>();
+									fourplayers = new ArrayList<ClientHandler>();
 								} else {
 									System.out.println("The game can be player only in 2, 3 or 4 players!");
 								}
 							}
 						}
 					}
-
 				}
 			}
 		} catch (IOException e) {

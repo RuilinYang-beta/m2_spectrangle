@@ -1,6 +1,10 @@
 package networking;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
@@ -49,6 +53,10 @@ public class Server{
 				clients[i] = (new Thread(handler));
 				clients[i].start();
 				i++;
+//				BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+//				BufferedWriter out = new BufferedWriter(new OutputStreamWriter());
+//				String j = in.readLine();
+//				out.write(j + "\n");
 //				handler.handleTerminalInput();
 //				handler.shutDown();
 			} catch (IOException e) {

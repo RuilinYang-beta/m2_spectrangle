@@ -41,16 +41,17 @@ public class PlayerClient extends Thread {
 		}
 		
 		// the port
-		try {
-			System.out.println("Please introduce the port: ");
-			ip = inn.nextLine();
-			port = Integer.parseInt(ip);
-		} catch (NumberFormatException e) {
-			System.out.println(USAGE);
-			System.out.println("ERROR: port " + ip + " is not an integer" + "\n");
-			System.exit(0);
+		while (port != 1024) {
+			try {
+				System.out.println("Please introduce the port: ");
+				ip = inn.nextLine();
+				port = Integer.parseInt(ip);
+			} catch (NumberFormatException e) {
+				System.out.println(USAGE);
+				System.out.println("ERROR: port " + ip + " is not an integer" + "\n");
+				System.exit(0);
+			}
 		}
-		
 	//	inn.close();
 		
 		// try to open a Socket to the server

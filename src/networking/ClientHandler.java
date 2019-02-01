@@ -14,7 +14,7 @@ import players.HumanPlayer;
  * Client handler for a client of the game
  */
 
-public class ClientHandler /*extends HumanPlayer*/ implements Runnable{
+public class ClientHandler extends Observable implements Runnable{
 
 	public static final String EXIT = "exit";
 	protected String name;
@@ -23,10 +23,6 @@ public class ClientHandler /*extends HumanPlayer*/ implements Runnable{
 	protected BufferedWriter out;
 	protected Thread[] clients;
 	protected GameControl gamecontrol;
-	protected List<ClientHandler> twoplayers;
-	protected List<ClientHandler> threeplayers;
-	protected List<ClientHandler> fourplayers;
-
 	/*
 	 * @requires (clients != null) && (sockArg != null);
 	 */
@@ -41,11 +37,8 @@ public class ClientHandler /*extends HumanPlayer*/ implements Runnable{
 		this.clients = clients;
 		in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 		out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
-		twoplayers = new ArrayList<ClientHandler>();
-		threeplayers = new ArrayList<ClientHandler>();
-		fourplayers = new ArrayList<ClientHandler>();
 	}
-
+	
 	/**
 	 * Reads strings of the stream of the socket-connection and writes the
 	 * characters to the default output.
@@ -71,37 +64,36 @@ public class ClientHandler /*extends HumanPlayer*/ implements Runnable{
 					System.out.println("Client " + getName() + ": " + s);
 					if (a[0].equals("Play") || a[0].equals("play")) {
 						int nr = Integer.parseInt(a[1]);
-						if (nr == 2) {
-							twoplayers.add(this);
-							out.write("Waiting " + (twoplayers.size() % 2) + "\n");
-							while (twoplayers.size() != 2) {
+//						this.addObserver(server);
+						if (nr > 1 && nr < 5) {
+//							setChanged();
+//							notifyObservers(nr);
+							if (nr == 2) {
+								Server.twoplayers.put(sock,name);
+								System.out.println("Waiting " + (2 - Server.twoplayers.size()));
+							}
+							while (Server.twoplayers.size() % 2 != 0) {
 								;
 							}
-							// start the game
-							System.out.println("Waiting 0");
-							twoplayers = new ArrayList<ClientHandler>();
+//							 start the game
 						} else {
 							if (nr == 3) {
-								threeplayers.add(this);
-								System.out.println("Waiting" + (3 - (threeplayers.size() % 3)));
-								while (threeplayers.size() != 3) {
+								Server.threeplayers.put(sock,name);
+								System.out.println("Waiting " + (3 - (Server.threeplayers.size())));
+								while (Server.threeplayers.size() % 3 != 0) {
 									;
 								}
 								// play the game on a new thread
-								System.out.println("Waiting 0");
-								threeplayers = new ArrayList<ClientHandler>();
 							} else {
 								if (nr == 4) {
-									fourplayers.add(this);
-									System.out.println("Waiting " + (4 - (fourplayers.size() % 4)));
-									while (fourplayers.size() != 4) {
+									Server.fourplayers.put(sock,name);
+									System.out.println("Waiting " + (4 - (Server.fourplayers.size())));
+									while (Server.fourplayers.size() % 4 != 0) {
 										;
 									}
 									// play the game on a new thread
-									System.out.println("Waiting 0");
-									fourplayers = new ArrayList<ClientHandler>();
 								} else {
-									System.out.println("The game can be player only in 2, 3 or 4 players!");
+									System.out.println("The game can be player only in 2, 3 or 4 players! Introduce another number: ");
 								}
 							}
 						}
@@ -109,7 +101,7 @@ public class ClientHandler /*extends HumanPlayer*/ implements Runnable{
 				}
 			}
 		} catch (IOException e) {
-			// System.out.println("C" + "\n");
+			e.printStackTrace();
 		}
 	}
 

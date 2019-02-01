@@ -9,11 +9,48 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
-public class Server{
+public class Server implements Observer {
 
 	private static final String USAGE = "usage: " + Server.class.getName() + " <ip> ";
 	private static Thread[] clients;
+	public static Map<Socket,String> twoplayers = new HashMap<>();;
+	public static Map<Socket,String> threeplayers = new HashMap<>();
+	public static Map<Socket,String> fourplayers = new HashMap<>();
 	
+	@Override
+	public void update(Observable o, Object arg) {
+//		System.out.println("smth");
+//		if(arg.equals(2)) {
+//			twoplayers.add((ClientHandler) o);
+//			System.out.println("Waiting " + (2 - twoplayers.size() % 2));
+//		}else {
+//			if(arg.equals(3)) {
+//				threeplayers.add((ClientHandler) o);
+//				System.out.println("Waiting " + (3 - threeplayers.size() % 3));
+//			}else {
+//				fourplayers.add((ClientHandler) o);
+//				System.out.println("Waiting " + (2 - fourplayers.size() % 4));
+//			}
+//		}
+//	}
+//		if(twoplayers.size() == 2) {
+//			System.out.println("Waiting 0");
+//		}else {
+//			System.out.println("Waiting " + (2 - twoplayers.size() % 2));
+//		}
+//		
+//		if(threeplayers.size() == 3) {
+//			System.out.println("Waiting 0");
+//		}else {
+//			System.out.println("Waiting " + (3 - threeplayers.size() % 3));
+//		}
+//		
+//		if(fourplayers.size() == 4) {
+//			System.out.println("Waiting 0");
+//		}else {
+//			System.out.println("Waiting " + (2 - fourplayers.size() % 4));
+		}
+
 	/** Starts a Server-application. */
 	public static void main(String[] args) {
 		if (args.length != 2) {
@@ -64,5 +101,8 @@ public class Server{
 			}
 		}
 	}
+	 
+	
+	}
 
-}
+

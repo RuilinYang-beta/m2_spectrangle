@@ -31,17 +31,14 @@ public class HumanPlayer extends Player{
 	
 	
 	// ======================== Making Choices ========================
-	public int chooseTileIdx(int numOfTile, boolean isFirstMove) {
+//	public int chooseTileIdx(int numOfTile, boolean isFirstMove) {
+	public int chooseTileIdx(int numOfTile) {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		Integer i = null;
 		String s = null;
 		while (true) {
 			
 			System.out.println("> Player " + name + ", Chose a Tile from :[0, " + (numOfTile - 1) + "] (inclusive): ");
-			if (!isFirstMove) {
-				System.out.println("- Or enter 8 to skip turn");
-				System.out.println("- Or enter 9 to exchange a Tile and pass turn");
-			}
 			
 			try {
 				s = br.readLine();
@@ -57,27 +54,8 @@ public class HumanPlayer extends Player{
 					break;
 				} 
 				else {
-					// First Move input out of range
-					if (isFirstMove) {
-						System.out.println("Input number out of range. Please try again.");
-						i = null;
-					} 
-					// Normal Move: user wants to skip
-					else if (i == 8) {
-						System.out.println("Player " + name + " choose to skip this turn.");
-						break;
-					} 
-					// Normal Move: user wants to exchange and pass turn
-					else if (i == 9) {
-						System.out.println("You are going to exchange a Tile with bag.");
-//						chooseATileToSwap(); // This function should be move to TUI
-						break;
-					}
-					// Normal Move: input out of range
-					else {
-						System.out.println("Input number out of range. Please try again.");
-						i = null;
-					}					
+					System.out.println("Input number out of range. Please try again.");
+					i = null;					
 				}
 				
 			} catch (NumberFormatException e) {
@@ -86,6 +64,61 @@ public class HumanPlayer extends Player{
 		}
 		
 		return i;
+	}
+	
+	public Integer chooseSkipOrSwap(int numOfTile) {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		Integer i = null;
+		String s = null;
+		
+		while (true) {
+			
+			System.out.println("> Player " + name + ", you have no Tile that matches the board. ");
+			System.out.println("- Enter 0 to skip the turn, or ");
+			System.out.println("- Enter 1 to swap a Tile with bag and pass the turn.");
+			
+			try {
+				s = br.readLine();
+			} catch (IOException e) {
+				System.out.println("IOException happens in chooseTileIdx br.readLine.");
+			}
+			
+			try {
+				i = Integer.parseInt(s);
+				
+				if ( i == 0) {
+					System.out.println("You've chosen to skip the turn.");
+//					break;
+					return null;
+				} else if ( i == 1) {
+					Integer tileIdxToSwap = chooseTileIdxToSwap(numOfTile);
+//					break;
+					return tileIdxToSwap;
+					
+				}
+				else {
+					System.out.println("Input number out of range. Please try again.");
+					i = null;			
+				}
+				
+			} catch (NumberFormatException e) {
+				System.out.println("Try again. Please input 0 or 1.");
+			}
+		}
+	}
+	
+	public void toSkip() {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		
+		System.out.println("> Player " + name + ", you have no Tile that matches the board, ");
+		System.out.println("> and there's no Tile in bag to swap. ");
+		System.out.println("> Enter anything to skip your turn");
+		
+		try {
+			String s = br.readLine();
+		} catch (IOException e) {
+			System.out.println("IOException happens in chooseTileIdx br.readLine.");
+		}
 	}
 	
 	public int chooseTileIdxToSwap(int numOfTile) {
@@ -148,8 +181,6 @@ public class HumanPlayer extends Player{
 		
 		return i;
 	}
-
-	
 	
 	public int chooseRotationIdx() {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -180,13 +211,23 @@ public class HumanPlayer extends Player{
     	return i;
 	}
 	
-	// ======================== Making Choices ========================
+	// ======================== Quries ========================
 	
 	public String getName() {
 		return this.name;
 	}
 	
-	
+	public ArrayList<Tile> getNonNullTiles(){
+    	// get non-null Tile and store them in a ArrayList (such that there's no null in between)
+		ArrayList<Tile> nonNullTiles = new ArrayList<>();
+		
+		for (int i = 0; i < tilesAtHand.length; i++) {
+			if (tilesAtHand[i] != null) {
+				nonNullTiles.add(tilesAtHand[i]);
+			}
+		}
+		return nonNullTiles;
+    }
 	
 
 //    private String readLine(String prompt) {

@@ -1,5 +1,6 @@
 package players;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import spectranglegame.*;
@@ -44,14 +45,19 @@ public abstract class Player {
 
 	// choose a Tile, return the Tile
 	// and accordingly set the Tile in TileAtHand to null
-	public abstract int chooseTileIdx(int numOfTile, boolean isFirstM);
+	public abstract int chooseTileIdx(int numOfTile);
+	
+	public abstract Integer chooseSkipOrSwap(int numOfTile) ;
 	
 	public abstract int chooseTileIdxToSwap(int numOfTile);
+	
+	public abstract void toSkip();
 	
 	public abstract int chooseFieldIdx();
 	
 	public abstract int chooseRotationIdx() ;
 	
+	public abstract ArrayList<Tile> getNonNullTiles();
 	
 	/**
 	 * Put the Tile at the first null position of Tiles[].

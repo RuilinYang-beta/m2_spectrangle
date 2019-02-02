@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Collections;
 import java.util.Map;
+import players.*;
+import spectranglegame.*;
 
 /**
  * @author RuilinYang
@@ -15,7 +17,11 @@ public class Board {
 	
 	public static final List<Integer> BONUSES =       Arrays.asList(1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 4, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2, 1, 1, 1, 3, 1);
  	private static final Integer[] ACCUMULATEDNUM = {1, 4, 9, 16, 25, 36};    // an helper array of getRCIdex
- 	public static final int FIELDSNUM = 36;
+ 	private static final int FIELDSNUM = 36;
+ 	// index of fields that have a vertical neighbor, left neighbor, and right neighbor
+ 	public static final List<Integer> hasVN = new ArrayList<Integer>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 26, 28, 30, 32, 34));
+ 	public static final List<Integer> hasLN = new ArrayList<Integer>(Arrays.asList(2, 3, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35));
+ 	public static final List<Integer> hasRN = new ArrayList<Integer>(Arrays.asList(1, 2, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34));
  	
 	// an array of current tiles on board, null if a field does not has a tile
  	private Tile[] tilesOnBoard = new Tile[36];
@@ -146,18 +152,6 @@ public class Board {
 		} else {
 			vNeighborIdx[0] -= 1;
 		}	
-		
-		// test run without tile: return neighbor index
-//		Integer[] neighbors = new Integer[3];
-//		neighbors[0] = (isLegalIdx(vNeighborIdx)) ? getOneDimIndex(vNeighborIdx) : null;
-//		neighbors[1] = (isLegalIdx(lNeighborIdx)) ? getOneDimIndex(lNeighborIdx) : null;
-//		neighbors[2] = (isLegalIdx(rNeighborIdx)) ? getOneDimIndex(rNeighborIdx) : null;
-		
-		// test run with tile: return an array of length 4:
-		// [isFacingUp, 
-		//  vertical_boarder_color, 
-		//  left_boarder_color, 
-		//  right_boarder_color ]
 		Character[] surroundings = new Character[4];
 		// U for up, D for down;
 		surroundings[0] = (facingUp)? 'U' : 'D';
@@ -172,6 +166,55 @@ public class Board {
 	}
 	
 	/**
+	 * Get the vertical boarder color of a field, null if there's no tile on the vertical boarder field.
+	 * @requires isLegalIdx(idx) && hasVN.contains(idx)
+	 */
+	public Character getVerticalBoarderColor(Integer idx) {
+		Integer[] rowColIdx = getRCIndex(idx);
+		
+		Integer[] vNeighborIdx = rowColIdx.clone();
+		
+		boolean facingUp = isFacingUp(idx);
+		if (facingUp) {
+			vNeighborIdx[0] += 1;
+		} else {
+			vNeighborIdx[0] -= 1;
+		}
+		// if there's a Tile on vertical neighbor field, return the vNeighbor's v color; else return null;
+		Tile vNeighbor = getTile(getOneDimIndex(vNeighborIdx));
+		return (vNeighbor != null)? vNeighbor.getVertical() : null;
+	}
+	
+	/**
+	 * Get the left boarder color of a field, null if there's no tile on the left boarder field.
+	 * @requires isLegalIdx(idx) && hasLN.contains(idx)
+	 */
+	public Character getLeftBoarderColor(Integer idx) {
+		Integer[] rowColIdx = getRCIndex(idx);
+		
+		Integer[] lNeighborIdx = rowColIdx.clone(); lNeighborIdx[1] -= 1;
+		
+		// If there's a Tile on the left neighbor field, return the left neighbor's **right** color; else return null;
+		Tile lNeighbor = getTile(getOneDimIndex(lNeighborIdx));
+		return (lNeighbor != null)? lNeighbor.getRight() : null;
+	}
+	
+	/**
+	 * Get the right boarder color of a field, null if there's no tile on the right boarder field.
+	 * @requires isLegalIdx(idx) && hasRN.contains(idx)
+	 */
+	public Character getRightBoarderColor(Integer idx) {
+		Integer[] rowColIdx = getRCIndex(idx);
+		
+		Integer[] rNeighborIdx = rowColIdx.clone(); rNeighborIdx[1] += 1;
+		
+		// If there's a Tile on the right neighbor field, return the right neighbor's **left** color; else return null;
+		Tile rNeighbor = getTile(getOneDimIndex(rNeighborIdx));
+		return ( rNeighbor != null)? rNeighbor.getLeft() : null;
+		
+	}
+	
+	/**
 	 * To see if a field is empty.
 	 * @param i The index of the field.
 	 * @return True if the field is empty.
@@ -181,7 +224,7 @@ public class Board {
 	}
 	
 	/**
-	 * @return An array list of empty fields.
+	 * @return An ArrayList of index of empty fields.
 	 */
 	public ArrayList<Integer> getEmptyFields() {
 		ArrayList<Integer> emptyFields = new ArrayList<>();
@@ -192,6 +235,25 @@ public class Board {
 		}
 		return emptyFields;
 	}
+	
+	/**
+	 * @return An ArrayList of index of empty fields that has at least a neighboring Tile.
+	 */
+	public ArrayList<Integer> getEmptyFieldsWithNeighborTile(){
+		ArrayList<Integer> emptyFieldsWNT = new ArrayList<>();
+		for (Integer emptyIdx: getEmptyFields()) {
+			if (fieldHasNeighborTile(emptyIdx)) {
+				emptyFieldsWNT.add(emptyIdx);
+			}
+		}
+		return emptyFieldsWNT;
+	}
+
+	public boolean fieldHasNeighborTile(Integer idx) {
+		Character[] srd = getSurroundingInfo(idx);
+		return (srd[1] != null) || (srd[2] != null) || (srd[3] != null);
+	}
+	
 	
 	/**
 	 * @return True if the board is full.
@@ -261,4 +323,46 @@ public class Board {
 		right = new ArrayList<>(Collections.nCopies(FIELDSNUM, null));
 	}
 	
+	// ======================== Temp: Main method ========================
+	public static void main(String[] args) {
+		// construct a nearly finished board
+		Board b = new Board();
+		b.setTile(0, new Tile(1, "RGR")); 
+		b.setTile(1, new Tile(1, "BYB"));    b.setTile(3, new Tile(1, "YPR"));
+		b.setTile(4, new Tile(1, "GGG"));    b.setTile(6, new Tile(1, "GYG"));     b.setTile(8, new Tile(1, "BBR"));
+		b.setTile(10, new Tile(1, "BGP"));   b.setTile(14, new Tile(1, "YBR"));
+//		b.setTile(17, new Tile(1, "RGR"));   b.setTile(18, new Tile(1, "ZZZ"));    b.setTile(19, new Tile(1, "GYP"));  b.setTile(20, new Tile(1, "ZZZ"));  b.setTile(21, new Tile(1, "YGY"));  b.setTile(22, new Tile(1, "ZZZ"));  b.setTile(23, new Tile(1, "PPP"));
+//		b.setTile(26, new Tile(1, "PBB"));   b.setTile(34, new Tile(1, "YYY"));
+		for (int i = 16; i < 36; i++) {
+			b.setTile(i, new Tile(1, "ZZZ"));
+		}
+		
+		GameTUI tui = new GameTUI(b);
+		tui.printBoardDynamic(b);
+		
+		// Empty fields: [2, 5, 7, 9, 11, 12, 13, 15]
+		// with 3 non-null neighbor Tile
+			// 2: new Tile(1, "BGR"); 5: new Tile(1, "GYG"); 7: new Tile(1, "GPR")
+		// with 2 neighbor Tile
+			// 9: new Tile(1, "PZX"), 11: new Tile(1, "XZB"), 13: new Tile(1, "RZX"), 15: new Tile(1, "XZY")
+		// with 1 neighbor Tile
+			// 12: new Tile(1, "XYX")
+		System.out.println(b.getEmptyFields());
+		
+		Tile[] tiles1 = {null, null, null, new Tile(3, "BZY")};
+//		Tile[] tiles2 = {new Tile(3, "RGB"), null, new Tile(1, "HEY"), null};
+//		Tile[] tiles3 = {new Tile(3, "RGB"), new Tile(1, "HEY"), null, new Tile(2, "ABC")};
+//		Tile[] tiles4 = {new Tile(3, "RGB"), new Tile(1, "HEY"), new Tile(2, "OOP"), new Tile(4, "WHO")};
+		
+		// Test of dealTiles
+		Player A = new HumanPlayer("A", tiles1);
+		Player B = new HumanPlayer("B");
+		Player C = new HumanPlayer("C");
+		Player D = new HumanPlayer("D");
+		
+		System.out.println(tui.canPlay(A));
+		System.out.println(tui.canPlay(B));
+		
+		
+	}
 }

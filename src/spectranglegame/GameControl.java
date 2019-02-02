@@ -33,7 +33,6 @@ public class GameControl {
 	// ======================== Constructor ========================
 	public GameControl(List<Player> lp, boolean shuffle) {
 		this.board = new Board();
-		this.tui = new GameTUI(this, this.board, lp);
 		
 		this.bag = new Bag(shuffle);
 		firstNonNullIdx = 0;
@@ -41,6 +40,23 @@ public class GameControl {
 		this.numPlayers = lp.size();
 		this.listPlayers = lp;
 		firstPlayerIdx = null;
+		
+		this.tui = new GameTUI(this, this.board, lp, this.bag);
+	}
+
+	
+	// only for test purpose
+	public GameControl(List<Player> lp, boolean shuffle, Board bd) {
+		this.board = bd;
+		
+		this.bag = new Bag(shuffle);
+		firstNonNullIdx = 0;
+		
+		this.numPlayers = lp.size();
+		this.listPlayers = lp;
+		firstPlayerIdx = null;
+		
+		this.tui = new GameTUI(this, this.board, lp, this.bag);
 	}
 	
 	// ============ Preparation: deal the initial tiles ============
@@ -125,7 +141,7 @@ public class GameControl {
 	}
 	
 	// ==================== Gaming: make a move ====================
-	// ----------------- FirstMove and its sanitaryCheck -----------------
+	// ----------------- FirstMove -----------------
 	/**
 	 * Let the first user make the first move.
 	 */
@@ -139,10 +155,11 @@ public class GameControl {
 		Player firstPlayer = listPlayers.get(firstPlayerIdx);
 		
 		tui.showInfoToPlayer(firstPlayer);
-		Tile theBaseTile = tui.askTile(firstPlayer, true);
+//		Tile theBaseTile = tui.askTile(firstPlayer, true);
+		Tile theBaseTile = tui.askTile(firstPlayer);
 		
-		int theField = tui.askField(firstPlayer, board, true);
-		Tile theTile = tui.askRotation(firstPlayer, theBaseTile, true);
+		int theField = tui.askField(firstPlayer, board);
+		Tile theTile = tui.askRotation(firstPlayer, theBaseTile);
 		
 		// 1. place the chosen rotation of chosen tile on the chosen field
 		putTileOnBoard(theField, theTile);
@@ -154,18 +171,17 @@ public class GameControl {
 		currentPlayerIdx = (firstPlayerIdx + 1) % numPlayers;
 	}
 	
-	// ----------------- NormalMove and its sanitaryCheck -----------------
+	// ----------------- NormalMove -----------------
 	public void makeNormalMove() {
 		Player currentPlayer = listPlayers.get(currentPlayerIdx);
 		
 		tui.showInfoToPlayer(currentPlayer);
-		// for now suppose user can make a move,
-		// think about where to check whether user is able to make a move
-		Tile theBaseTile = tui.askTile(currentPlayer, false);
+		
+		Tile theBaseTile = tui.askTile(currentPlayer);
 		
 		if (theBaseTile != null) { // that is, user did chose a Tile
-			int theField = tui.askField(currentPlayer, board, false);
-			Tile theTile = tui.askRotation(currentPlayer, theBaseTile, false);
+			int theField = tui.askField(currentPlayer, board);
+			Tile theTile = tui.askRotation(currentPlayer, theBaseTile);
 			
 			// 1. place the chosen rotation of chosen tile on the chosen field
 			putTileOnBoard(theField, theTile);
@@ -174,7 +190,6 @@ public class GameControl {
 			// 3. deal one tile to player, to restore to 4 tiles in hand
 			dealATileToPlayer(currentPlayer);
 		}
-		
 		
 		currentPlayerIdx = (currentPlayerIdx + 1) % numPlayers;
 	}
@@ -248,7 +263,7 @@ public class GameControl {
 		board.resetBoard();
 	}
 	
-
+	
 	// ======================== Queries ========================
 
 	public List<Player> getListPlayers(){
@@ -268,8 +283,78 @@ public class GameControl {
 		return this.firstNonNullIdx;
 	}
 	
+	/**
+	 * Return true if Player p has a tile that can be placed on board.
+	 */
+//	public boolean canPlay(Player p) {
+//		// if player doesn't have non null Tile, canPlay is false
+//		if (p.getNonNullTiles().size() == 0) {
+//			return false;
+//		}
+//		
+//		// all boarders open to be matched
+//		ArrayList<Character> openToMatch = new ArrayList<>();
+//		
+//		for (Integer idx : Board.hasVN) {
+//			// if there's a Tile on it, and it's vertical boarder color is null
+//			// then this Tile's vertical color is open to be matched
+//			if ((!board.fieldIsEmpty(idx)) && (board.getVerticalBoarderColor(idx) == null)) {
+//				openToMatch.add(board.getTile(idx).getVertical());
+//			}
+//		}
+//		
+//		for (Integer idx : Board.hasLN) {
+//			// if there's a Tile on it, and it's left boarder color is null
+//			// then this Tile's left color is open to be matched
+//			if ((!board.fieldIsEmpty(idx)) && (board.getLeftBoarderColor(idx) == null)) {
+//				openToMatch.add(board.getTile(idx).getLeft());
+//			}
+//		}
+//		
+//		for (Integer idx : Board.hasRN) {
+//			// if there's a Tile on it, and it's right boarder color is null
+//			// then this Tile's right color is open to be matched
+//			if ((!board.fieldIsEmpty(idx)) && (board.getRightBoarderColor(idx) == null)) {
+//				openToMatch.add(board.getTile(idx).getRight());
+//			}
+//		}
+//		
+//		ArrayList<Character> atHand = new ArrayList<>();
+//		for (Tile t : p.getNonNullTiles()) {
+//			atHand.add(t.getVertical());
+//			atHand.add(t.getLeft());
+//			atHand.add(t.getRight());
+//		}
+//		
+//		// only leave the intersection of atHand and openToMath in atHand 
+//		atHand.retainAll(openToMatch); 
+//		
+//		return atHand.size() > 0;
+//	}
+
+	public boolean currentCanPlay() {
+		return tui.canPlay(listPlayers.get(currentPlayerIdx));
+	}
+	
+	public boolean noOneCanPlay() {
+		for (Player p : listPlayers) {
+			if (tui.canPlay(p)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public boolean bagIsEmpty() {
+		return firstNonNullIdx > 35;
+	}
+	
 	// ======================== Main ========================
 	public static void main(String[] args) {
+//		Tile[] tiles1 = {new Tile(3, "RGB"), null, null, null};
+//		Tile[] tiles2 = {new Tile(3, "RGB"), null, new Tile(1, "HEY"), null};
+//		Tile[] tiles3 = {new Tile(3, "RGB"), new Tile(1, "HEY"), null, new Tile(2, "ABC")};
+//		Tile[] tiles4 = {new Tile(3, "RGB"), new Tile(1, "HEY"), new Tile(2, "OOP"), new Tile(4, "WHO")};
 		
 		// Test of dealTiles
 		Player A = new HumanPlayer("A");
@@ -279,6 +364,14 @@ public class GameControl {
 		
 		GameControl shuffled3P = new GameControl( Arrays.asList(A, B, C, D), 
 												  true);
+		
+//		shuffled3P.putTileOnBoard(2, new Tile(0, "XZZ")); // A can
+//		shuffled3P.putTileOnBoard(20, new Tile(0, "XXZ")); // B can't
+//		System.out.println(shuffled3P.canPlay(A));
+//		System.out.println(shuffled3P.canPlay(B));
+//		System.out.println(shuffled3P.canPlay(C));
+//		System.out.println(shuffled3P.canPlay(D));
+//		System.out.println(shuffled3P.noOneCanPlay());
 
 		int firstIdx = shuffled3P.dealTiles();
 		System.out.println("First player is Player at index: " + firstIdx);
@@ -287,7 +380,7 @@ public class GameControl {
 		
 		shuffled3P.makeFirstMove();
 		
-		while (!shuffled3P.board.boardIsFull()) {
+		while (!(shuffled3P.bagIsEmpty() && shuffled3P.noOneCanPlay())) {
 			shuffled3P.makeNormalMove();
 		}
 		

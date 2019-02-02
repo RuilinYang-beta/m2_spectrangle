@@ -44,6 +44,10 @@ public class GameTUI {
 		this.bag = bg;
 	}
 
+	// only for test purpose
+	public GameTUI(Board b) {
+		this.board = b;
+	}
 	// ========================= Ask User Input =========================
 	/**
      * Helper function of askTileAndRotation, if not valid, keep asking until valid.
@@ -257,105 +261,73 @@ public class GameTUI {
  
     
     // ========================= Query Model Data =========================
-	/**
-	 * Return true if Player p has a tile that can be placed on board.
-	 */
 	public boolean canPlay(Player p) {
 		// if no Tile on board, and Player has Tile, it's first move, always can play.
 		if (isFirstMove()) {
 			return true;
 		}
 		
+		ArrayList<Tile> tilesAtHand = p.getNonNullTiles();
+		
 		// if player doesn't have non null Tile, canPlay is false
-		if (p.getNonNullTiles().size() == 0) {
+		if (tilesAtHand.size() == 0) {
 			return false;
 		}
 		
-		// all boarders open to be matched
-		ArrayList<Character> openToMatch = new ArrayList<>();
-		
-		for (Integer idx : Board.hasVN) {
-			// if there's a Tile on it, and it's vertical boarder color is null
-			// then this Tile's vertical color is open to be matched
-			if ((!board.fieldIsEmpty(idx)) && (board.getVerticalBoarderColor(idx) == null)) {
-				openToMatch.add(board.getTile(idx).getVertical());
+		// if player has a Joker, can play
+		for (Tile t : tilesAtHand) {
+			if (t.isJoker()) {
+				return true;
 			}
 		}
 		
-		for (Integer idx : Board.hasLN) {
-			// if there's a Tile on it, and it's left boarder color is null
-			// then this Tile's left color is open to be matched
-			if ((!board.fieldIsEmpty(idx)) && (board.getLeftBoarderColor(idx) == null)) {
-				openToMatch.add(board.getTile(idx).getLeft());
-			}
-		}
-		
-		for (Integer idx : Board.hasRN) {
-			// if there's a Tile on it, and it's right boarder color is null
-			// then this Tile's right color is open to be matched
-			if ((!board.fieldIsEmpty(idx)) && (board.getRightBoarderColor(idx) == null)) {
-				openToMatch.add(board.getTile(idx).getRight());
-			}
-		}
-		
-		ArrayList<Character> atHand = new ArrayList<>();
-		for (Tile t : p.getNonNullTiles()) {
-			atHand.add(t.getVertical());
-			atHand.add(t.getLeft());
-			atHand.add(t.getRight());
-		}
-		
-		// only leave the intersection of atHand and openToMath in atHand 
-		atHand.retainAll(openToMatch); 
-		
-		return atHand.size() > 0;
-	}
-
-	public boolean canPlay2(Player p) {
-		// if no Tile on board, and Player has Tile, it's first move, always can play.
-		if (isFirstMove()) {
-			return true;
-		}
-		
-		// if player doesn't have non null Tile, canPlay is false
-		if (p.getNonNullTiles().size() == 0) {
-			return false;
-		}
-		
-		// when there's already some Tile on board, and Player has Tile in hand
+		// when there's already some Tile on board, and Player has Tile in hand but don't have Joker
 		ArrayList<Integer> emptyWNT = board.getEmptyFieldsWithNeighborTile();
 		// for every empty field with at least a neighboring Tile
 		for (Integer idx : emptyWNT) {
 			Character[] srd = board.getSurroundingInfo(idx);
 			
 			// for every tile in user's hand
-			for (Tile t : p.getNonNullTiles()) {
-				// for every tile in rotation 0, 2, 4, return true as long as you find a match
-				if (srd[0] == 'U') {
-					ArrayList<Tile> upRotations = new ArrayList<Tile>(
-							Arrays.asList(t, t.rotateTileTwice(), t.rotateTileFourTimes()));
-					for (Tile up : upRotations) {
-						boolean match = boarderMatchs(srd, up);
-						if (match) {
-							return true;
-						}
-					}	
-					
-				}
-				// for every tile in rotation 1, 3, 5, return true as long as you find a match
-				else {
-					ArrayList<Tile> downRotations = new ArrayList<Tile>(
-							Arrays.asList(t.rotateTileOnce(), t.rotateTileOnce().rotateTileTwice(), t.rotateTileOnce().rotateTileFourTimes()));
-					for (Tile down : downRotations) {
-						boolean match = boarderMatchs(srd, down);
-						if (match) {
-							return true;
-						}
-					}	
-				}
-				
-				
+			for (Tile t : tilesAtHand) {
+				if (boarderPossibleToMatch(srd, t)) {
+					return true;
+				}	
 			}	
+		}
+		return false;
+	}
+	
+	/**
+	 * @param srd
+	 * @param base
+	 * @return
+	 */
+	/*
+	 * @requires (srd[1] != null) || (srd[2] != null) || (srd[3] != null);
+	 * @requires ((srd[0] == 'U') && (t.isFacingUp())) || ((srd[0] == 'D') && (!t.isFacingUp()));
+	 * @requires t.getRotation() == 0;
+	 */
+	public boolean boarderPossibleToMatch(Character[] srd, Tile base) {
+		
+		if (srd[0] == 'U') {
+			ArrayList<Tile> upRotations = new ArrayList<Tile>(
+					Arrays.asList(base, base.rotateTileTwice(), base.rotateTileFourTimes()));
+			for (Tile up : upRotations) {
+				boolean match = boarderMatchs(srd, up);
+				if (match) {
+					return true;
+				}
+			}
+		}
+		else {
+			ArrayList<Tile> downRotations = new ArrayList<Tile>(
+					Arrays.asList(base.rotateTileOnce(), base.rotateTileOnce().rotateTileTwice(), base.rotateTileOnce().rotateTileFourTimes()));
+			for (Tile down : downRotations) {
+				boolean match = boarderMatchs(srd, down);
+				if (match) {
+					return true;
+				}
+			}
 		}
 		return false;
 	}
@@ -364,26 +336,32 @@ public class GameTUI {
 	 * Given the surrounding infos of an empty field with at least one neighboring tile, and a specific Tile, 
 	 * can the Tile be placed on the field?
 	 * @param srds The surrounding information of the field.
-	 * @param t The Tile you want to place on the empty field.
+	 * @param t The Tile you want to place on the empty field, should be a baseTile (with rotation 0)
 	 * @return true If the tile match the surroundings.
 	 */
 	/*
 	 * @requires (srd[1] != null) || (srd[2] != null) || (srd[3] != null);
 	 * @requires ((srd[0] == 'U') && (t.isFacingUp())) || ((srd[0] == 'D') && (!t.isFacingUp()));
+	 * @requires t.getRotation() == 0;
 	 */
 	public boolean boarderMatchs(Character[] srd, Tile t) {
-		// (has a vertical neighbor) && (vertical color mismatch)
-		if ((srd[1] != null) && (t.getVertical() != srd[1])) {
+		// Joker can be placed anywhere as long as there's a neighboring Tile
+		if (t.isJoker()) {
+			return true;
+		}
+		
+		// (has a vertical neighbor) && (vertical neighborTile is not Joker) && (vertical color mismatch)
+		if ((srd[1] != null) && (srd[1] != 'W') && (t.getVertical() != srd[1])) {
 			return false;
 		}
 		
-		// (has a left neighbor) && (left color mismatch)
-		if ((srd[2] != null) && (t.getLeft() != srd[2])) {
+		// (has a left neighbor) && (vertical neighborTile is not Joker) && (left color mismatch)
+		if ((srd[2] != null) && (srd[2] != 'W') && (t.getLeft() != srd[2])) {
 			return false;
 		}
 		
-		// (has a right neighbor) && (right color mismatch)
-		if ((srd[3] != null) && (t.getRight() != srd[3])) {
+		// (has a right neighbor) && (vertical neighborTile is not Joker) && (right color mismatch)
+		if ((srd[3] != null) && (srd[3] != 'W') && (t.getRight() != srd[3])) {
 			return false;
 		}
 		

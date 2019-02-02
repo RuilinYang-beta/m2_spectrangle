@@ -1,6 +1,5 @@
 package spectranglegame;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,10 +8,6 @@ import java.util.Map;
 import players.*;
 import spectranglegame.*;
 
-/**
- * @author RuilinYang
- *
- */
 public class Board { 
 	
 	public static final List<Integer> BONUSES =       Arrays.asList(1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 4, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2, 1, 1, 1, 3, 1);
@@ -24,14 +19,14 @@ public class Board {
  	public static final List<Integer> hasRN = new ArrayList<Integer>(Arrays.asList(1, 2, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34));
  	
 	// an array of current tiles on board, null if a field does not has a tile
- 	private Tile[] tilesOnBoard = new Tile[36];
+	private Tile[] tilesOnBoard = new Tile[36];
 	// 4 lists below only cares about the 4 dimension of each of the 36 tiles
 	private List<Integer> values;
-    private List<Character> vertical;
-    private List<Character> left;
-    private List<Character> right;
- 	
- 	// ======================== Constructor ========================
+	private List<Character> vertical;
+	private List<Character> left;
+	private List<Character> right;
+
+	// ======================== Constructor ========================
 	/**
 	 * Generate a board, with no tiles on it.
 	 */
@@ -42,7 +37,7 @@ public class Board {
 		left = new ArrayList<>(Collections.nCopies(FIELDSNUM, null));
 		right = new ArrayList<>(Collections.nCopies(FIELDSNUM, null));
 	}
-	
+
 	// ======================== Static Methods ========================
 	/**
 	 * @param i The one dimensional index.
@@ -51,7 +46,7 @@ public class Board {
 	public static boolean isLegalIdx(Integer i) {
 		return (0 <= i) && (i <= 35);
 	}
-	
+
 	/**
 	 * @param rowCol Row-column index of that field.
 	 * @return True if this index is legal.
@@ -63,7 +58,7 @@ public class Board {
 		boolean cond2 = (-row <= col) && (col <= row);
 		return cond1 && cond2;
 	}
-	
+
 	/**
 	 * @param idx The index of the field of your interest.
 	 * @return true if this field is a bonus field.
@@ -71,7 +66,7 @@ public class Board {
 	public static boolean isBonusField(int idx) {
 		return BONUSES.get(idx) != 1;
 	}
-	
+
 	/**
 	 * @param i The index of the field of interest.
 	 * @return true if the field is facing up.
@@ -79,7 +74,7 @@ public class Board {
 	public static boolean isFacingUp(Integer i) {
 		return Board.isFacingUp(Board.getRCIndex(i));
 	}
-	
+
 	/**
 	 * @param rowCol Row-column index of that field.
 	 * @return true if the field is facing upward.
@@ -87,17 +82,18 @@ public class Board {
 	public static boolean isFacingUp(Integer[] rowCol) {
 		return ((rowCol[0] + rowCol[1]) % 2 == 0);
 	}
-	
+
 	/**
 	 * To get the one dimensional index from the row-column index.
+	 * 
 	 * @param rowCol The row-column coordinate of a field
 	 * @return One dimension index of that field
 	 */
- 	public static Integer getOneDimIndex(Integer[] rowCol) {
+	public static Integer getOneDimIndex(Integer[] rowCol) {
 		if (!isLegalIdx(rowCol)) {
 			return null;
 		}
-		
+
 		Integer r = rowCol[0];
 		Integer c = rowCol[1];
 		return r * r + r + c;
@@ -105,15 +101,16 @@ public class Board {
 
 	/**
 	 * To get the row-column index from a one dimensional index.
+	 * 
 	 * @param i The one dimensional index.
-	 * @return An array of length two, 
-	 * 		   of which first element is row index, second element is column index.
+	 * @return An array of length two, of which first element is row index, second
+	 *         element is column index.
 	 */
 	public static Integer[] getRCIndex(Integer i) {
 		if (!Board.isLegalIdx(i)) {
 			return null;
 		}
-		
+
 		Integer nthField = i + 1;
 		Integer idx = 0;
 		Integer[] rowCol = new Integer[2];
@@ -121,50 +118,67 @@ public class Board {
 			idx += 1;
 		}
 		rowCol[0] = idx;
-		rowCol[1] = (idx == 0) ? 0 : nthField - ACCUMULATEDNUM[idx - 1] - (idx+1);
-		return rowCol;	
+		rowCol[1] = (idx == 0) ? 0 : nthField - ACCUMULATEDNUM[idx - 1] - (idx + 1);
+		return rowCol;
 	}
-	
+
 	// ======================== Instance Queries ========================
 	/**
-	 * Input a one-dimensional index, get the corresponding field's surrounding informations, see return.
+	 * Input a one-dimensional index, get the corresponding field's surrounding
+	 * informations, see return.
+	 * 
 	 * @param i An one-dimension index of a field
-	 * @return An array of length 4: [fieldDirection, verticalBoarder, leftBoarder, rightBoarder]
-	 * 			(verticalBoarder != null) ==> (field has a vertical neighbor field) && (there's a tile on vertical neighbor field);
+	 * @return An array of length 4: [fieldDirection, verticalBoarder, leftBoarder,
+	 *         rightBoarder] (verticalBoarder != null) ==> (field has a vertical
+	 *         neighbor field) && (there's a tile on vertical neighbor field);
 	 */
 	// public Integer[] getSurroundingInfo(Integer i) {
 	public Character[] getSurroundingInfo(Integer i) {
 		if (!isLegalIdx(i)) {
 			return null;
 		}
-		
+
 		Integer[] rowColIdx = getRCIndex(i);
-		
+
 		// get a stub row-col index of the left/right/vertical neighbor
 		// they can be illegal so later there's a sanity check
-		Integer[] lNeighborIdx = rowColIdx.clone(); lNeighborIdx[1] -= 1;
-		Integer[] rNeighborIdx = rowColIdx.clone(); rNeighborIdx[1] += 1;
+		Integer[] lNeighborIdx = rowColIdx.clone();
+		lNeighborIdx[1] -= 1;
+		Integer[] rNeighborIdx = rowColIdx.clone();
+		rNeighborIdx[1] += 1;
 		Integer[] vNeighborIdx = rowColIdx.clone();
-		
+
 		boolean facingUp = isFacingUp(i);
 		if (facingUp) {
 			vNeighborIdx[0] += 1;
 		} else {
 			vNeighborIdx[0] -= 1;
 		}	
+
 		Character[] surroundings = new Character[4];
 		// U for up, D for down;
-		surroundings[0] = (facingUp)? 'U' : 'D';
-		surroundings[1] = (isLegalIdx(vNeighborIdx)) ? ((getTile(getOneDimIndex(vNeighborIdx)) != null)? getTile(getOneDimIndex(vNeighborIdx)).getVertical() : null)  : null;
-		// the surrounding color of left boarder should be the **right** color of the left neighbor
-		surroundings[2] = (isLegalIdx(lNeighborIdx)) ? ((getTile(getOneDimIndex(lNeighborIdx)) != null)? getTile(getOneDimIndex(lNeighborIdx)).getRight() : null) : null;
-		// the surrounding color of right boarder should be the **left** color of the left neighbor
-		surroundings[3] = (isLegalIdx(rNeighborIdx)) ? ((getTile(getOneDimIndex(rNeighborIdx)) != null)? getTile(getOneDimIndex(rNeighborIdx)).getLeft() : null) : null;
-		
+		surroundings[0] = (facingUp) ? 'U' : 'D';
+		surroundings[1] = (isLegalIdx(vNeighborIdx))
+				? ((getTile(getOneDimIndex(vNeighborIdx)) != null) ? getTile(getOneDimIndex(vNeighborIdx)).getVertical()
+						: null)
+				: null;
+		// the surrounding color of left boarder should be the **right** color of the
+		// left neighbor
+		surroundings[2] = (isLegalIdx(lNeighborIdx))
+				? ((getTile(getOneDimIndex(lNeighborIdx)) != null) ? getTile(getOneDimIndex(lNeighborIdx)).getRight()
+						: null)
+				: null;
+		// the surrounding color of right boarder should be the **left** color of the
+		// left neighbor
+		surroundings[3] = (isLegalIdx(rNeighborIdx))
+				? ((getTile(getOneDimIndex(rNeighborIdx)) != null) ? getTile(getOneDimIndex(rNeighborIdx)).getLeft()
+						: null)
+				: null;
+
 //		return neighbors;
 		return surroundings;
 	}
-	
+
 	/**
 	 * Get the vertical boarder color of a field, null if there's no tile on the vertical boarder field.
 	 * @requires isLegalIdx(idx) && hasVN.contains(idx)
@@ -216,13 +230,14 @@ public class Board {
 	
 	/**
 	 * To see if a field is empty.
+	 * 
 	 * @param i The index of the field.
 	 * @return True if the field is empty.
 	 */
 	public boolean fieldIsEmpty(int i) {
 		return (this.tilesOnBoard[i] == null);
 	}
-	
+
 	/**
 	 * @return An ArrayList of index of empty fields.
 	 */
@@ -235,7 +250,7 @@ public class Board {
 		}
 		return emptyFields;
 	}
-	
+
 	/**
 	 * @return An ArrayList of index of empty fields that has at least a neighboring Tile.
 	 */
@@ -261,47 +276,49 @@ public class Board {
 	public boolean boardIsFull() {
 		return this.getEmptyFields().size() == 0;
 	}
-	
+
 	/**
 	 * @param i The index of the tile.
-	 * @return The tile of that index. 
+	 * @return The tile of that index.
 	 */
 	public Tile getTile(int i) {
 		return tilesOnBoard[i];
 	}
-	
+
 	/**
 	 * A getter of List<Integer> values;
 	 */
-	protected List<Integer> getValuesOnBoard(){
+	protected List<Integer> getValuesOnBoard() {
 		return values;
 	}
-	
+
 	/**
 	 * A getter of List<Character> vertical;
 	 */
-	protected List<Character> getVerticalOnBoard(){
+	protected List<Character> getVerticalOnBoard() {
 		return vertical;
 	}
-	
+
 	/**
 	 * A getter of List<Character> left;
 	 */
-	protected List<Character> getLeftOnBoard(){
+	protected List<Character> getLeftOnBoard() {
 		return left;
 	}
-	
+
 	/**
 	 * A getter of List<Character> right;
 	 */
-	protected List<Character> getRightOnBoard(){
+	protected List<Character> getRightOnBoard() {
 		return right;
 	}
-	
+
 	// ======================== Instance Commands ========================
-	
+
 	/**
-	 * Put a tile t on the field with index i, update Tile[] and also 4 arrayLists accordingly.
+	 * Put a tile t on the field with index i, update Tile[] and also 4 arrayLists
+	 * accordingly.
+	 * 
 	 * @param i The index you want to put a tile on.
 	 * @param t The tile object.
 	 */
@@ -312,7 +329,7 @@ public class Board {
 		left.set(i, t.getLeft());
 		right.set(i, t.getRight());
 	}
-	
+
 	/**
 	 * 
 	 */

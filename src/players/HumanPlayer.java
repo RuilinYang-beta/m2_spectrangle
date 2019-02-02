@@ -8,17 +8,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Observable;
 
 import spectranglegame.*;
 
-public class HumanPlayer extends Player{
+public class HumanPlayer extends Player {
 	
 //	private String name;
 //	private Tile[] tilesAtHand;
 	private int score;
 	private Scanner in;
 	// later move this to PlayerClient
-	private static final List<Integer> BONUSES =       Arrays.asList(1, 1, 3, 1, 1, 1, 1, 1, 1, 1, 2, 4, 1, 4, 2, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 1, 2, 1, 1, 1, 3, 1);
+	private static final List<Integer> BONUSES =       Arrays.asList(2, 10, 11, 13, 14, 20, 26, 30, 34);
 	
 	// ======================== Constructor ========================
 	public HumanPlayer(String n, Tile[] tiles) {
@@ -97,7 +98,7 @@ public class HumanPlayer extends Player{
 					
 				}
 				else {
-					System.out.println("Input number out of range. Please try again.");
+					System.out.println("Try again. Please input 0 or 1.");
 					i = null;			
 				}
 				
@@ -170,6 +171,40 @@ public class HumanPlayer extends Player{
 				i = Integer.parseInt(s);
 				if ((0 <= i) && (i <= 35)) {
 					break;
+				} else {
+					System.out.println("Index is not on board. Please try again.");
+					i = null;
+				}
+			} catch (NumberFormatException e) {
+				System.out.println("Try again. Please input a number.");
+			}
+		}
+		
+		return i;
+	}
+	
+	public int chooseFieldIdx(boolean isFirstMove) {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		Integer i = null;
+		String s = null;
+		while (true) {
+			System.out.print("> Player " + name + ", Please chose a field: ");
+			try {
+				s = br.readLine();
+			} catch (IOException e) {
+				System.out.println("IOException happens in br.readLine.");
+			}
+			
+			try {
+				i = Integer.parseInt(s);
+				if ((0 <= i) && (i <= 35)) {
+					if (!isFirstMove) {
+						break;
+					} else if (!BONUSES.contains(i)) {
+						break;
+					} else {
+						System.out.println("First Move cannot be on a bonus Field. Please try again.");
+					}
 				} else {
 					System.out.println("Index is not on board. Please try again.");
 					i = null;

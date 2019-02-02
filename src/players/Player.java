@@ -1,11 +1,13 @@
 package players;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
+import java.util.Observable;
 
 import spectranglegame.*;
 
-public abstract class Player {
+public abstract class Player extends Observable{
 	protected String name;
 	protected Tile[] tilesAtHand;
 	protected int score;
@@ -54,8 +56,9 @@ public abstract class Player {
 	public abstract void toSkip();
 	
 	public abstract int chooseFieldIdx();
+	public abstract int chooseFieldIdx(boolean isFirstMove) ;
 	
-	public abstract int chooseRotationIdx();
+	public abstract int chooseRotationIdx() ;
 	
 	public abstract ArrayList<Tile> getNonNullTiles();
 	
@@ -66,11 +69,13 @@ public abstract class Player {
 	public void takeTheTile(Tile t) {
 		for (int i = 0; i < tilesAtHand.length; i++) {
 			if (tilesAtHand[i] == null) {
-//				System.out.println("Here's a null Tile slot.");
 				tilesAtHand[i] = t;
+				// should notify Observer the change, with argument "Player"
 				break;
 			}
 		}
+		setChanged();
+		notifyObservers("Give " + name + " " + t.stringTile());
 	}
 	
 	

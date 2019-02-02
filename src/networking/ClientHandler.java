@@ -1,18 +1,20 @@
 package networking;
 
 import java.io.BufferedReader;
+import java.util.*;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.Scanner;
-
+import spectranglegame.GameControl;
+import players.HumanPlayer;
 /**
  * Client handler for a client of the game
  */
 
-public class ClientHandler implements Runnable {
+public class ClientHandler extends Observable implements Runnable{
 
 	public static final String EXIT = "exit";
 	protected String name;
@@ -20,14 +22,14 @@ public class ClientHandler implements Runnable {
 	protected BufferedReader in;
 	protected BufferedWriter out;
 	protected Thread[] clients;
-
+	protected GameControl gamecontrol;
 	/*
-	 * @requires (nameArg != null) && (sockArg != null);
+	 * @requires (clients != null) && (sockArg != null);
 	 */
 	/**
 	 * Constructor. creates a ClientHandler object based in the given parameters.
 	 * 
-	 * @param nameArg name of the Client Handler-process
+	 * @param clients the thread array for every client that connects to the server
 	 * @param sockArg Socket of the Client Handler-process
 	 */
 	public ClientHandler(Socket sockArg, Thread[] clients) throws IOException {
@@ -36,25 +38,70 @@ public class ClientHandler implements Runnable {
 		in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 		out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 	}
-
+	
 	/**
 	 * Reads strings of the stream of the socket-connection and writes the
 	 * characters to the default output.
 	 */
 	public void run() {
+		boolean first = true;
 		try {
 			while (true) {
 				String s = in.readLine();
-				if (s == null || s.isEmpty() || s.equals("exit")) {
-					System.out.println("Client " + getName()+ " disconnectd");
+				if (/* s == null || */ s.isEmpty() || s.equals("exit")) {
+					System.out.println("Client " + getName() + " disconnectd");
 					shutDown();
 					break;
 				}
-				name = s;
-				System.out.println("Hello " + s + "!");
+				String[] a = s.split(" ");
+				if (first) {
+					if (a[0].equals("hello") || a[0].equals("Hello")) {
+						name = a[1];
+						System.out.println("Hello " + name + " false false false false");
+						first = false;
+					}
+				} else {
+					System.out.println("Client " + getName() + ": " + s);
+					if (a[0].equals("Play") || a[0].equals("play")) {
+						int nr = Integer.parseInt(a[1]);
+//						this.addObserver(server);
+						if (nr > 1 && nr < 5) {
+//							setChanged();
+//							notifyObservers(nr);
+							if (nr == 2) {
+								Server.twoplayers.put(sock,name);
+								System.out.println("Waiting " + (2 - Server.twoplayers.size()));
+							}
+							while (Server.twoplayers.size() % 2 != 0) {
+								;
+							}
+//							 start the game
+						} else {
+							if (nr == 3) {
+								Server.threeplayers.put(sock,name);
+								System.out.println("Waiting " + (3 - (Server.threeplayers.size())));
+								while (Server.threeplayers.size() % 3 != 0) {
+									;
+								}
+								// play the game on a new thread
+							} else {
+								if (nr == 4) {
+									Server.fourplayers.put(sock,name);
+									System.out.println("Waiting " + (4 - (Server.fourplayers.size())));
+									while (Server.fourplayers.size() % 4 != 0) {
+										;
+									}
+									// play the game on a new thread
+								} else {
+									System.out.println("The game can be player only in 2, 3 or 4 players! Introduce another number: ");
+								}
+							}
+						}
+					}
+				}
 			}
 		} catch (IOException e) {
-			// System.out.println("C" + "\n");
+			e.printStackTrace();
 		}
 	}
 
@@ -89,7 +136,7 @@ public class ClientHandler implements Runnable {
 			in.close();
 			sock.close();
 			out.close();
-		//	System.exit(0);
+			// System.exit(0);
 		} catch (IOException e) {
 
 		}

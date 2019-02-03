@@ -115,4 +115,28 @@ class BoardTest {
 		assertNull(srd[2]);  // left boarder color
 		assertNull(srd[3]);  // right board color
 	}
+	
+	@Test
+	void testIsEmpty() {
+		b.resetBoard();
+		int i = (int) (Math.random() * ( 35 ));
+		assertTrue(b.fieldIsEmpty(i));
+	}
+	
+	@Test
+	void testBonusField() {
+		assertTrue(Board.isBonusField(2));
+		Tile t = new Tile(3,"RGB");
+		int i = (int) (Math.random() * ( 35 ));
+		b.setTile(i, t, "radu");
+	}
+	
+	@Test
+	void testBoardisFull() {
+		Tile t = new Tile(3,"RGB");
+		for (int i = 0; i < 36; i++) {
+			b.setTile(i, t);
+		}
+		assertTrue(b.boardIsFull());
+	}
 }

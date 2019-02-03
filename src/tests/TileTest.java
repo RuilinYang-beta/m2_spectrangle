@@ -30,7 +30,11 @@ class TileTest {
 		assertEquals("RGB3", t.toString());
 	}
 	
-	
+	@Test
+	void isJoker() {
+		Tile t = new Tile(1,"WWW");
+		assertTrue(t.isJoker());
+	}
 	@Test
 	public void testShowTile() {
 		// You have to examine the console visually.

@@ -1,9 +1,5 @@
 package spectranglegame;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
-
 public class Tile {
 
 	private int value;
@@ -234,8 +230,8 @@ public class Tile {
 		Tile t0 = new Tile(3,"RGB");
 		Tile t1 = t0.rotateTileOnce();
 		Tile t2 = t1.rotateTileOnce();
-		Tile t3 = t2.rotateTileOnce();
-		Tile t4 = t3.rotateTileOnce();
+//		Tile t3 = t2.rotateTileOnce();
+//		Tile t4 = t3.rotateTileOnce();
 	//	Tile t5 = t4.rotateTileOnce();
 		
 		System.out.println(t0);

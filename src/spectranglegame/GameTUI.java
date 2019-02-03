@@ -189,8 +189,8 @@ public class GameTUI {
     public Tile askRotation(Player p, Tile baseT) {
     	Tile chosenRotation = null;
     	
-    	// ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ Below are printing all possible Rotation  ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-    	// ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ Later TUI should send this String representation to PlayerClient ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    	// ====== Below are printing all possible Rotation  =======
+    	// ====== Later TUI should send this String representation to PlayerClient =====
     	// Generate 3 different rotation from the base Tile,
     	ArrayList<Tile> allRotation = new ArrayList<>();
 
@@ -217,7 +217,7 @@ public class GameTUI {
     	} else {
     		System.out.println("Error! chosen field direction unknow!"); // impossible to happen.
     	}
-    	// ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ Above are printing all possible Rotation ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+    	// ====== Above are printing all possible Rotation ======
     	
     	// TUI doing the sanitary check, if not sanitary, keep asking until user give legal fieldIdx.
     	while (true) {

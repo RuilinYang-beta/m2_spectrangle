@@ -146,17 +146,17 @@ public class ClientHandler extends Observable implements Runnable{
 	public String getName() {
 		return name;
 	}
-
-	/** read a line from the default input */
-	static public String readString(String tekst) {
-		System.out.print(tekst);
-		String antw = null;
-		try {
-			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-			antw = in.readLine();
-		} catch (IOException e) {
-		}
-
-		return (antw == null) ? "" : antw;
-	}
+//
+//	/** read a line from the default input */
+//	static public String readString(String tekst) {
+//		System.out.print(tekst);
+//		String antw = null;
+//		try {
+//			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+//			antw = in.readLine();
+//		} catch (IOException e) {
+//		}
+//
+//		return (antw == null) ? "" : antw;
+//	}
 }

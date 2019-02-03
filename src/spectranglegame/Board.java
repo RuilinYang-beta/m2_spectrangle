@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Collections;
-import java.util.Map;
 import players.*;
-import spectranglegame.*;
 
 public class Board { 
 	
@@ -31,7 +29,6 @@ public class Board {
 	 * Generate a board, with no tiles on it.
 	 */
 	public Board() {
-//		Arrays.fill(tilesOnBoard, null);
 		values = new ArrayList<>(Collections.nCopies(FIELDSNUM, null));
 		vertical = new ArrayList<>(Collections.nCopies(FIELDSNUM, null));
 		left = new ArrayList<>(Collections.nCopies(FIELDSNUM, null));

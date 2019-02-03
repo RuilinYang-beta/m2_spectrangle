@@ -70,12 +70,14 @@ public abstract class Player extends Observable{
 		for (int i = 0; i < tilesAtHand.length; i++) {
 			if (tilesAtHand[i] == null) {
 				tilesAtHand[i] = t;
-				// should notify Observer the change, with argument "Player"
+				
+				setChanged();
+				notifyObservers("Give " + name + " " + t.stringTile());
+				
 				break;
 			}
 		}
-		setChanged();
-		notifyObservers("Give " + name + " " + t.stringTile());
+		
 	}
 	
 	

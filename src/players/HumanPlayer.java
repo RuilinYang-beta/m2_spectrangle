@@ -89,11 +89,9 @@ public class HumanPlayer extends Player {
 				
 				if ( i == 0) {
 					System.out.println("You've chosen to skip the turn.");
-//					break;
 					return null;
 				} else if ( i == 1) {
 					Integer tileIdxToSwap = chooseTileIdxToSwap(numOfTile);
-//					break;
 					return tileIdxToSwap;
 					
 				}
@@ -265,23 +263,6 @@ public class HumanPlayer extends Player {
     }
 	
 
-//    private String readLine(String prompt) {
-//        String value = "";
-//        boolean intRead = false;
-//        @SuppressWarnings("resource")
-//        Scanner line = new Scanner(System.in);
-//        do {
-//            System.out.print(prompt);
-//            try (Scanner scannerLine = new Scanner(line.nextLine());) {
-//                if (scannerLine.hasNextLine()) {
-//                    intRead = true;
-//                    value = scannerLine.nextLine();
-//                }
-//            }
-//        } while (!intRead);
-//        return value;
-//    }
-//   
 
     private String readLine(String prompt) {
         String value = "";
@@ -307,13 +288,13 @@ public class HumanPlayer extends Player {
 	public static void main(String[] args) {
 		HumanPlayer p = new HumanPlayer("joke");
 
-//		System.out.println("chosen Field Idx is: " + p.chooseFieldIdx());
+		System.out.println("chosen Field Idx is: " + p.chooseFieldIdx());
 //		System.out.println("chosen Tile Idx is: " + p.chooseTileIdx(3));
 //		System.out.println("chosen Rotation Idx is: " + p.chooseRotationIdx());
 		
-		System.out.println(p.readLine("> Question 1:"));
-		System.out.println(p.readLine("> Question 2:"));
-		System.out.println(p.readLine("> Question 3:"));
+//		System.out.println(p.readLine("> Question 1:"));
+//		System.out.println(p.readLine("> Question 2:"));
+//		System.out.println(p.readLine("> Question 3:"));
 		
 		
 	}

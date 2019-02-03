@@ -268,21 +268,23 @@ public class Tile {
 		Tile t0 = new Tile("0RGB3");
 		t0.showTile();
 		
-		Tile t1 = new Tile("1RGB3");
-		t1.showTile();
-		
-		Tile t2 = new Tile("2RGB3");
-		t2.showTile();
-		
-		Tile t3 = new Tile("3RGB3");
-		t3.showTile();
-		
-		
-		Tile t4 = new Tile("4RGB3");
-		t4.showTile();
-		
-		Tile t5 = new Tile("5RGB3");
-		t5.showTile();
+		System.out.println(t0.stringTile());
+		System.out.println(t0.toString());
+//		Tile t1 = new Tile("1RGB3");
+//		t1.showTile();
+//		
+//		Tile t2 = new Tile("2RGB3");
+//		t2.showTile();
+//		
+//		Tile t3 = new Tile("3RGB3");
+//		t3.showTile();
+//		
+//		
+//		Tile t4 = new Tile("4RGB3");
+//		t4.showTile();
+//		
+//		Tile t5 = new Tile("5RGB3");
+//		t5.showTile();
 		
 	}
 

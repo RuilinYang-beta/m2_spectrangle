@@ -1,25 +1,20 @@
 package networking;
 
 import java.io.BufferedReader;
-import java.util.*;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.util.Scanner;
+import java.util.Map;
+import java.util.HashMap;
 import spectranglegame.GameControl;
-import players.HumanPlayer;
-/**
- * Client handler for a client of the game
- */
+
+import utils.*;
 
 public class HandshakeServer extends Thread{
 
 	private static final String EXIT = "exit";
-	private static final String HELLO = "Hello";
-	private static final String PLAY  = "Play";
-	private static final String WAITING = "Waiting";
 	
 	private String playerName;
 	private Integer numOfPlayers;
@@ -65,11 +60,11 @@ public class HandshakeServer extends Thread{
         }
         
         switch (info[0]) {
-			case HELLO:
+			case Commands.HELLO:
 				this.playerName = info[1];
-				sendToClient(HELLO, "", this.out);
+				sendToClient(Commands.HELLO, "", this.out);
 				break;
-			case PLAY:
+			case Commands.PLAY:
 				this.numOfPlayers = Integer.parseInt(info[1]); 
 				break;
 			default:
@@ -82,11 +77,11 @@ public class HandshakeServer extends Thread{
 		String msg = null;
 		
 		switch (cmd) {
-			case HELLO:
-				msg = HELLO + " false false false false";
+			case Commands.HELLO:
+				msg = Commands.HELLO + " false false false false";
 				break;
-			case WAITING:
-				msg = WAITING + " " + other;
+			case Commands.WAITING:
+				msg = Commands.WAITING + " " + other;
 				break;
 			default:
 				System.out.println("Unknow command.");
@@ -145,7 +140,7 @@ public class HandshakeServer extends Thread{
 			}
 			
 			Integer waiting = wantedNum - map.size();
-			sendToClient(WAITING, "" + waiting, outt);
+			sendToClient(Commands.WAITING, "" + waiting, outt);
 		}
 		
 		

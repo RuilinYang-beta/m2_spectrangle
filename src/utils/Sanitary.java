@@ -1,4 +1,4 @@
-package spectranglegame;
+package utils;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Set;
 import players.Player;
 import players.HumanPlayer;
+
+import spectranglegame.*;
 
 public class Sanitary {
 	

@@ -1,4 +1,4 @@
-package spectranglegame;
+package utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import players.*;
+import spectranglegame.*;
 
-import players.Player;
 
 public class Display {
 	
@@ -61,7 +61,19 @@ public class Display {
 		
 		
     }
-       
+    
+    public static void showAllRotation(ArrayList<Tile> rotations, Integer idx) {
+    	boolean isFacingUp = Board.isFacingUp(idx);
+    	
+    	if (isFacingUp) {
+    		Display.showMultiTilesUp(rotations);
+    		
+    	} else {
+    		Display.showThreeTilesDown(rotations);
+    	} 
+    }
+    
+    
 	private static void showOneTileUp(List<Tile> tiles) {
 		Tile t0 = tiles.get(0);
 		

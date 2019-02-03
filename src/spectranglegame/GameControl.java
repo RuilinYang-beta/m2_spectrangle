@@ -11,28 +11,36 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Observer;
 import java.util.Observable;
+import java.io.BufferedWriter;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 import players.*;
+import utils.*;
 
 public class GameControl  extends Thread implements Observer{
 
 	// ======================== Fields ========================
 	// ---------- old ones ----------
 
-	private PlayerTUI tui;
+	private PlayerClient tui;
 
-	private int firstNonNullIdx; // auxiliary to bag.getTiles
-
-	private int numPlayers; // auxiliary to listPlayers
-	private Integer firstPlayerIdx; // auxiliary to listPlayers, not determined until dealTiles
+	// ---------- networking ----------
+	private List<Socket> sockets = new ArrayList<>();     // sockets.size() == listPlayers.size()
+	private List<BufferedReader> ins = new ArrayList<>();
+	private List<BufferedWriter> outs = new ArrayList<>();
+	
+	// ---------- Models ----------
+	private List<Player> listPlayers = new ArrayList<>(); // to have a order in players
+	private int numPlayers; 		  // auxiliary to listPlayers
+	private Integer firstPlayerIdx;   // auxiliary to listPlayers, not determined until dealTiles
 	private Integer currentPlayerIdx; // auxiliary to listPlayers
 
-	// ---------- new ones ----------
-	private List<Socket> sockets = new ArrayList<>(); // sockets.size() == listPlayers.size()
-	private List<Player> listPlayers = new ArrayList<>(); // to have a order in players
-
 	private Bag bag;
+	private int firstNonNullIdx; // auxiliary to bag.getTiles
 	private Board board;
 
 	// ======================== Constructor ========================
@@ -46,7 +54,7 @@ public class GameControl  extends Thread implements Observer{
 		this.listPlayers = lp;
 		firstPlayerIdx = null;
 
-		this.tui = new PlayerTUI(this, this.board, lp, this.bag);
+		this.tui = new PlayerClient(this, this.board, lp, this.bag);
 	}
 
 	// only for test purpose
@@ -60,26 +68,35 @@ public class GameControl  extends Thread implements Observer{
 		this.listPlayers = lp;
 		firstPlayerIdx = null;
 
-		this.tui = new PlayerTUI(this, this.board, lp, this.bag);
+		this.tui = new PlayerClient(this, this.board, lp, this.bag);
 	}
 	
 	public GameControl(Map<Socket, String> map) {
 		// service side Model
-		this.board = new Board();
-		this.board.addObserver(this);
-		this.bag = new Bag(true);
-		firstNonNullIdx = 0;
-
-		this.listPlayers = new ArrayList<Player>();
+		this.board = new Board(); 		this.board.addObserver(this);
+		this.bag = new Bag(true); 		firstNonNullIdx = 0;
 		
 		for (Map.Entry<Socket, String> e : map.entrySet()) {
 			this.sockets.add(e.getKey());
 			this.listPlayers.add( new HumanPlayer(e.getValue()) );
 		}
+		
+		for (Socket s: sockets) {
+			try {
+				BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
+				
+				this.ins.add(br);
+				this.outs.add(bw);
+			} catch (IOException e) {
+				System.out.println("IOException in GameControl constuctor");
+			}
+		}
 
 		for (Player p : listPlayers) {
 			p.addObserver(this);
 		}
+		
 		this.numPlayers = listPlayers.size();
 
 //		this.tui = new PlayerTUI("player", null, this); // later will maintain a list of GameTUI, one for each Player
@@ -157,122 +174,162 @@ public class GameControl  extends Thread implements Observer{
 	}
 
 	// ==================== Gaming: make a move ====================
-
 	public void promptFirstTurn() {
-		// if when each user has 4 tiles but still duplicate max (very unlikely but
-		// still possible)
-		// let the first user make the first move
 		if (firstPlayerIdx == null) {
 			firstPlayerIdx = 0;
 		}
+		
+		String order = "";
+		Integer idx = firstPlayerIdx;
+		for (int i = 0; i < numPlayers; i++) {
+			order += listPlayers.get(idx).getName() + " ";
+			idx = (idx + 1) % numPlayers;
+		}
+		toAll(Commands.ORDER, order);
 
 		Player firstPlayer = listPlayers.get(firstPlayerIdx);
-		// later: S -> C: Turn <username>
-		toAll("Turn " + firstPlayer.getName());
+		toAll(Commands.TURN, firstPlayer.getName());
 
-		// in the form: Move <index> <tile encoding>
-		String theChoice = tui.promptChoice(firstPlayer);
-		String[] words = theChoice.split("\\s");
-
-		int theField = Integer.parseInt(words[1]);
-		Tile theTile = new Tile(words[2]);
-
-		// 1. place the chosen rotation of chosen tile on the chosen field
-		putTileOnBoard(theField, theTile, firstPlayer.getName());
-		// 2. nullify the chosen Tile at Player's hand
-		nullifyChosenTile(firstPlayer, theTile);
-		// 3. deal one tile to player, to restore to 4 tiles in hand
-		dealATileToPlayer(firstPlayer);
-
+		parseFromClient(firstPlayerIdx);
+		
 		currentPlayerIdx = (firstPlayerIdx + 1) % numPlayers;
 	}
 
 	public void promptNormalTurn() {
 		Player currentPlayer = listPlayers.get(currentPlayerIdx);
+		toAll(Commands.TURN, currentPlayer.getName());
+		
 		Map<String, Set<Integer>> allMove = Sanitary.generateAllPossibleMoves(board, currentPlayer);
 
-		// later: S -> C: Turn <username> ( to all )
-		toAll("Turn " + currentPlayer.getName());
+		parseFromClient(currentPlayerIdx);
 
-		// if in the form: Move <index> <tile encoding>, or : Skip [tile encodings]
-		while (true) {
-			String theChoice = tui.promptChoice(currentPlayer);
-			String[] words = theChoice.split("\\s");
-
-			if (words[0].equals("Move")) {
-				int theField = Integer.parseInt(words[1]);
-				Tile theTile = new Tile(words[2]);
-
-				if (allMove.get(theTile.stringTile()).contains(theField)) {
-					// 1. place the chosen rotation of chosen tile on the chosen field
-					putTileOnBoard(theField, theTile, currentPlayer.getName());
-					// 2. nullify the chosen Tile at Player's hand
-					nullifyChosenTile(currentPlayer, theTile);
-					// 3. deal one tile to player, to restore to 4 tiles in hand
-					dealATileToPlayer(currentPlayer);
-
-					break;
-				}
-
-				else {
-					// later: S -> C: Error <reason>
-					System.out.println("Illegal move, try again.");
-				}
-
-			} else if ((words[0].equals("Skip")) && (words.length == 2)) {
-				// user want to swap a tile
-				Tile fromPlayer = new Tile(words[1]);
-				Tile fromBag = swapRandomTileInBag(fromPlayer);
-
-				toAll("Skip " + currentPlayer.getName() + " " + fromPlayer.stringTile() + " " + fromBag.stringTile());
-
-				nullifyChosenTile(currentPlayer, fromPlayer);
-				dealATileToPlayer(currentPlayer, fromBag);
-
-			} else if ((words[0].equals("Skip")) && (words.length == 1)) {
-				// user want to skip turn
-				toAll("Skip " + currentPlayer.getName());
-
-			} else {
-				System.out.println("You shouldn't fall here.");
-			}
-		}
+//		// if in the form: Move <index> <tile encoding>, or : Skip [tile encodings]
+//		while (true) {
+//			String theChoice = tui.promptChoice(currentPlayer);
+//			String[] words = theChoice.split("\\s");
+//
+//			if (words[0].equals("Move")) {
+//				int theField = Integer.parseInt(words[1]);
+//				Tile theTile = new Tile(words[2]);
+//
+//				if (allMove.get(theTile.stringTile()).contains(theField)) {
+//					// 1. place the chosen rotation of chosen tile on the chosen field
+//					putTileOnBoard(theField, theTile, currentPlayer.getName());
+//					// 2. nullify the chosen Tile at Player's hand
+//					nullifyChosenTile(currentPlayer, theTile);
+//					// 3. deal one tile to player, to restore to 4 tiles in hand
+//					dealATileToPlayer(currentPlayer);
+//
+//					break;
+//				}
+//
+//				else {
+//					// later: S -> C: Error <reason>
+//					System.out.println("Illegal move, try again.");
+//				}
+//
+//			} else if ((words[0].equals("Skip")) && (words.length == 2)) {
+//				// user want to swap a tile
+//				Tile fromPlayer = new Tile(words[1]);
+//				Tile fromBag = swapRandomTileInBag(fromPlayer);
+//
+//				toAll(Commands.SKIP, currentPlayer.getName() + " " + fromPlayer.stringTile() + " " + fromBag.stringTile());
+//
+//				nullifyChosenTile(currentPlayer, fromPlayer);
+//				dealATileToPlayer(currentPlayer, fromBag);
+//
+//			} else if ((words[0].equals("Skip")) && (words.length == 1)) {
+//				// user want to skip turn
+//				toAll(Commands.SKIP, currentPlayer.getName());
+//
+//			} else {
+//				System.out.println("You shouldn't fall here.");
+//			}
+//		}
 		currentPlayerIdx = (currentPlayerIdx + 1) % numPlayers;
 	}
 
 	// ==================== Observer-Observable pattern ====================
 
 	public void update(Observable obs, Object arg) {
-		String[] notice = ((String) arg).split("\\s");
-
-		if (notice[0].equals("Give")) {
-			// later: // S -> C: Give <username> <tile encoding> [tile encoding] [tile
-			// encoding] [tile encoding]
-			System.out.print("Player tiles changed: ");
-			System.out.println((String) arg);
-
-		}
-
-		if (notice[0].equals("Move")) {
-			// later: S -> C: Move <username> <index> <tile encoding>
-			System.out.print("Board tiles changed: ");
-			System.out.println((String) arg);
-		}
+		// Player and Board will send readily-made command 
+		toAll((String) arg);
 
 	}
 
 
 	// ================== Networking: common functionalities ==================
-	public void toAll(String msg) {
-		// later: send msg to the "out" of every socket
-		System.out.println(msg);
+	public void toAll(String cmd, String other) {
+		for (BufferedWriter bw : outs) {
+			try {
+				bw.write(cmd + " " + other);
+				bw.newLine();
+				bw.flush();
+			} catch (IOException e) {
+				System.out.println("ERROR: unable to communicate to server");
+	            e.printStackTrace();
+			}
+		}
+	}
+	
+	public void toAll(String whole) {
+		// only to be used in update()
+		toAll(whole, "");
+	}
+	
+	public void parseFromClient(Integer idx) {
+		BufferedReader br = ins.get(idx);
+		Player currentPlayer = listPlayers.get(idx);
+		
+		String s = null;
+		try {
+			s = br.readLine();
+		} catch (IOException e) {
+			System.out.println("IOException in parsing info from server.");
+		}
+		
+        String[] info = null;
+        if (s != null) {
+        	info = s.split("\\s");
+        } else {
+        	System.out.println("Server sends null");
+        }
+        
+        switch(info[0]) {
+        	case Commands.MOVE:
+        		putTileOnBoard(info, currentPlayer.getName());
+        		nullifyChosenTile(info[2], currentPlayer);
+        		dealATileToPlayer(currentPlayer);
+        		break;
+        	case Commands.SKIP:
+        		System.out.println("In skip, Game Server has received: " + s);
+        		if (info.length == 1) {
+        			toAll(Commands.SKIP, currentPlayer.getName());
+        			break; 
+        		}
+        		if (info.length == 2) {
+        			Tile fromPlayer = new Tile(info[1]);
+    				Tile fromBag = swapRandomTileInBag(fromPlayer);
+    				toAll(Commands.SKIP, currentPlayer.getName() + " " + fromPlayer.stringTile() + " " + fromBag.stringTile());
+        			
+        			nullifyChosenTile(fromPlayer.stringTile(), currentPlayer);
+        			dealATileToPlayer(currentPlayer, fromBag);
+        		}
+        		break;
+        }
 	}
 
 	// ================== Gaming: other common functionalities ==================
 	// ------------------ that both FirstMove and NormalMove can use
 	// ------------------
-	public void putTileOnBoard(int idx, Tile t, String player) {
-		board.setTile(idx, t, player);
+	public void putTileOnBoard(int idx, Tile t, String playerName) {
+		board.setTile(idx, t, playerName);
+	}
+	
+	public void putTileOnBoard(String[] infos, String playerName) {
+		int theField = Integer.parseInt(infos[1]);
+		Tile theTile = new Tile(infos[2]);
+		board.setTile(theField, theTile, playerName);
 	}
 
 	private void nullifyChosenTile(Player p, Tile chosenTile) {
@@ -281,6 +338,19 @@ public class GameControl  extends Thread implements Observer{
 			// you don't want to call toString on a null object.
 			if (t != null) {
 				if (t.toString().equals(chosenTile.toString())) {
+					p.getTiles()[i] = null;
+					System.out.println("Server side model player chosen tile nullified.");
+				}
+			}
+		}
+	}
+	
+	private void nullifyChosenTile(String encoding, Player p) {
+		for (int i = 0; i < 4; i++) {
+			Tile t = p.getTiles()[i];
+			// you don't want to call toString on a null object.
+			if (t != null) {
+				if (t.toString().equals(encoding.substring(1))) {
 					p.getTiles()[i] = null;
 				}
 			}
@@ -368,7 +438,7 @@ public class GameControl  extends Thread implements Observer{
 
 	public boolean noOneCanPlay() {
 		for (Player p : listPlayers) {
-			if (Sanitary.generateAllPossibleMoves(board, p).size() == 0) {
+			if (Sanitary.generateAllPossibleMoves(board, p).size() > 0) {
 				return false;
 			}
 		}
@@ -397,15 +467,17 @@ public class GameControl  extends Thread implements Observer{
 	public void run() {
 		System.out.println("You are in GameControl.run()");
 		
-//		System.out.println("First player is at index: " + dealTiles());
-//
-//		promptFirstTurn();
-//
-//		while (!((bagIsEmpty()) && (noOneCanPlay()))) {
-//			promptNormalTurn();
-//		}
-//
-//		System.out.println("Congrats! You've reached the end of one game!");
+		System.out.println("First player is at index: " + dealTiles());
+
+		promptFirstTurn();
+
+		while (!((bagIsEmpty()) && (noOneCanPlay()))) {
+			promptNormalTurn();
+		}
+		
+		toAll(Commands.END, " BigCongrats!");
+
+		System.out.println("Congrats! You've reached the end of one game!");
 	}
 
 }

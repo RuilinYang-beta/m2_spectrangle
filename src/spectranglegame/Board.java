@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Observable;
 import players.*;
 import spectranglegame.*;
+import utils.*;
 
 /**
  * @author RuilinYang
@@ -274,28 +275,28 @@ public class Board extends Observable{
 	/**
 	 * A getter of List<Integer> values;
 	 */
-	protected List<Integer> getValuesOnBoard(){
+	public List<Integer> getValuesOnBoard(){
 		return values;
 	}
 	
 	/**
 	 * A getter of List<Character> vertical;
 	 */
-	protected List<Character> getVerticalOnBoard(){
+	public List<Character> getVerticalOnBoard(){
 		return vertical;
 	}
 	
 	/**
 	 * A getter of List<Character> left;
 	 */
-	protected List<Character> getLeftOnBoard(){
+	public List<Character> getLeftOnBoard(){
 		return left;
 	}
 	
 	/**
 	 * A getter of List<Character> right;
 	 */
-	protected List<Character> getRightOnBoard(){
+	public List<Character> getRightOnBoard(){
 		return right;
 	}
 	
@@ -350,7 +351,7 @@ public class Board extends Observable{
 			b.setTile(i, new Tile(1, "ZZZ"));
 		}
 		
-		PlayerTUI tui = new PlayerTUI(b);
+		PlayerClient tui = new PlayerClient(b);
 		Display.printBoardDynamic(b);
 		
 		// Empty fields: [2, 5, 7, 9, 11, 12, 13, 15]
@@ -373,8 +374,8 @@ public class Board extends Observable{
 		Player C = new HumanPlayer("C");
 		Player D = new HumanPlayer("D");
 		
-		System.out.println(tui.canPlay(A));
-		System.out.println(tui.canPlay(B));
+//		System.out.println(tui.canPlay(A));
+//		System.out.println(tui.canPlay(B));
 		
 		
 	}

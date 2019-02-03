@@ -10,27 +10,27 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.regex.Pattern;
 import java.util.Scanner;
+
 import spectranglegame.*;
+import utils.*;
 
 public class HandshakeClient extends Thread {
 
 	private static final String USAGE = "Client <address> <port>";
-	private static final String HELLO = "Hello";
-	private static final String PLAY  = "Play";
-	private static final String WAITING = "Waiting";
 	private static BufferedReader in = null;
 	private static BufferedWriter out = null;
 	/** Starts a Client application. */
 	public static void main(String[] args) {
-		Scanner inn = new Scanner(System.in);
+//		Scanner inn = new Scanner(System.in);
+		BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
 		// ------------------------- Connect to Server -------------------------
 		InetAddress addr = null;
 		Integer port = 0;
 		Socket sock = null;
 
 		while ( (in == null) || (out == null) ) {
-			addr = promptIPAddr(inn); 	//  the IP-adress
-			port = promptPort(inn);		// the port
+			addr = promptIPAddr(r); 	//  the IP-adress
+			port = promptPort(r);		// the port
 			sock = tryConnection(addr, port);   // try connection
 			if (sock != null) {
 				initInOut(sock);
@@ -40,50 +40,50 @@ public class HandshakeClient extends Thread {
 		System.out.println("Your connection is established!");
 
 		// ------------------------- Prompt User Info -------------------------
-		String name = promptName(inn);
-		sendToServer(HELLO, name);
+		String name = promptName(r);
+		sendToServer(Commands.HELLO, name);
 		parseFromServer();
 
-		Integer numOfOppo = promptNumOppo(inn);
-		sendToServer(PLAY, "" + (numOfOppo + 1));
-//		parseFromServer();
+		Integer numOfOppo = promptNumOppo(r);
+		sendToServer(Commands.PLAY, "" + (numOfOppo + 1));
 		
 		while (true) {
 			String numWaiting = parseFromServer();
 			if (numWaiting.equals("0")){
 				System.out.println("Player " + name + ", Game is goint to start, be prepared...");
-				Thread t =  new PlayerTUI(sock, name, numOfOppo+1);
+				Thread t =  new PlayerClient(sock, name, numOfOppo+1, r);
 				t.start();
 				break;
 			}
 		}
-		
-		inn.close();
 	}
 
-	public static InetAddress promptIPAddr(Scanner in) {
+	public static InetAddress promptIPAddr(BufferedReader br) {
 		String s = null;
 		
 		while (true) {
 			try {
 				System.out.println("Please enter the ip address of server: ");
-				s = in.nextLine();
-				return InetAddress.getByName(s);
+				s = br.readLine();
+				InetAddress res = InetAddress.getByName(s);
+				return res;
 			} catch (UnknownHostException e) {
 				System.out.println("ERROR: host " + s + " unknown, please try again.");
-			}
+			} catch (IOException e) {
+                System.out.println("IOException happens in chooseTileIdx br.readLine.");
+            }
 		}
 
 	}
 
-	public static Integer promptPort(Scanner in) {
+	public static Integer promptPort(BufferedReader br) {
 		String s = null;
 		Integer p = null;
 		
 		while (true) {
 			try {
 				System.out.println("Please enter the port on the server: ");
-				s = in.nextLine();
+				s = br.readLine();
 				p = Integer.parseInt(s);
 				if (p != 1024) {
 					System.out.println("Hint: the correct port for your group is 1024. Try again.");
@@ -92,7 +92,9 @@ public class HandshakeClient extends Thread {
 				}
 			} catch (NumberFormatException e) {
 				System.out.println("Hint: the correct port for your group is 1024. Try again.");
-			}
+			} catch (IOException e) {
+                System.out.println("IOException happens in chooseTileIdx br.readLine.");
+            }
 		}
 	}
 
@@ -119,25 +121,35 @@ public class HandshakeClient extends Thread {
 		}
 	}
 	
-	public static String promptName(Scanner in) {
+	public static String promptName(BufferedReader br) {
 		String s;
 		
 		while (true) {
 			System.out.print("> Please enter your user name: ");
-			s = in.nextLine();
+			try {
+                s = br.readLine();
+                if (Pattern.matches("\\w+", s))  { return s; }
+                else { System.out.println("Name can only have letters, digitis, and underscore. Try again."); } 
+            } catch (IOException e) {
+                System.out.println("IOException happens in chooseTileIdx br.readLine.");
+            }
 			
-			if (Pattern.matches("\\w+", s))  { return s; }
-			else { System.out.println("Name can only have letters, digitis, and underscore. Try again."); } 	
+				
 		}
 	}
 	
-	public static Integer promptNumOppo(Scanner in) {
+	public static Integer promptNumOppo(BufferedReader br) {
 		Integer numOfOppo = null;
+		String num = null;
 		
 		while (true) {
 			System.out.print("You want to play with how many opponents? (Yourself NOT included) \n> Enter 1, 2, or 3: ");
-			String num = in.nextLine();
-			
+
+			try {
+                num = br.readLine();
+            } catch (IOException e) {
+                System.out.println("IOException happens in chooseTileIdx br.readLine.");
+            }
 			try {
 				numOfOppo = Integer.parseInt(num); 
 				if (numOfOppo == 1 || numOfOppo == 2 || numOfOppo == 3) {
@@ -157,11 +169,11 @@ public class HandshakeClient extends Thread {
 		String msg = null;
 		
 		switch (cmd) {
-			case HELLO:
-				msg = HELLO + " " + other + " false false false false";
+			case Commands.HELLO:
+				msg = Commands.HELLO + " " + other + " false false false false";
 				break;
-			case PLAY:
-				msg = PLAY + " " + other;
+			case Commands.PLAY:
+				msg = Commands.PLAY + " " + other;
 				break;
 			default:
 				System.out.println("Unknow command.");
@@ -194,14 +206,14 @@ public class HandshakeClient extends Thread {
         }
         
         switch (info[0]) {
-			case HELLO:
+			case Commands.HELLO:
 				System.out.println("Your name has been registered.");
 				System.out.println("- Chat extension enabled: 		 " 	 + info[1]);
 				System.out.println("- Challenge extension enabled:   "   + info[2]);
 				System.out.println("- Leaderboard extension enabled: "   + info[3]);
 				System.out.println("- Security extension enabled:    " 	 + info[4]);
 				return "";
-			case WAITING:
+			case Commands.WAITING:
 				System.out.println("Waiting for " + info[1] + " player(s)....");
 				return info[1];
 		}

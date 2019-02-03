@@ -23,9 +23,7 @@ public class GameControl {
 	private final int numPlayers;     // auxiliary to listPlayers
 	private Integer firstPlayerIdx;   // auxiliary to listPlayers, not determined until dealTiles
 	private Integer currentPlayerIdx; // auxiliary to listPlayers
-	
-	// Map<Player, Tile[]> mapPlayers will be deprecated
-//	private Map<Player, Tile[]> mapPlayers; // to store player and its tiles
+
 	
 	
 	// ======================== Constructor ========================
@@ -66,21 +64,12 @@ public class GameControl {
 	 *         (which is very unlikely for shuffled bag)
 	 */
 	public Integer dealTiles() {
-		// this is achieved by newly initialized Player
-//		for (Player p : this.listPlayers) {
-//			Tile[] tiles = new Tile[4];
-//			mapPlayers.put(p, tiles);
-//		}
-		
+
 		// for each of the 4 slot in Tile[4]
 		for (int j = 0; j < 4; j++) {
 			// give each user one tile and remove the tile from the bag
 			for (int i = 0; i < numPlayers; i++) {
-//				mapPlayers.get(listPlayers.get(i))[j] = this.bag.getTiles().get(j * numPlayers + i);
-//				bag.getTiles().set(j * numPlayers + i, null); 
-//				firstNonNullIdx++;
 				dealATileToPlayer(listPlayers.get(i));
-//				mapPlayers.get(listPlayers.get(i))[j] = drawATile();
 			} 
 		
 			// if the player to make the first move is undetermined
@@ -371,10 +360,8 @@ public class GameControl {
 //		System.out.println(shuffled3P.canPlay(D));
 //		System.out.println(shuffled3P.noOneCanPlay());
 
-		int firstIdx = shuffled3P.dealTiles();
-		System.out.println("First player is Player at index: " + firstIdx);
+		//int firstIdx = shuffled3P.dealTiles();
 
-		System.out.println("First non null tile index in bag is : " + shuffled3P.firstNonNullIdx);
 		
 		shuffled3P.makeFirstMove();
 		

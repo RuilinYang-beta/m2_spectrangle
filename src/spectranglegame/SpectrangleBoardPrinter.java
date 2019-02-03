@@ -18,7 +18,6 @@ public class SpectrangleBoardPrinter {
     
     public static void main(String[] args) {
         // This is an example of a random tile put on the board.
-        //Tile tile = t.randomTile();
     	t = new Bag(true);
     	Tile tile = t.getTile(1);
         SpectrangleBoardPrinter t12 = new SpectrangleBoardPrinter();
